@@ -1,1 +1,1 @@
-# gitcollab
+# GitCollab
