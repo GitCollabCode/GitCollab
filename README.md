@@ -1,2 +1,2 @@
 # GitCollab
-jenkins test 1234
+jenkins test
