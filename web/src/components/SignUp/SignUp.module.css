@@ -1,0 +1,11 @@
+.container {
+  align-self: center;
+  margin-top: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container input {
+  width: 500px;
+}
