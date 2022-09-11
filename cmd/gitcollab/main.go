@@ -1,4 +1,4 @@
-//Test main
+//Test main.go file to create docker image
 package main
 
 import (

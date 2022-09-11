@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/GitCollabCode/GitCollab/profiles/data"
-	"github.com/GitCollabCode/GitCollab/profiles/models"
+	"profiles/data"
+	"profiles/models"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"

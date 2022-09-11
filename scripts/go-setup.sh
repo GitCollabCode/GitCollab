@@ -26,15 +26,15 @@ then
     echo "export PATH=\$PATH:/usr/local/go/bin" >>  ~/.profile
 fi
 
-#There is an issue with WSL paths in bash scripts for .profiles and .bashrc
+#There is an issue with WSL paths in bash scripts for .profiles and .bashrc files
 #https://askubuntu.com/questions/1354999/bad-variable-name-error-on-wsl
 if grep -qi microsoft /proc/version
 then
-    echo "##########################################################################"
+    echo "############################################################################"
     echo "  Please manually soruce ~/.profile for WSL environments"
-    echo "  Bash is unable to process .bashrc and .profile paths within WSL"
+    echo "  Bash is unable to properly process .bashrc and .profile paths within WSL"
     echo "  https://askubuntu.com/questions/1354999/bad-variable-name-error-on-wsl"
-    echo "##########################################################################"
+    echo "############################################################################"
 
     rm /tmp/go1.19.1.linux-amd64.tar.gz
     exit 0
@@ -43,5 +43,8 @@ fi
 . "/$HOME/.profile"
 
 go version
+
+#go env -w GOPRIVATE=github.com/GitCollabCode/*
+#git config --global url.git@github.com:.insteadOf https://github.com/
 
 rm /tmp/go1.19.1.linux-amd64.tar.gz

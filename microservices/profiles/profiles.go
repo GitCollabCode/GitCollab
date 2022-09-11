@@ -8,10 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/GitCollabCode/GitCollab/profiles/data"
-	"github.com/GitCollabCode/GitCollab/profiles/handlers"
-	"github.com/GitCollabCode/GitCollab/profiles/models"
-	"github.com/GitCollabCode/GitCollab/profiles/router"
+	"profiles/data"
+	"profiles/handlers"
+	"profiles/models"
+	"profiles/router"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
