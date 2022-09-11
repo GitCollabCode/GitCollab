@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/GitCollabCode/profiles/handlers"
+	"github.com/GitCollabCode/GitCollab/profiles/handlers"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

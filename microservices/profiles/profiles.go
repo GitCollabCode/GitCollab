@@ -1,4 +1,4 @@
-package main
+package profiles
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/GitCollabCode/profiles/data"
-	"github.com/GitCollabCode/profiles/handlers"
-	"github.com/GitCollabCode/profiles/models"
-	"github.com/GitCollabCode/profiles/router"
+	"github.com/GitCollabCode/GitCollab/profiles/data"
+	"github.com/GitCollabCode/GitCollab/profiles/handlers"
+	"github.com/GitCollabCode/GitCollab/profiles/models"
+	"github.com/GitCollabCode/GitCollab/profiles/router"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -19,7 +19,7 @@ import (
 
 var docs = flag.Bool("docs", false, "Expose documentation endpoint")
 
-func main() {
+func Init() {
 	flag.Parse()
 	log := logrus.New() //customize logger later
 

@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 
-	"github.com/GitCollabCode/profiles/models"
+	"github.com/GitCollabCode/GitCollab/profiles/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
