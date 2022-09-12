@@ -17,6 +17,8 @@ wget https://golang.org/dl/go1.19.1.linux-amd64.tar.gz -P /tmp/
 
 #TODO: SHA256 checksum of tarball
 
+#TODO: remove old go installs
+
 #Unpack go tar
 sudo tar -C /usr/local -xvf /tmp/go1.19.1.linux-amd64.tar.gz
 
