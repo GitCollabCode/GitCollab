@@ -22,14 +22,14 @@ services:
       - default
     ports:
       - "8080:8080"
-  # frontend:
-  #   build:
-  #     context: ./web
-  #     dockerfile: Dockerfile
-  #   networks:
-  #     - default
-  #   ports:
-  #     - "8080:8080"
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    networks:
+      - default
+    ports:
+      - "3000:3000"
 volumes:
   db:
     driver: local
