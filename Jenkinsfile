@@ -11,11 +11,10 @@ void setBuildStatus(String message, String state) {
 pipeline {
     agent any 
 
-    setBuildStatus("Build pending", "PENDING");
-
     stages {
         stage('Hello') {
             steps {
+                setBuildStatus("Build pending", "PENDING");
                 echo 'Hello World'
             }
         }
