@@ -15,7 +15,7 @@ pipeline {
         stage('Hello') {
             steps {
                 setBuildStatus("Build pending", "PENDING");
-                sh 'sleep 10'
+                sh 'sleep 5'
                 echo 'Hello World'
             }
         }
