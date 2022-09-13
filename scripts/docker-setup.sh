@@ -19,8 +19,9 @@ sudo apt-get -y remove docker docker-engine docker.io containerd runc
 sudo apt-get -y install \
     ca-certificates \
     curl \
-    gnupg \
-    lsb-release
+    gnupg2 \
+    lsb-release \
+    apt-transport-https
 
 #Add Docker’s official GPG key
 sudo mkdir -p /etc/apt/keyrings
@@ -37,6 +38,8 @@ sudo apt-get -y update
 
 #NOTE: Should we install a select versions?
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+sudo usermod -aG docker $USER
 
 #Start Docker and run hello-world
 sudo service docker start
