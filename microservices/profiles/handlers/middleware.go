@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/GitCollabCode/profiles/models"
+	"profiles/models"
 )
 
 func SetContentType(contentType string) func(next http.Handler) http.Handler {
