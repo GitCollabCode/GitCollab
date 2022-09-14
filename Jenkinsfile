@@ -24,6 +24,9 @@ pipeline {
                 setBuildStatus("Build pending", "PENDING");
                 sh 'sleep 5'
                 echo 'Hello World'
+                sshagent(['dev-server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
+                }
             }
         }
 
@@ -33,9 +36,6 @@ pipeline {
     post {
         success {
             setBuildStatus("Build succeeded", "SUCCESS");
-            sshagent(['dev-server']) {
-                sh 'ssh -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
-            }
         }
         failure {
             setBuildStatus("Build failed", "FAILURE");
