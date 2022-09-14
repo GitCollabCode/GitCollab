@@ -25,7 +25,7 @@ pipeline {
                 sh 'sleep 5'
                 echo 'Hello World'
                 sshagent(['dev-server']) {
-                    sh 'ssh -v -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
+                    sh 'ssh -t -t -v -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
                 }
             }
         }
