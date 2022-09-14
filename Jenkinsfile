@@ -10,7 +10,14 @@ void setBuildStatus(String message, String state) {
 
 pipeline {
     agent any 
-
+    environment {
+        /*
+        define your command in variable
+        */
+        remoteCommands =
+        """touch ~/test;
+           echo "test" > ~/test"""
+    }
     stages {
         stage('Hello') {
             steps {
@@ -19,11 +26,16 @@ pipeline {
                 echo 'Hello World'
             }
         }
+
+        //TODO: Add a final stage to ssh inside live deployment server, issue docker down, build and issue docker up
     }
 
     post {
         success {
             setBuildStatus("Build succeeded", "SUCCESS");
+            sshagent(['dev-server']) {
+                sh 'ssh -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
+            }
         }
         failure {
             setBuildStatus("Build failed", "FAILURE");
