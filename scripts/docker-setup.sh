@@ -39,9 +39,10 @@ sudo apt-get -y update
 #NOTE: Should we install a select versions?
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-sudo usermod -aG docker $USER
+sudo usermod -aG docker "$USER"
 
 #Start Docker and run hello-world
 sudo service docker start
+sudo systemctl enable docker
 sleep 3
 sudo docker run hello-world
