@@ -30,6 +30,8 @@ services:
       - default
     ports:
       - "3000:3000"
+    volumes:
+      - ./web/src:/app/src
 volumes:
   db:
     driver: local
