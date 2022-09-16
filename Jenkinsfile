@@ -19,11 +19,12 @@ pipeline {
             }
         }
         stage('Update Live Deployment Server') {
-            environment {
-                MQTT_LOGIN = credentials('mqtt-server')
-            }
             steps {
-                sh("mosqitto_pub -h monkeymoment.duckdns.org -u $MQTT_LOGIN_USR -P $MQTT_LOGIN_PSW -t \"dev-server\" -m \"update\"")
+                withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
+                                usernameVariable: 'USER', 
+                                passwordVariable: 'PASSWORD')]) {
+                    sh "mosquitto_pub -h monkeymoment.duckdns.org -u $USER -P $PASSWORD -t \"dev-server\" -m \"update\""
+                }
             }
         }
     }
