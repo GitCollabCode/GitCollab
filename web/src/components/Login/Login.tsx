@@ -1,50 +1,76 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import styles from './Login.module.css'
 
 const Login = () => {
+  const { proxy_url, logIn, user, isLoggedIn, client_id, redirect_uri } =
+    useContext(UserLoginContext)
+  const [data, setData] = useState({ errorMessage: '', isLoading: false })
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // After requesting Github access, Github redirects back to your app with a code parameter
+    const url = window.location.href
+    const hasCode = url.includes('?code=')
+    const newUri = proxy_url || ''
+
+    // If Github API returns the code parameter
+    if (hasCode) {
+      const newUrl = url.split('?code=')
+      window.history.pushState({}, '', newUrl[0])
+      setData({ ...data, isLoading: true })
+
+      const requestData = {
+        code: newUrl[1],
+      }
+
+      console.log(requestData)
+
+      // Use code parameter and other parameters to make POST request to proxy_server
+      fetch(newUri, {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          logIn(data)
+        })
+        .catch((error) => {
+          setData({
+            isLoading: false,
+            errorMessage: 'Sorry! Login failed',
+          })
+        })
+    }
+  }, [isLoggedIn, data, logIn, proxy_url])
+
+  if (isLoggedIn) {
+    navigate('/')
+  }
   return (
     <div className={styles.container}>
-      <form onSubmit={() => navigate('/profile')}>
-        <h3>Sign In</h3>
-        <div className="mb-3">
-          <label>Email address</label>
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Enter email"
-          />
-        </div>
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Enter password"
-          />
-        </div>
-        <div className={`${styles.remember} mb-3`}>
-          <div className="custom-control custom-checkbox">
-            <input
-              type="checkbox"
-              className="custom-control-input"
-              id="customCheck1"
-            />
-            <label className="custom-control-label" htmlFor="customCheck1">
-              Remember me
-            </label>
+      <h3>Sign In</h3>
+      <div className="login-container">
+        {data.isLoading ? (
+          <div className="loader-container">
+            <div className="loader"></div>
           </div>
-        </div>
-        <div className="d-grid">
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </div>
-        <p className="forgot-password text-right">
-          Forgot <a href="/#">password?</a>
-        </p>
-      </form>
+        ) : (
+          <>
+            {console.log(user)}
+            <a
+              className="login-link"
+              href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
+              onClick={() => {
+                setData({ ...data, errorMessage: '' })
+              }}
+            >
+              <span>Login with GitHub</span>
+            </a>
+          </>
+        )}
+      </div>
     </div>
   )
 }

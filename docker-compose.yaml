@@ -30,6 +30,11 @@ services:
       - default
     ports:
       - "3000:3000"
+    volumes:
+      - ./web/src:/app/src
+    environment:
+      - REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
+      - REACT_APP_REDIRECT_URI=http://localhost:3000
 volumes:
   db:
     driver: local
