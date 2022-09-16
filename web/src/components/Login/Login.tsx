@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UserLoginContext } from '../../Context/userLoginContext/userLoginContext'
+import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import styles from './Login.module.css'
 
 const Login = () => {
