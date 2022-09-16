@@ -1,2 +1,1 @@
 # GitCollab
-jenkins pipeline test
