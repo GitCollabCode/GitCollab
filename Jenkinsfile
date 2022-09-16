@@ -10,27 +10,22 @@ void setBuildStatus(String message, String state) {
 
 pipeline {
     agent any 
-    environment {
-        /*
-        define your command in variable
-        */
-        remoteCommands =
-        """touch ~/test;
-           echo "test" > ~/test"""
-    }
     stages {
         stage('Hello') {
             steps {
                 setBuildStatus("Build pending", "PENDING");
                 sh 'sleep 5'
                 echo 'Hello World'
-                sshagent(['dev-server']) {
-                    sh 'ssh -t -t -v -o StrictHostKeyChecking=no gitcollab@192.168.1.120 $remoteCommands'
-                }
             }
         }
-
-        //TODO: Add a final stage to ssh inside live deployment server, issue docker down, build and issue docker up
+        stage('Update Live Deployment Server') {
+            environment {
+                MQTT_LOGIN = credentials('mqtt-server')
+            }
+            steps {
+                sh("mosqitto_pub -h monkeymoment.duckdns.org -u $MQTT_LOGIN_USR -P $MQTT_LOGIN_PSW -t \"dev-server\" -m \"update\"")
+            }
+        }
     }
 
     post {

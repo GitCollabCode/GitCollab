@@ -18,15 +18,27 @@ elif grep -q 'centos' /etc/os-release; then
 fi
 
 SERVER="$1"
-GICOLLAB_REPO_DIR="$2"
+USERNAME="$2"
+PASSWORD="$3"
+GICOLLAB_REPO_DIR="$4"
 
 if [ -z "$SERVER" ]; then
     echo "First argument is not set, expecting mqtt server address!"
     exit 1
 fi
 
+if [ -z "$USERNAME" ]; then
+    echo "Second argument is not set, expecting mqtt server username!"
+    exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+    echo "Third argument is not set, expecting mqtt server password!"
+    exit 1
+fi
+
 if [ ! -d "$GICOLLAB_REPO_DIR" ]; then
-    echo "Second argument is not a path to directory, expecting path to GitCollab repo!"
+    echo "Fourth argument is not a path to directory, expecting path to GitCollab repo!"
     exit 1
 fi
 
