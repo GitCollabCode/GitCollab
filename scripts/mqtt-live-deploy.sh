@@ -47,7 +47,7 @@ do
     DATE=$(date)
     echo "[$DATE] Waiting for MQTT message, from dev-server topic"
     message=""
-    read -r message < <(mosquitto_sub -h "$SERVER" -C 1 -t "dev-server")
+    read -r message < <(mosquitto_sub -h $SERVER -u $USERNAME -P $PASSWORD -t dev-server)
     if [ $? -ne 0 ]; then
         echo "mosquitto_sub returned an error, exiting!"
         exit 1
