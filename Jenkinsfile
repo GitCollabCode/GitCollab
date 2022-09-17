@@ -30,12 +30,14 @@ pipeline {
                 sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOBIN) v1.49.0'
             }
         }
+
         stage('Go Build') {
             steps {
                 echo 'Building [Go]..'
                 sh 'go build $WORKSPACE/cmd/gitcollab/main.go'
             }
         }
+
         stage('Go Test') {
             when {
                 expression { false }
@@ -43,6 +45,7 @@ pipeline {
             steps {
                 echo 'Skipping, no steps Go tests not setup!'
             }
+            // Will need to get updated when some tests are added
             // steps {
 			// 	withCredentials([usernamePassword(credentialsId: 'TEST_CREDENTIALS', usernameVariable: 'TEST_USERNAME', passwordVariable: 'TEST_PASSWORD'), string(credentialsId: 'KOPANO_SERVER_DEFAULT_URI', variable: 'KOPANO_SERVER_DEFAULT_URI')]) {
 			// 		echo 'Testing..'
@@ -54,12 +57,38 @@ pipeline {
 			// 	junit allowEmptyResults: true, testResults: 'tests.xml'
 			// }
         }
+
         stage('Go Code Analysis') {
             steps {
                 echo 'Preforming Code Analysis [Go]..'
                 sh 'PATH=$PATH:$GOBIN golangci-lint --timeout=5m run'
             }
         }
+
+        stage('npm Install') {
+            steps {
+                dir('$WORKSPACE/web') {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('npm Build') {
+            steps {
+                dir('$WORKSPACE/web') {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('npm Test') {
+            steps {
+                dir('$WORKSPACE/web') {
+                    sh 'npm test'
+                }
+            }
+        }
+
         stage('Update Live Deployment Server') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
