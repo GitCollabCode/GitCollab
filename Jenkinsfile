@@ -9,13 +9,55 @@ void setBuildStatus(String message, String state) {
 }
 
 pipeline {
-    agent any 
+    agent any
+
+    tools {
+        go 'go1.19.1'
+    }
+
+    environment {
+        GO119MODULE = 'on'
+        GOBIN = '/tmp/go-bin'
+    }
+
     stages {
-        stage('Hello') {
+        stage('Setup') {
             steps {
                 setBuildStatus("Build pending", "PENDING");
-                sh 'sleep 5'
-                echo 'Hello World'
+                echo 'Installing dependencies'
+                sh 'go version'
+                sh 'go mod vendor'
+                sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOBIN) v1.49.0'
+            }
+        }
+        stage('Go Build') {
+            steps {
+                echo 'Building [Go]..'
+                sh 'go build $WORKSPACE/cmd/gitcollab/main.go'
+            }
+        }
+        stage('Go Test') {
+            when {
+                expression { false }
+            }
+            steps {
+                echo 'Skipping, no steps Go tests not setup!'
+            }
+            // steps {
+			// 	withCredentials([usernamePassword(credentialsId: 'TEST_CREDENTIALS', usernameVariable: 'TEST_USERNAME', passwordVariable: 'TEST_PASSWORD'), string(credentialsId: 'KOPANO_SERVER_DEFAULT_URI', variable: 'KOPANO_SERVER_DEFAULT_URI')]) {
+			// 		echo 'Testing..'
+			// 		sh 'echo Kopano Server URI: \$KOPANO_SERVER_DEFAULT_URI'
+			// 		sh 'echo Kopano Server Username: \$TEST_USERNAME'
+			// 		sh 'go test -v -count=1 | tee tests.output'
+			// 		sh 'PATH=$PATH:$GOBIN  go2xunit -fail -input tests.output -output tests.xml'
+			// 	}
+			// 	junit allowEmptyResults: true, testResults: 'tests.xml'
+			// }
+        }
+        stage('Go Code Analysis') {
+            steps {
+                echo 'Preforming Code Analysis [Go]..'
+                sh 'PATH=$PATH:$GOBIN golangci-lint run'
             }
         }
         stage('Update Live Deployment Server') {
@@ -30,6 +72,9 @@ pipeline {
     }
 
     post {
+        always {
+			cleanWs()
+		}
         success {
             setBuildStatus("Build succeeded", "SUCCESS");
         }
