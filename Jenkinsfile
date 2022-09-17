@@ -13,10 +13,11 @@ pipeline {
 
     tools {
         go 'go1.19.1'
+        nodejs 'node18.9.0'
     }
 
     environment {
-        GO119MODULE = 'on'
+        GO111MODULE = 'on'
         GOBIN = '/tmp/go-bin'
     }
 
@@ -94,6 +95,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
                                 usernameVariable: 'USER', 
                                 passwordVariable: 'PASSWORD')]) {
+                    //Fix credential warn
                     sh "mosquitto_pub -h monkeymoment.duckdns.org -u $USER -P $PASSWORD -t \"dev-server\" -m \"update\""
                 }
             }
