@@ -3,6 +3,7 @@ services:
   db:
     image: postgres:14.5-alpine
     restart: always
+    command: ["postgres", "-c", "log_statement=all"]
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -10,6 +11,7 @@ services:
       - '5432:5432'
     volumes: 
       - db:/var/lib/postgresql/data
+      - ./microservices/authentication/data/:/docker-entrypoint-initdb.d/
   backend:
     build:
       context: .
