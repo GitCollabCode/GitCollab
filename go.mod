@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/jackc/pgx/v5 v5.0.0
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/sirupsen/logrus v1.9.0
@@ -12,7 +13,6 @@ require (
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/jackc/pgx/v5 v5.0.0
 	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
