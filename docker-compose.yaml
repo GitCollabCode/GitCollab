@@ -16,8 +16,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # env_file:
-    #   - .env
+    environment:
+      - POSTGRES_URL="postgres://postgres:postgres@localhost:5432/user_auth"
     depends_on:
       - db
     networks:

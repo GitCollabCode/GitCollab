@@ -1,13 +1,11 @@
 package profiles
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -30,13 +28,13 @@ func Init() {
 		return
 	}
 
-	db, err := data.InitMongoDBDriver(log)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	// db, err := data.InitMongoDBDriver(log)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
-	defer db.Client.Disconnect(context.TODO())
+	// defer db.Client.Disconnect(context.TODO())
 
 	//v := models.NewValidtor()
 

@@ -1,9 +1,13 @@
-//Test main.go file to create docker image
+// Test main.go file to create docker image
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/GitCollabCode/GitCollab/internal/db"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -27,6 +31,12 @@ func main() {
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "8080"
+	}
+
+	authDB, err := db.ConnectPostgres(e.Logger)
+	authDB.Connection.Close(context.Background())
+	if err != nil {
+		fmt.Println("we ball")
 	}
 
 	e.Logger.Fatal(e.Start(":" + httpPort))
