@@ -59,12 +59,12 @@ pipeline {
 			// }
         }
 
-        stage('Go Code Analysis') {
-            steps {
-                echo 'Preforming Code Analysis [Go]..'
-                sh 'PATH=$PATH:$GOBIN golangci-lint --timeout=5m run'
-            }
-        }
+        // stage('Go Code Analysis') {
+        //     steps {
+        //         echo 'Preforming Code Analysis [Go]..'
+        //         sh 'PATH=$PATH:$GOBIN golangci-lint --timeout=5m run'
+        //     }
+        // }
 
         stage('npm Install') {
             steps {
