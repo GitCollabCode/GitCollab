@@ -5,5 +5,5 @@ import (
 )
 
 func Init() {
-	fmt.print("Bounties");
+	fmt.Print("Bounties")
 }

@@ -5,5 +5,5 @@ import (
 )
 
 func Init() {
-	fmt.print("Projects");
+	fmt.Print("Projects")
 }

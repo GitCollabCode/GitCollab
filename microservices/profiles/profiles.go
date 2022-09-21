@@ -1,17 +1,10 @@
 package profiles
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
-
-	"profiles/data"
-	"profiles/handlers"
-	"profiles/models"
-	"profiles/router"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -35,25 +28,25 @@ func Init() {
 		return
 	}
 
-	db, err := data.InitMongoDBDriver(log)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	// db, err := data.InitMongoDBDriver(log)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return
+	// }
 
-	defer db.Client.Disconnect(context.TODO())
+	// defer db.Client.Disconnect(context.TODO())
 
-	v := models.NewValidtor()
+	//v := models.NewValidtor()
 
-	p := handlers.NewProfiles(log, db, v)
+	//p := handlers.NewProfiles(log, db, v)
 
-	r := router.InitRouter(p)
+	//r := router.InitRouter(p)
 
 	if *docs {
 		fmt.Println("add swagger docs endpoint here")
 	}
 
-	http.ListenAndServe(":3000", r)
+	//http.ListenAndServe(":3000", r)
 
 	//use graceful down here
 }

@@ -33,7 +33,7 @@ fi
 if grep -qi microsoft /proc/version
 then
     echo "############################################################################"
-    echo "  Please manually soruce ~/.profile for WSL environments"
+    echo "  Please manually source ~/.profile for WSL environments"
     echo "  Bash is unable to properly process .bashrc and .profile paths within WSL"
     echo "  https://askubuntu.com/questions/1354999/bad-variable-name-error-on-wsl"
     echo "############################################################################"
