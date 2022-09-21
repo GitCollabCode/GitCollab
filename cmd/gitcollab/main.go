@@ -23,6 +23,9 @@ func main() {
 	tokenAuth := jwtauth.New("HS256", []byte(SECRET), nil)
 	r.Use(jwtauth.Verifier(tokenAuth))
 
+	// add middleware fro JWT Blacklist
+	
+
 	// initialize logger
 	log := logrus.New()
 	log.Info("Starting Logger!")
