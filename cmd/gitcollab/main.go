@@ -6,8 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/jwtauth"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,18 +18,25 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	Log := logrus.New()
-	Log.Info("Starting Logger!")
-	Log.Error("Poopoo")
+	// add middleware for JWT
+	SECRET := os.Getenv("JWT_SECRET")
+	tokenAuth := jwtauth.New("HS256", []byte(SECRET), nil)
+	r.Use(jwtauth.Verifier(tokenAuth))
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi from Git Collab"))
-	})
+	// initialize logger
+	log := logrus.New()
+	log.Info("Starting Logger!")
 
+	// get port for backend
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = ":8080"
 	}
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hi from Git Collab"))
+	})
+
+	r.Mount("/auth", router.AuthRouter())
 	http.ListenAndServe(httpPort, r)
 }
