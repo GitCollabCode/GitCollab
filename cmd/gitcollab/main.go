@@ -2,42 +2,32 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"net/http"
 	"os"
+	"time"
 
-	"github.com/GitCollabCode/GitCollab/internal/db"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(60 * time.Second))
 
-	e := echo.New()
+	Log := logrus.New()
+	Log.Info("Starting Logger!")
+	Log.Error("Poopoo")
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "Hello, Docker! <3")
-	})
-
-	e.GET("/ping", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hi from Git Collab"))
 	})
 
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
-		httpPort = "8080"
+		httpPort = ":8080"
 	}
 
-	authDB, err := db.ConnectPostgres(e.Logger)
-	authDB.Connection.Close(context.Background())
-	if err != nil {
-		fmt.Println("we ball")
-	}
-
-	e.Logger.Fatal(e.Start(":" + httpPort))
+	http.ListenAndServe(httpPort, r)
 }
