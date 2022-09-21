@@ -68,25 +68,19 @@ pipeline {
 
         stage('npm Install') {
             steps {
-                dir('$WORKSPACE/web') {
-                    sh 'npm install'
-                }
+                sh 'npm install'
             }
         }
 
         stage('npm Build') {
             steps {
-                dir('$WORKSPACE/web') {
-                    sh 'npm run build'
-                }
+                sh 'npm run build'
             }
         }
 
         stage('npm Test') {
             steps {
-                dir('$WORKSPACE/web') {
-                    sh 'npm test'
-                }
+                sh 'npm test'
             }
         }
 
