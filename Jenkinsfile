@@ -68,19 +68,25 @@ pipeline {
 
         stage('npm Install') {
             steps {
-                sh 'npm install'
+                dir('web') {
+                    sh 'npm install'
+                }
             }
         }
 
         stage('npm Build') {
             steps {
-                sh 'npm run build'
+                dir('web') {
+                    sh 'npm run build'
+                }
             }
         }
 
         stage('npm Test') {
             steps {
-                sh 'npm test'
+                dir('web') {
+                    sh 'npm test'
+                }
             }
         }
 
