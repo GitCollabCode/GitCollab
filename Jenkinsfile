@@ -62,7 +62,7 @@ pipeline {
         stage('Go Code Analysis') {
             steps {
                 echo 'Preforming Code Analysis [Go]..'
-                sh 'PATH=$PATH:$GOBIN golangci-lint --timeout=5m run'
+                sh '$(go env GOBIN)/golangci-lint --timeout=5m run'
             }
         }
 
