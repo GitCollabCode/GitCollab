@@ -60,10 +60,16 @@ pipeline {
         }
 
         stage('Go Code Analysis') {
-            steps {
-                echo 'Preforming Code Analysis [Go]..'
-                sh '$(go env GOBIN)/golangci-lint --timeout=5m run'
+            when {
+                expression { false }
             }
+            steps {
+                echo 'Skipping, broken on jenkins please make sure to run golangci-lint locally!'
+            }
+            // steps {
+            //     echo 'Preforming Code Analysis [Go]..'
+            //     sh '$(go env GOBIN)/golangci-lint --timeout=5m run'
+            // }
         }
 
         stage('npm Install') {
