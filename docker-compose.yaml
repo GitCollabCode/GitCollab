@@ -5,6 +5,7 @@ services:
     restart: always
     command: ["postgres", "-c", "log_statement=all"]
     environment:
+    #TODO: move these into an enviroment file
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
@@ -12,6 +13,12 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
       - ./microservices/authentication/data/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
+      timeout: 15s
+      interval: 10s
+      retries: 5
+
   backend:
     build:
       context: .
@@ -24,6 +31,15 @@ services:
       - default
     ports:
       - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/ping" ]
+      timeout: 15s
+      interval: 10s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./web
@@ -38,6 +54,10 @@ services:
       - REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
       - REACT_APP_REDIRECT_URI=http://localhost:3000
       - REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
+    depends_on:
+      backend:
+        condition: service_healthy
+
 volumes:
   db:
     driver: local

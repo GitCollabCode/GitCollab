@@ -10,6 +10,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o gitcollab_back
 
 #Run Stage
 FROM alpine:latest  
+RUN apk --no-cache add curl
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder ./usr/src/app/gitcollab_backend ./
