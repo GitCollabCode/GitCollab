@@ -24,7 +24,6 @@ func main() {
 	r.Use(jwtauth.Verifier(tokenAuth))
 
 	// add middleware fro JWT Blacklist
-	
 
 	// initialize logger
 	log := logrus.New()
@@ -38,6 +37,11 @@ func main() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi from Git Collab"))
+	})
+
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("pong!"))
 	})
 
 	r.Mount("/auth", router.AuthRouter())
