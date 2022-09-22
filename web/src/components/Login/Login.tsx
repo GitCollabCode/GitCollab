@@ -13,7 +13,7 @@ const Login = () => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    const newUri = proxy_url || ''
+    const newUri = "http://localhost:8080/auth/signin/" || ''
 
     // If Github API returns the code parameter
     if (hasCode) {
@@ -27,7 +27,7 @@ const Login = () => {
 
       console.log(requestData)
 
-      // Use code parameter and other parameters to make POST request to proxy_server
+      // Use code parameter and other parameters to make POST request to BE
       fetch(newUri, {
         method: 'POST',
         body: JSON.stringify(requestData),
@@ -50,7 +50,7 @@ const Login = () => {
   }
   return (
     <div className={styles.container}>
-      <h3>Sign In</h3>
+      <h3>Login</h3>
       <div className="login-container">
         {data.isLoading ? (
           <div className="loader-container">
@@ -58,15 +58,19 @@ const Login = () => {
           </div>
         ) : (
           <>
-            {console.log(user)}
-            <a
-              className="login-link"
+           {console.log(user)}
+            
+              <button className={"btn btn-primary"}>
+              
+              <i className="fa fa-trophy"></i> | Signin with GitHub
+              </button>
+              <a
+              
               href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
               onClick={() => {
                 setData({ ...data, errorMessage: '' })
               }}
             >
-              <span>Login with GitHub</span>
             </a>
           </>
         )}
