@@ -7,7 +7,7 @@ import LandingPage from './components/LandingPage/LandingPage'
 import Login from './components/Login/Login'
 import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
-import SignUp from './components/SignUp/SignUp'
+import SignUp from './components/Login/Login'
 
 const App = () => {
   return (
