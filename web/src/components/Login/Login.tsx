@@ -62,7 +62,7 @@ const Login = () => {
             
               <button className={"btn btn-primary"}>
               
-              <i className="fa fa-trophy"></i> | Signin with GitHub
+              <i className="fa fa-trophy"></i>  Login with GitHub
               </button>
               <a
               
