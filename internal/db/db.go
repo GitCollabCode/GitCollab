@@ -1,18 +1,24 @@
 package db
 
-//type PostgresDriver struct {
-//	Connection pgx.Conn
-//}
+import (
+	"context"
+	"os"
+	"time"
 
-//func ConnectPostgres() (*PostgresDriver, error) {
-//	postgresUrl := os.Getenv("POSTGRES_URL")
-//	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-//	defer cancel()
+	"github.com/jackc/pgx/v5"
+)
 
-//	conn, err := pgx.Connect(ctx, postgresUrl)
-///	if err != nil {
-//		return nil, err
-//	}
+type PostgresDriver struct {
+	Connection pgx.Conn
+}
 
-//	return &PostgresDriver{Connection: *conn}, err
-//}
+func ConnectPostgres() (*PostgresDriver, error) {
+	postgresUrl := os.Getenv("POSTGRES_URL")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	conn, err := pgx.Connect(ctx, postgresUrl)
+	if err != nil {
+		return nil, err
+	}
+	return &PostgresDriver{Connection: *conn}, err
+}
