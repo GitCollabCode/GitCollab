@@ -5,13 +5,14 @@ services:
     restart: always
     command: ["postgres", "-c", "log_statement=all"]
     environment:
-    #TODO: move these into an enviroment file
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - gitcollab
     ports:
       - '5432:5432'
     volumes: 
-      - db:/var/lib/postgresql/data
+      - ./data:/var/lib/postgresql/data
       - ./microservices/authentication/data/:/docker-entrypoint-initdb.d/
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
@@ -24,11 +25,9 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - POSTGRES_URL="postgres://postgres:postgres@localhost:5432/user_auth"
-    depends_on:
-      - db
+      - POSTGRES_URL=${POSTGRES_URL}
     networks:
-      - default
+      - gitcollab
     ports:
       - "8080:8080"
     healthcheck:
@@ -44,19 +43,23 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+    environment:
+      - REACT_APP_CLIENT_ID=${REACT_APP_CLIENT_ID}
+      - REACT_APP_REDIRECT_URI=${REACT_APP_REDIRECT_URI}
+      - REACT_APP_PROXY_URL=${REACT_APP_PROXY_URL}
     networks:
-      - default
+      - gitcollab
     ports:
       - "3000:3000"
     volumes:
       - ./web/src:/app/src
-    environment:
-      - REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
-      - REACT_APP_REDIRECT_URI=http://localhost:3000
-      - REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
     depends_on:
       backend:
         condition: service_healthy
+
+networks:
+  gitcollab:
+    name: gitcollab_network
 
 volumes:
   db:

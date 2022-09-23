@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+if [ "$(basename "$(pwd)")" != "GitCollab" ]
+then
+    echo "Please run gitcollab.sh from the GitCollab repo directory!"
+    echo "i.e. ./scripts/gitcollab.sh [options] arguments"
+    exit 1
+fi
+
 # Enable xtrace if the DEBUG environment variable is set
 if [[ ${DEBUG-} =~ ^1|yes|true$ ]]; then
     set -o xtrace       # Trace the execution of the script (debug)
@@ -30,29 +37,41 @@ EOF
 }
 
 function build() {
-    docker compose build
+    echo "Building GitCollab docker images..."
+    docker compose -f "$(pwd)/docker-compose-convert.yaml" build
 }
 
 function start() {
     if [ "$is_verbose" = "true" ]; then
-        docker compose up
+        echo "Starting GitCollab docker containers..."
+        docker compose -f "$(pwd)/docker-compose-convert.yaml" up
     else
-        docker compose up -d 
+        echo "Starting GitCollab docker containers [verbose]..."
+        docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d 
     fi
 }
 
 function restart() {
+    echo "Restarting GitCollab docker containers..."
     docker compose down
-    docker compose up -d 
+    docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d 
 }
 
 function stop() {
+    echo "Stopping active GitCollab docker containers..."
     docker compose stop
 }
 
 function clean() {
+    echo "Taking down active GitCollab docker containers..."
     docker compose down
+    echo "Docker system prune..."
     docker system prune -a
+}
+
+function clean-db() {
+    echo "Removing saved postgres data from $(pwd)/data..."
+    sudo rm -rfd "$(pwd)/data"
 }
 
 function parse_params() {
@@ -82,6 +101,12 @@ function parse_params() {
                 ;;
             clean)
                 clean
+                echo "done!"
+                exit 0
+                ;;
+            clean-db)
+                clean-db
+                echo "done!"
                 exit 0
                 ;;
             *)
@@ -103,7 +128,18 @@ function main() {
 
     is_verbose=false
 
+    docker compose convert > "$(pwd)/docker-compose-convert.yaml"
     parse_params "$@"
 }
 
+if [ ! -f "$(pwd)/env" ]; then
+    echo "env missing, what did you do!"
+    exit 1
+fi
+
+if [ ! -f "$(pwd)/.env" ]; then
+    cp "$(pwd)/env" "$(pwd)/.env"
+fi
+
 main "$@"
+echo "done!"
