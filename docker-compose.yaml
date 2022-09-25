@@ -32,7 +32,7 @@ services:
       - "8080:8080"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/ping" ]
-      timeout: 40s
+      timeout: 15s
       interval: 10s
       retries: 5
     depends_on:

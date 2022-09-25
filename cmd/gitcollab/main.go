@@ -28,9 +28,9 @@ func main() {
 	authDB, err := db.ConnectPostgres()
 	if err != nil {
 		log.Error(err)
-	} else {
-		log.Info("Connected to db!")
-	}
+		return
+	} 
+
 	defer authDB.Connection.Close(context.Background())
 
 	// add middleware for JWT
