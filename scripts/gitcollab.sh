@@ -139,6 +139,7 @@ fi
 
 if [ ! -f "$(pwd)/.env" ]; then
     cp "$(pwd)/env" "$(pwd)/.env"
+    chmod 777 "$(pwd)/.env" # change to write permission
 fi
 
 main "$@"
