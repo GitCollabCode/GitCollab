@@ -39,6 +39,7 @@ sudo apt-get -y update
 #NOTE: Should we install a select versions?
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
+#NOTE: WSL has an issue here, still wont allow docker commands without sudo
 sudo usermod -aG docker "$USER"
 
 #Start Docker and run hello-world

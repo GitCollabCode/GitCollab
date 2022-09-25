@@ -43,10 +43,10 @@ function build() {
 
 function start() {
     if [ "$is_verbose" = "true" ]; then
-        echo "Starting GitCollab docker containers..."
+        echo "Starting GitCollab docker containers [verbose]..."
         docker compose -f "$(pwd)/docker-compose-convert.yaml" up
     else
-        echo "Starting GitCollab docker containers [verbose]..."
+        echo "Starting GitCollab docker containers..."
         docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d 
     fi
 }
@@ -139,6 +139,7 @@ fi
 
 if [ ! -f "$(pwd)/.env" ]; then
     cp "$(pwd)/env" "$(pwd)/.env"
+    chmod 777 "$(pwd)/.env" # change to write permission
 fi
 
 main "$@"

@@ -2,10 +2,12 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -18,6 +20,19 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	// initialize logger
+	log := logrus.New()
+	log.Info("Starting Logger!")
+
+	// create db drivers
+	authDB, err := db.ConnectPostgres()
+	if err != nil {
+		log.Error(err)
+		return
+	} 
+
+	defer authDB.Connection.Close(context.Background())
+
 	// add middleware for JWT
 	SECRET := os.Getenv("JWT_SECRET")
 	tokenAuth := jwtauth.New("HS256", []byte(SECRET), nil)
@@ -25,9 +40,7 @@ func main() {
 
 	// add middleware fro JWT Blacklist
 
-	// initialize logger
-	log := logrus.New()
-	log.Info("Starting Logger!")
+
 
 	// get port for backend
 	httpPort := os.Getenv("HTTP_PORT")
