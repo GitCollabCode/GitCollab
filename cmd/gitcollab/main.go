@@ -18,8 +18,6 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Timeout(60 * time.Second))
 
 	// initialize logger
 	log := logrus.New()
@@ -37,16 +35,17 @@ func main() {
 	SECRET := os.Getenv("JWT_SECRET")
 	tokenAuth := jwtauth.New("HS256", []byte(SECRET), nil)
 
+	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(60 * time.Second))
+
 	// middleware for blacklist
 	r.Use(jwt.JWTBlackList(tokenAuth, authDB, log))
+
 	// midleware for jwt
 	r.Use(jwtauth.Verifier(tokenAuth))
 
-	// get port for backend
-	httpPort := os.Getenv("HTTP_PORT")
-	if httpPort == "" {
-		httpPort = ":8080"
-	}
+	// init authentication microservice
+	router.InitAuth(tokenAuth, log)	
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi from Git Collab"))
@@ -58,5 +57,11 @@ func main() {
 	})
 
 	r.Mount("/auth", router.AuthRouter())
+
+	// Start server
+	httpPort := os.Getenv("HTTP_PORT")
+	if httpPort == "" {
+		httpPort = ":8080"
+	}
 	http.ListenAndServe(httpPort, r)
 }
