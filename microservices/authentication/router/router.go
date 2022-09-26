@@ -2,9 +2,11 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/github"
+	"github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth"
 	"github.com/sirupsen/logrus"
@@ -15,7 +17,7 @@ type gitOauth struct {
 }
 
 var (
-	log *logrus.Logger
+	log       *logrus.Logger
 	tokenAuth *jwtauth.JWTAuth
 )
 
@@ -35,7 +37,7 @@ func AuthRouter() chi.Router {
 	// signin for our application, create new jwt and swend back to frontend
 	r.Get("/sign-in", func(w http.ResponseWriter, r *http.Request) {
 		var oauth gitOauth
-		
+
 		// try to retrieve code from request body
 		if err := json.NewDecoder(r.Body).Decode(&oauth); err != nil {
 			log.Error("No code present in sign-in request")
@@ -52,9 +54,18 @@ func AuthRouter() chi.Router {
 
 		// create a new jwt for the user, TODO: add more to above checks
 		// THIS SHOULD ONLY BE DONE IF USER IS ACUTALLY VALID!!!!
-		userNameClaim := handlers.Claim{"test", "123"}
-		handlers.CreateToken(tokenAuth, userNameClaim)
+		// create claims
 
+		username := "evan" // get from git
+		tokenString, err := handlers.CreateToken(username)
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return // probably should do more here? Update context?
+		}
+		jsonToken := fmt.Sprintf("{token:%s}", tokenString)
+
+		w.Write([]byte(jsonToken))
 	})
 	return r
 

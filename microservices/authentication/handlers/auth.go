@@ -1,18 +1,18 @@
 package handlers
 
-import "github.com/go-chi/jwtauth"
+import (
+	"time"
 
-type Claim struct {
-	claim string
-	val string
-}
+	"github.com/golang-jwt/jwt"
+)
 
-func CreateToken(tokenAuth *jwtauth.JWTAuth, claims ...Claim) (error, string) {
-	var c = map[string]interface{}{}
-	for _, claimData := range claims {
-		c[claimData.claim] = claimData.val
-	}
-	// below returns a token object, maybe use?
-	_, tokenString, err := tokenAuth.Encode(c)
-	return err, tokenString
+func CreateToken(username string) (string, error) {
+	var sampleSecretKey = []byte("JWT_SECRET")
+	token := jwt.New(jwt.SigningMethodEdDSA)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["exp"] = time.Now().Add(48 * time.Hour) // todo update this
+	claims["authorized"] = true
+	claims["user"] = username
+	// create token, return err and token string
+	return token.SignedString(sampleSecretKey)
 }
