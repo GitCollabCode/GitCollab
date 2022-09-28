@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Error(err)
 		return
-	} 
+	}
 	defer authDB.Connection.Close(context.Background())
 
 	// add middleware for JWT
@@ -45,7 +45,7 @@ func main() {
 	r.Use(jwtauth.Verifier(tokenAuth))
 
 	// init authentication microservice
-	router.InitAuth(tokenAuth, log)	
+	router.InitAuth(tokenAuth, log)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi from Git Collab"))
