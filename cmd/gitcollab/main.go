@@ -40,12 +40,10 @@ func main() {
 
 	// middleware for blacklist
 	r.Use(jwt.JWTBlackList(tokenAuth, authDB, log))
-
-	// midleware for jwt
-	r.Use(jwtauth.Verifier(tokenAuth))
+	r.Use(jwt.VerifyJWT(log))
 
 	// init authentication microservice
-	router.InitAuth(tokenAuth, log)
+	router.InitAuth(log, SECRET)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi from Git Collab"))

@@ -8,7 +8,6 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/github"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/jwtauth"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,13 +16,13 @@ type gitOauth struct {
 }
 
 var (
-	log       *logrus.Logger
-	tokenAuth *jwtauth.JWTAuth
+	log    *logrus.Logger
+	secret string
 )
 
-func InitAuth(ja *jwtauth.JWTAuth, logger *logrus.Logger) {
+func InitAuth(logger *logrus.Logger, jwtSecret string) {
 	log = logger
-	tokenAuth = ja
+	secret = jwtSecret
 }
 
 func AuthRouter() chi.Router {
@@ -57,7 +56,7 @@ func AuthRouter() chi.Router {
 		// create claims
 
 		username := "evan" // get from git
-		tokenString, err := handlers.CreateToken(username)
+		tokenString, err := handlers.CreateToken(username, secret)
 		if err != nil {
 			log.Error(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
