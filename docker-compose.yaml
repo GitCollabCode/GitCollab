@@ -13,7 +13,9 @@ services:
       - '5432:5432'
     volumes: 
       - ./data:/var/lib/postgresql/data
-      - ./microservices/authentication/data/:/docker-entrypoint-initdb.d/
+      - ./microservices/profiles/data/profiles_init.sql:/docker-entrypoint-initdb.d/profiles_init.sql
+      - ./microservices/projects/data/projects_init.sql:/docker-entrypoint-initdb.d/projects_init.sql
+      - ./microservices/authentication/data/auth_init.sql:/docker-entrypoint-initdb.d/auth_init.sql
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
       timeout: 15s
