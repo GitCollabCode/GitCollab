@@ -19,6 +19,9 @@ const initialState = {
   logIn: (user: string) => {
     /** */
   },
+  setToken: (token:string)=> {
+    /** */
+  }
 }
 
 export const UserLoginContext =
@@ -27,10 +30,16 @@ export const UserLoginContext =
 export function UserLoginProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const logOut = () =>
+  const logOut = () => {
+    localStorage.removeItem('gitcollab_jwt')
     dispatch({
       type: 'LOGOUT',
     })
+  }
+
+  const setToken = (token: string) => {
+    localStorage.setItem('gitcollab_jwt', token)
+  }
 
   const logIn = (user: string) => {
     dispatch({
@@ -50,6 +59,7 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
         proxy_url: state.proxy_url,
         logOut,
         logIn,
+        setToken,
       }}
     >
       {children}
