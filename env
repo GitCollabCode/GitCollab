@@ -1,6 +1,6 @@
 # Some of these vars might need to be changed on deployment or be defaulted to empty and filled in on deployment!
 REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
-REACT_APP_REDIRECT_URI=http://localhost:3000
+REACT_APP_REDIRECT_URI=http://localhost:3000/login
 REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
 
 DB_STORE_DIR=./data

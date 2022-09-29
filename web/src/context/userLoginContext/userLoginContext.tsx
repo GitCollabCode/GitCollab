@@ -19,6 +19,9 @@ const initialState = {
   logIn: (user: string) => {
     /** */
   },
+  setToken: (token:string)=> {
+    /** */
+  }
 }
 
 export const UserLoginContext =
