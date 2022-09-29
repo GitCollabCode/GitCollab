@@ -12,6 +12,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/go-chi/jwtauth"
 	"github.com/sirupsen/logrus"
 )
@@ -19,6 +20,7 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(httprate.LimitByIP(100, time.Minute))
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	// initialize logger
@@ -58,5 +60,7 @@ func main() {
 	})
 
 	r.Mount("/auth", router.AuthRouter())
+	r.Mount("/debug", middleware.Profiler())
+
 	http.ListenAndServe(httpPort, r)
 }
