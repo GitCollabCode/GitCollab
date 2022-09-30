@@ -34,7 +34,7 @@ func AuthRouter() chi.Router {
 	})
 
 	// signin for our application, create new jwt and swend back to frontend
-	r.Get("/sign-in", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/signin", func(w http.ResponseWriter, r *http.Request) {
 		var oauth gitOauth
 
 		// try to retrieve code from request body
