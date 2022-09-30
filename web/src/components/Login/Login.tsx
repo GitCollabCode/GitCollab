@@ -4,8 +4,15 @@ import { UserLoginContext } from '../../context/userLoginContext/userLoginContex
 import styles from './Login.module.css'
 
 const Login = () => {
-  const { proxy_url, logIn, user, isLoggedIn, client_id, redirect_uri } =
-    useContext(UserLoginContext)
+  const {
+    proxy_url,
+    logIn,
+    user,
+    isLoggedIn,
+    client_id,
+    redirect_uri,
+    logOut,
+  } = useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
   const navigate = useNavigate()
 
@@ -13,11 +20,13 @@ const Login = () => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    const newUri = "http://localhost:8080/auth/signin/" || ''
+    const newUri = 'http://localhost:8080/auth/signin/' || ''
+    console.log('here')
 
     // If Github API returns the code parameter
     if (hasCode) {
       const newUrl = url.split('?code=')
+      console.log('here2')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })
 
@@ -34,9 +43,11 @@ const Login = () => {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log(data)
           logIn(data)
         })
         .catch((error) => {
+          console.log(error)
           setData({
             isLoading: false,
             errorMessage: 'Sorry! Login failed',
@@ -58,20 +69,23 @@ const Login = () => {
           </div>
         ) : (
           <>
-           {console.log(user)}
-            
-              <button className={"btn btn-primary"}>
-              
-              <i className="fa fa-trophy"></i>  Login with GitHub
-              </button>
+            {console.log(user)}
+            {!isLoggedIn ? (
               <a
-              
-              href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
-              onClick={() => {
-                setData({ ...data, errorMessage: '' })
-              }}
-            >
-            </a>
+                href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
+                onClick={() => {
+                  setData({ ...data, errorMessage: '' })
+                }}
+              >
+                <button className={'btn btn-primary'}>
+                  <i className="fa fa-trophy"></i> Login with GitHub
+                </button>
+              </a>
+            ) : (
+              <button className={'btn btn-primary'} onClick={() => logOut()}>
+                <i className="fa fa-trophy"></i> Logout
+              </button>
+            )}
           </>
         )}
       </div>

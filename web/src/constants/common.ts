@@ -10,6 +10,7 @@ export type userValue = {
 export type userDispatch = {
   logOut: () => void
   logIn: (user: string) => void
+  setToken: (token:string)=> void;
 }
 
 export type userLoginContextState = userValue & userDispatch
