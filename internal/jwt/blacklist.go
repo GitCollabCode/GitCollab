@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
@@ -14,14 +13,6 @@ type contextKey struct {
 	name string
 }
 
-var (
-	ErrorCtxKey = &contextKey{"Error"}
-)
-
-var (
-	ErrTokenInvalid = errors.New("token is blacklisted")
-	ErrTokenMissing = errors.New("no token found in header or cookie")
-)
 
 // Middleware to check if a given JWT is blacklisted
 // All private routes with JWT headers should pass through this

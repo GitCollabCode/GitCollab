@@ -21,7 +21,7 @@ const Login = () => {
     const url = window.location.href
     const hasCode = url.includes('?code=')
     const newUri = 'http://localhost:8080/auth/signin/' || ''
-    console.log('here')
+    console.log('sending')
 
     // If Github API returns the code parameter
     if (hasCode) {
