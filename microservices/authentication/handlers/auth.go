@@ -48,6 +48,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if !gitAccessToken.Valid() {
 		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	// create new github client, get info
