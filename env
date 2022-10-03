@@ -8,3 +8,9 @@ DB_STORE_DIR=./data
 POSTGRES_URL="postgres://postgres:postgres@db:5432/postgres"
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
+
+GITHUB_CLIENTID=""
+GITHUB_SECRET=""
+
+# change in the future
+GITCOLLAB_SECRET="CUENGTARD123"

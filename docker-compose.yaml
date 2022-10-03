@@ -28,6 +28,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - POSTGRES_URL=${POSTGRES_URL}
+      - GITHUB_CLIENTID=${GITHUB_CLIENTID}
+      - GITHUB_SECRET=${GITHUB_SECRET}
     networks:
       - gitcollab
     ports:
@@ -46,7 +48,7 @@ services:
       context: ./web
       dockerfile: Dockerfile
     environment:
-      - REACT_APP_CLIENT_ID=${REACT_APP_CLIENT_ID}
+      - REACT_APP_CLIENT_ID=${GITHUB_CLIENTID}
       - REACT_APP_REDIRECT_URI=${REACT_APP_REDIRECT_URI}
       - REACT_APP_PROXY_URL=${REACT_APP_PROXY_URL}
     networks:
