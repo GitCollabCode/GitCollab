@@ -19,7 +19,7 @@ type jsonGitOauth struct {
 
 
 // todo, move to other package, not handlers
-func createToken(username string) (string, error) {
+func createGitCollabJwt(username string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["exp"] = time.Now().Add(48 * time.Hour) // todo update this
 	claims["authorized"] = true
@@ -63,7 +63,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, err := createToken(*username.Login)
+	tokenString, err := createGitCollabJwt(*username.Login)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
