@@ -1,53 +1,28 @@
 package github
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"context"
+	"fmt"
 	"os"
+
+	"golang.org/x/oauth2"
+	githuboauth "golang.org/x/oauth2/github"
 )
 
-// Represents the response received from Github
-type githubAccessTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	Scope       string `json:"scope"`
+
+var GitOauthConfig = &oauth2.Config{
+	ClientID:     os.Getenv("GITHUB_CLIENTID"), // maybe store?
+	ClientSecret: os.Getenv("GITHUB_SECRET"), // maybe store?
+	Scopes:       []string{"user:email", "user:name"}, // verify what we need
+	Endpoint:     githuboauth.Endpoint,
 }
 
-func GetGithubAccessToken(code string) string {
-	clientID := os.Getenv("GITHUB_CLIENTID")
-	clientSecret := os.Getenv("GITHUB_SECRET")
-
-	requestBodyMap := map[string]string{
-		"client_id":     clientID,
-		"client_secret": clientSecret,
-		"code":          code,
+func GetGithubAccessToken(code string) (*oauth2.Token, error) {
+	token, err := GitOauthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		fmt.Println("I didnt make a token!")
+		return nil, err
 	}
-	requestJSON, _ := json.Marshal(requestBodyMap)
-
-	req, reqerr := http.NewRequest(
-		"POST",
-		"https://github.com/login/oauth/access_token",
-		bytes.NewBuffer(requestJSON),
-	)
-
-	if reqerr != nil {
-		log.Panic("Request creation failed")
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-
-	resp, resperr := http.DefaultClient.Do(req)
-	if resperr != nil {
-		log.Panic("Request failed")
-	}
-
-	respbody, _ := ioutil.ReadAll(resp.Body)
-
-	var ghresp githubAccessTokenResponse
-	json.Unmarshal(respbody, &ghresp)
-	return ghresp.AccessToken
+	fmt.Println("I made a token!")
+	return token, nil
 }
