@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"net/http"
+
+	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 )
 
 func SetContentType(contentType string) func(next http.Handler) http.Handler {
@@ -15,22 +17,22 @@ func SetContentType(contentType string) func(next http.Handler) http.Handler {
 	}
 }
 
-func (p Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
+func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		profile := &models.Profile{}
-		err := models.FromJSON(profile, r.Body)
+		profile := &data.Profile{}
+		err := data.FromJSON(profile, r.Body)
 		if err != nil {
 			p.log.Error(err)
 			w.WriteHeader(http.StatusBadRequest)
-			models.ToJSON(&models.ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
+			data.ToJSON(&ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
 			return
 		}
 
-		errs := p.v.Validate(profile)
+		errs := p.validate.Validate(profile)
 		if len(errs) != 0 {
 			w.WriteHeader(http.StatusUnprocessableEntity)
-			models.ToJSON(&models.ValidatorErrorList{Messages: errs.Errors()}, w)
+			data.ToJSON(&ValidationError{Messages: errs.Errors()}, w)
 			return
 		}
 

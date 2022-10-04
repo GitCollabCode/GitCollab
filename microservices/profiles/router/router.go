@@ -8,8 +8,6 @@ import (
 
 func InitRouter(r *chi.Mux, p *handlers.Profiles) {
 
-	//use validator middleware to ensure proper json structure is meet
-
 	r.Route("/profile", func(r chi.Router) {
 		r.Use(middleware.AllowContentEncoding("application/json"))
 		r.Use(handlers.SetContentType("application/json"))
