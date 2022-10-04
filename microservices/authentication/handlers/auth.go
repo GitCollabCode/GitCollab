@@ -5,37 +5,54 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"time"
 
+	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/github"
-	"github.com/golang-jwt/jwt"
 	goGithub "github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
+// struct to hold info for handlers
+type Auth struct {
+	log            *logrus.Logger
+	gitOauthID     string
+	gitRedirectUrl string
+}
+
+// Expected Http Body for login request
 type jsonGitOauth struct {
-	Code string
+	Code string // github code
 }
 
-
-// todo, move to other package, not handlers
-func createGitCollabJwt(username string) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["exp"] = time.Now().Add(48 * time.Hour) // todo update this
-	claims["authorized"] = true
-	claims["user"] = username
-	// create token, return err and token string
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET") // check if ""
-	return  token.SignedString([]byte(gitCollabSecret))
+func NewAuth(log *logrus.Logger, oauthID string, redirectUrl string) *Auth {
+	// create refrence to new auth struct, hold logger
+	return &Auth{log, oauthID, redirectUrl}
 }
 
+func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
+	// get the redirect url for github, when login button is clicked, this will be returned
+	// to the frontend
+	a.log.Info("Redirecting user to Github")
+	rUrl := "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
+	redirect := fmt.Sprintf(rUrl, a.gitOauthID, a.gitRedirectUrl)
+	jsonRedirectUrl := fmt.Sprintf("{redirect:%s}", redirect)
+	w.Write([]byte(jsonRedirectUrl))
+}
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	// Handler for login, occurs when user returns from github redirect.
+	// Will first attempt to get code from request body, if valid retrieve a
+	// github access token. If this token is good, go ahead and create a JWT
+	// for frontend.
+
+	// TODO: If user does not exist in DB, should create jwt and bring to new
+	// 		 user flow.
+	a.log.Info("Serving login request")
 	dec := json.NewDecoder(r.Body)
 	var oauth jsonGitOauth
-	err := dec.Decode(&oauth) // try to retrieve code from request body 
+	err := dec.Decode(&oauth)
 	if err != nil {
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -43,35 +60,36 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// get github access token from git with code
 	gitAccessToken, err := github.GetGithubAccessToken(oauth.Code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		a.log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
 	if !gitAccessToken.Valid() {
+		a.log.Error("Invalid Github Access Token!")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// create new github client, get info
-	// TODO, MOVE THIS TO NEW METHOD, WILL GET INFO AND ADD TO DB! OR FETCH FROM DB
+	// create github client to retrieve user info, store in JWT
 	oauthClient := github.GitOauthConfig.Client(context.Background(), gitAccessToken)
 	client := goGithub.NewClient(oauthClient)
-	fmt.Println("getting username")
 	username, _, err := client.Users.Get(context.Background(), "")
-	fmt.Printf("USERNAME %s", *username.Login)
 	if err != nil {
+		a.log.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	// create a new token for the frontend
+	tokenString, err := jwt.CreateGitCollabJwt(*username.Login)
+	if err != nil {
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	tokenString, err := createGitCollabJwt(*username.Login)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// serve token
+	// serve token to frontend
 	jsonToken := fmt.Sprintf("{token:%s}", tokenString)
 	w.Write([]byte(jsonToken))
-	
 }
