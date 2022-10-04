@@ -70,8 +70,8 @@ function clean() {
 }
 
 function clean-db() {
-    echo "Removing saved postgres data from $(pwd)/db-data..."
-    sudo rm -rfd "$(pwd)/db-data"
+    echo "Removing saved postgres data from $(pwd)/db_data..."
+    sudo rm -rfd "$(pwd)/db_data"
 }
 
 function refresh-env-file() {
