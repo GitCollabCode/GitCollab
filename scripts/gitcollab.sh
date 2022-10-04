@@ -70,8 +70,14 @@ function clean() {
 }
 
 function clean-db() {
-    echo "Removing saved postgres data from $(pwd)/data..."
-    sudo rm -rfd "$(pwd)/data"
+    echo "Removing saved postgres data from $(pwd)/db-data..."
+    sudo rm -rfd "$(pwd)/db-data"
+}
+
+function refresh-env-file() {
+    echo "Refreshing $(pwd)/.env..."
+    cp "$(pwd)/env" "$(pwd)/.env"
+    chmod 777 "$(pwd)/.env" # change to write permission
 }
 
 function parse_params() {
@@ -108,6 +114,9 @@ function parse_params() {
                 clean-db
                 echo "done!"
                 exit 0
+                ;;
+            refresh-env-file)
+                refresh-env-file
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"

@@ -3,7 +3,7 @@ REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
 REACT_APP_REDIRECT_URI=http://localhost:3000/login
 REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
 
-DB_STORE_DIR=./data
+DB_STORE_DIR="./db_data"
 
 POSTGRES_URL="postgres://postgres:postgres@db:5432/postgres"
 POSTGRES_USER=postgres
