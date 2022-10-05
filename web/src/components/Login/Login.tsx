@@ -1,18 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Url, URL } from 'url'
+import { GITHUB_REDIRECT } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import styles from './Login.module.css'
 
 const Login = () => {
-  const {
-    proxy_url,
-    logIn,
-    user,
-    isLoggedIn,
-    client_id,
-    redirect_uri,
-    logOut,
-  } = useContext(UserLoginContext)
+  const { proxy_url, logIn, user, isLoggedIn, logOut } =
+    useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
   const navigate = useNavigate()
 
@@ -20,21 +15,17 @@ const Login = () => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    const newUri = 'http://localhost:8080/auth/signin/' || ''
-    console.log('sending')
+    const newUri = process.env.API_URI + GITHUB_REDIRECT
 
     // If Github API returns the code parameter
     if (hasCode) {
       const newUrl = url.split('?code=')
-      console.log('here2')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })
 
       const requestData = {
         code: newUrl[1],
       }
-
-      console.log(requestData)
 
       // Use code parameter and other parameters to make POST request to BE
       fetch(newUri, {
@@ -59,6 +50,22 @@ const Login = () => {
   if (isLoggedIn) {
     navigate('/')
   }
+
+  type githubRedirectURL = {
+    redirect: string
+  }
+  const redirectToGithub = () => {
+    fetch(process.env.API_URI + GITHUB_REDIRECT, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data: githubRedirectURL) => {
+        window.location.replace(data.redirect)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
   return (
     <div className={styles.container}>
       <h3>Login</h3>
@@ -71,16 +78,12 @@ const Login = () => {
           <>
             {console.log(user)}
             {!isLoggedIn ? (
-              <a
-                href={`https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${redirect_uri}`}
-                onClick={() => {
-                  setData({ ...data, errorMessage: '' })
-                }}
+              <button
+                className={'btn btn-primary'}
+                onClick={() => redirectToGithub()}
               >
-                <button className={'btn btn-primary'}>
-                  <i className="fa fa-trophy"></i> Login with GitHub
-                </button>
-              </a>
+                <i className="fa fa-trophy"></i> Login with GitHub
+              </button>
             ) : (
               <button className={'btn btn-primary'} onClick={() => logOut()}>
                 <i className="fa fa-trophy"></i> Logout
