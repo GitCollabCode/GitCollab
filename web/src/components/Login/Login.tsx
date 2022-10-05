@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Url, URL } from 'url'
 import { GITHUB_REDIRECT } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import styles from './Login.module.css'
@@ -27,15 +26,19 @@ const Login = () => {
         code: newUrl[1],
       }
 
+      type jwtToken = {
+        token: string
+      }
+
       // Use code parameter and other parameters to make POST request to BE
       fetch(newUri, {
         method: 'POST',
         body: JSON.stringify(requestData),
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then((data: jwtToken) => {
           console.log(data)
-          logIn(data)
+          logIn(data.token, {})
         })
         .catch((error) => {
           console.log(error)
@@ -55,7 +58,7 @@ const Login = () => {
     redirect: string
   }
   const redirectToGithub = () => {
-    fetch(process.env.API_URI + GITHUB_REDIRECT, {
+    fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
       method: 'GET',
     })
       .then((response) => response.json())

@@ -13,15 +13,16 @@ const initialState = {
   redirect_uri: process.env.REACT_APP_REDIRECT_URI,
   client_secret: process.env.REACT_APP_CLIENT_SECRET,
   proxy_url: process.env.REACT_APP_PROXY_URL,
+  jwtToken: '',
   logOut: () => {
     /** */
   },
-  logIn: (user: string) => {
+  logIn: (token: string, user: any) => {
     /** */
   },
-  setToken: (token:string)=> {
+  setToken: (token: string) => {
     /** */
-  }
+  },
 }
 
 export const UserLoginContext =
@@ -31,7 +32,6 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const logOut = () => {
-    localStorage.removeItem('gitcollab_jwt')
     dispatch({
       type: 'LOGOUT',
     })
@@ -41,7 +41,8 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('gitcollab_jwt', token)
   }
 
-  const logIn = (user: string) => {
+  const logIn = (token: string, user: any) => {
+    setToken(token)
     dispatch({
       type: 'LOGIN',
       payload: { user: user, isLoggedIn: true },
@@ -57,6 +58,7 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
         redirect_uri: state.redirect_uri,
         client_secret: state.client_secret,
         proxy_url: state.proxy_url,
+        jwtToken: state.jwtToken,
         logOut,
         logIn,
         setToken,
