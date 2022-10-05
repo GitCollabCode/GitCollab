@@ -77,7 +77,7 @@ func main() {
 	})
 
 	// register all sub routers
-	auth := authHandlers.NewAuth(log, clientID, gitRedirect)
+	auth := authHandlers.NewAuth(log, authDB, clientID, gitRedirect)
 	authRouter.InitAuthRouter(r, auth)
 
 	// Start server

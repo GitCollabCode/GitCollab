@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/github"
 	goGithub "github.com/google/go-github/github"
@@ -15,6 +16,7 @@ import (
 // struct to hold info for handlers
 type Auth struct {
 	log            *logrus.Logger
+	pgConn         *db.PostgresDriver
 	gitOauthID     string
 	gitRedirectUrl string
 }
@@ -24,9 +26,13 @@ type jsonGitOauth struct {
 	Code string // github code
 }
 
-func NewAuth(log *logrus.Logger, oauthID string, redirectUrl string) *Auth {
+type jsonLogout struct {
+	Jwt string
+}
+
+func NewAuth(log *logrus.Logger, pg *db.PostgresDriver, oauthID string, redirectUrl string) *Auth {
 	// create refrence to new auth struct, hold logger
-	return &Auth{log, oauthID, redirectUrl}
+	return &Auth{log, pg, oauthID, redirectUrl}
 }
 
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,4 +98,18 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// serve token to frontend
 	jsonToken := fmt.Sprintf("{token:%s}", tokenString)
 	w.Write([]byte(jsonToken))
+}
+
+func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	j := r.URL.Query().Get("jwt")
+	if j == "" {
+		w.Write([]byte("not found"))
+		return
+	}
+	a.log.Infof("Adding jwt %s to blacklist", j)
+	w.Write([]byte("adding to blacklist"))
+	err := jwt.InsertJwtBlacklist(a.pgConn, j)
+	if err != nil {
+		a.log.Error(err)
+	}
 }
