@@ -24,9 +24,10 @@ func CreateGitCollabJwt(username string) (string, error) {
 	return token.SignedString([]byte(gitCollabSecret))
 }
 
+// TODO: Fix, either this or jwt generation putting invalid time
+// Get the time a given JWT expires at. Takes the jwt string and returns
+// time it expires at as time.Time
 func getExpTime(tokenString string) (time.Time, error) {
-	// maybe verify? if it isn't valid, no need to add.
-	// Or run through verifier middleware
 	token, _, err := new(goJwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
 	if err != nil {
 		return time.Time{}, err
@@ -50,16 +51,16 @@ func getExpTime(tokenString string) (time.Time, error) {
 }
 
 func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
-
-	_, err := getExpTime(jwtString) // TODO, THIS SHOULD ADD TO DB, look into formating
+	expTime, err := getExpTime(jwtString)
 	if err != nil {
 		return err
 	}
-	// "INSERT INTO %s(jwt) VALUES (%s) ON CONFLICT (jwt) DO NOTHING",
-	insertSting := fmt.Sprintf("INSERT INTO jwt_blacklist(jwt) VALUES (%s)", jwtString)
 
-	// Attempting to query DB
-	_, err = pg.Connection.Exec(context.Background(), insertSting)
+	// Attempting to insert new jwt
+	_, err = pg.Connection.Exec(context.Background(),
+		`INSERT INTO jwt_blacklist (jwt, invalidated_time)
+		 VALUES ($1, $2)`, jwtString, expTime)
+
 	if err != nil {
 		return fmt.Errorf("failed to add jwt to blacklist")
 	}
