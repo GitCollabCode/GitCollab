@@ -54,9 +54,9 @@ const Login = () => {
     navigate('/')
   }
 
- /* type githubRedirectURL = {
+  type githubRedirectURL = {
     redirect: string
-  }*/
+  }
 
   const redirectToGithub = () => {
     fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
