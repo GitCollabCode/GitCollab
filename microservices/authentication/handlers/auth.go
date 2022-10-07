@@ -39,9 +39,9 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	// get the redirect url for github, when login button is clicked, this will be returned
 	// to the frontend
 	a.Log.Info("Redirecting user to Github")
-	rUrl := "github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
+	rUrl := "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 	redirect := fmt.Sprintf(rUrl, a.gitOauthID, a.gitRedirectUrl)
-	jsonRedirectUrl := fmt.Sprintf("{redirect:%s}", redirect)
+	jsonRedirectUrl := fmt.Sprintf(redirect)
 	w.Write([]byte(jsonRedirectUrl))
 }
 

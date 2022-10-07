@@ -27,11 +27,6 @@ export type ValidAction = LogIn | LogOut
 export const reducer = (state: userValue, action: ValidAction): userValue => {
   switch (action.type) {
     case 'LOGIN': {
-      localStorage.setItem(
-        'isLoggedIn',
-        JSON.stringify(action.payload.isLoggedIn)
-      )
-      localStorage.setItem('gitCollab_jwt', JSON.stringify(action.payload.user))
       return {
         ...state,
         isLoggedIn: action.payload.isLoggedIn,

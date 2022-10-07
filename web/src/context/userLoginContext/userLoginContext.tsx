@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, ReactNode } from 'react'
+import React, { createContext, useReducer, ReactNode, useEffect } from 'react'
 
 import { userLoginContextState } from '../../constants/common'
 import { reducer } from './userLoginValues'
@@ -37,6 +37,16 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  useEffect(()=>{
+    const getToken = localStorage.getItem('gitcollab_jwt') || "";
+    if(getToken !== "") {
+      dispatch({
+        type:'LOGIN',
+        payload:{user:{}, isLoggedIn:true},
+      });
+    }
+  },[])
+  
   const setToken = (token: string) => {
     localStorage.setItem('gitcollab_jwt', token)
   }

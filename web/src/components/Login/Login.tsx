@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { GITHUB_REDIRECT } from '../../constants/endpoints'
+import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import styles from './Login.module.css'
 
@@ -8,13 +7,13 @@ const Login = () => {
   const { proxy_url, logIn, user, isLoggedIn, logOut } =
     useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
-  const navigate = useNavigate()
+ 
 
   useEffect(() => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    const newUri = process.env.REACT_APP_API_URI + GITHUB_REDIRECT
+    
 
     // If Github API returns the code parameter
     if (hasCode) {
@@ -29,9 +28,9 @@ const Login = () => {
       type jwtToken = {
         token: string
       }
-
+  
       // Use code parameter and other parameters to make POST request to BE
-      fetch(newUri, {
+      fetch(process.env.REACT_APP_API_URI + SIGNIN, {
         method: 'POST',
         body: JSON.stringify(requestData),
       })
@@ -50,26 +49,20 @@ const Login = () => {
     }
   }, [isLoggedIn, data, logIn, proxy_url])
 
-  if (isLoggedIn) {
-    navigate('/')
-  }
-
-  type githubRedirectURL = {
-    redirect: string
-  }
 
   const redirectToGithub = () => {
     fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
       method: 'GET',
     })
-      .then((response) => response.json())
-      .then((data: githubRedirectURL) => {
-        window.location.replace(data.redirect)
+      .then((response) => response.text())
+      .then((data) => {
+        window.location.replace(data)
       })
       .catch((error) => {
         console.log(error)
       })
   }
+
   return (
     <div className={styles.container}>
       <h3>Login</h3>
