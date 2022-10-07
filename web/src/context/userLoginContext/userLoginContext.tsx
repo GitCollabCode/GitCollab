@@ -31,7 +31,13 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const logOut = () => {
+    const token = localStorage.getItem('gitcollab_jwt')
     localStorage.removeItem('gitcollab_jwt')
+
+    fetch("http://localhost:8080?jwt="+token, {
+      method: 'GET'
+    }).then((response)=>console.log(response)).then(()=>localStorage.removeItem("gitcollab_jwt"))
+    
     dispatch({
       type: 'LOGOUT',
     })
