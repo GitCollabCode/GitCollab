@@ -5,4 +5,4 @@ RUN apk --no-cache add curl
 COPY package.json /app
 RUN npm install
 COPY . /app
-CMD ["npm", "start"]
+ENTRYPOINT ["npm", "start"]
