@@ -57,7 +57,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./web:/app
+      - ./web/src:/app/src
     depends_on:
       backend:
         condition: service_healthy
