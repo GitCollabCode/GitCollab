@@ -101,15 +101,17 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	j := r.URL.Query().Get("jwt")
-	if j == "" {
-		w.Write([]byte("not found"))
+	// add jwt's to the blacklist, these will be picked up by the blacklist
+	// middleware and refuse access if found
+	jwtString := r.Header["Token"]
+	if jwtString == nil {
+		// add err for frontend
+		a.Log.Error("jwt not found in header")
 		return
 	}
-	a.Log.Infof("Adding jwt %s to blacklist", j)
-	w.Write([]byte("adding to blacklist"))
-	err := jwt.InsertJwtBlacklist(a.PgConn, j)
+	err := jwt.InsertJwtBlacklist(a.PgConn, jwtString[0])
 	if err != nil {
 		a.Log.Error(err)
+		// add error for frontend
 	}
 }
