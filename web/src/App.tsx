@@ -8,6 +8,7 @@ import Login from './components/Login/Login'
 import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
 import SignUp from './components/Login/Login'
+import NotFound from './components/Misc/NotFound'
 
 const App = () => {
   return (
@@ -21,6 +22,8 @@ const App = () => {
           <Route path="/login" element={<Login />}></Route>
           <Route path="/sign-up" element={<SignUp />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
+          {/* star catches any route that is not found */}
+          <Route path="/*" element={<NotFound />}></Route>
           <Route path="/dashboard"></Route>
         </Routes>
       </div>
