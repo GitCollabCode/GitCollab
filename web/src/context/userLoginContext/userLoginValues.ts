@@ -10,6 +10,7 @@ export const initialState = {
   redirect_uri: process.env.REACT_APP_REDIRECT_URI,
   client_secret: process.env.REACT_APP_CLIENT_SECRET,
   proxy_url: process.env.REACT_APP_PROXY_URL,
+  jwtToken: '',
 }
 
 type LogIn = {
@@ -26,11 +27,6 @@ export type ValidAction = LogIn | LogOut
 export const reducer = (state: userValue, action: ValidAction): userValue => {
   switch (action.type) {
     case 'LOGIN': {
-      localStorage.setItem(
-        'isLoggedIn',
-        JSON.stringify(action.payload.isLoggedIn)
-      )
-      localStorage.setItem('user', JSON.stringify(action.payload.user))
       return {
         ...state,
         isLoggedIn: action.payload.isLoggedIn,
