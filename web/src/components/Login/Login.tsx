@@ -14,7 +14,8 @@ const Login = () => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    const newUri = process.env.API_URI + GITHUB_REDIRECT
+    console.log(process.env.REACT_APP_API_URI + GITHUB_REDIRECT);
+    const newUri = process.env.REACT_APP_API_URI + GITHUB_REDIRECT
 
     // If Github API returns the code parameter
     if (hasCode) {
