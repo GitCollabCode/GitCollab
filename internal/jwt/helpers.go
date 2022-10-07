@@ -59,10 +59,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 	// Attempting to insert new jwt
 	_, err = pg.Connection.Exec(context.Background(),
 		`INSERT INTO jwt_blacklist (jwt, invalidated_time)
-		 SELECT ($1, $2) WHERE
-		 	NOT EXISTS (
-				SELECT jwt FROM jwt_blacklist WHERE jwt=$1
-			)`,
+		 VALUES ($1, $2) ON CONFLICT (jwt) DO NOTHING`,
 		jwtString, expTime)
 
 	if err != nil {
