@@ -95,6 +95,7 @@ func main() {
 		httpPort = ":8080"
 	}
 
+	//TODO: add debug flag condition for this
 	r.Mount("/debug", middleware.Profiler())
 
 	s := http.Server{
