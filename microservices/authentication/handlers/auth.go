@@ -15,34 +15,31 @@ import (
 
 // struct to hold info for handlers
 type Auth struct {
-	Log            *logrus.Logger
 	PgConn         *db.PostgresDriver
+	log            *logrus.Logger
 	gitOauthID     string
 	gitRedirectUrl string
 }
+
+const (
+	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
+)
 
 // Expected Http Body for login request
 type jsonGitOauth struct {
 	Code string // github code
 }
 
-type jsonLogout struct {
-	Jwt string
-}
-
 func NewAuth(log *logrus.Logger, pg *db.PostgresDriver, oauthID string, redirectUrl string) *Auth {
 	// create refrence to new auth struct, hold logger
-	return &Auth{log, pg, oauthID, redirectUrl}
+	return &Auth{pg, log, oauthID, redirectUrl}
 }
 
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	// get the redirect url for github, when login button is clicked, this will be returned
 	// to the frontend
-	a.Log.Info("Redirecting user to Github")
-	rUrl := "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 	redirect := fmt.Sprintf(rUrl, a.gitOauthID, a.gitRedirectUrl)
-	jsonRedirectUrl := fmt.Sprintf(redirect)
-	w.Write([]byte(jsonRedirectUrl))
+	w.Write([]byte(redirect))
 }
 
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,12 +50,12 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: If user does not exist in DB, should create jwt and bring to new
 	// 		 user flow.
-	a.Log.Info("Serving login request")
+	a.log.Info("Serving login request")
 	dec := json.NewDecoder(r.Body)
 	var oauth jsonGitOauth
 	err := dec.Decode(&oauth)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -66,13 +63,13 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// get github access token from git with code
 	gitAccessToken, err := github.GetGithubAccessToken(oauth.Code)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	if !gitAccessToken.Valid() {
-		a.Log.Error("Invalid Github Access Token!")
+		a.log.Error("Invalid Github Access Token!")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -82,7 +79,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	client := goGithub.NewClient(oauthClient)
 	username, _, err := client.Users.Get(context.Background(), "")
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -90,7 +87,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// create a new token for the frontend
 	tokenString, err := jwt.CreateGitCollabJwt(*username.Login)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -106,12 +103,12 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	jwtString := r.Header["Token"]
 	if jwtString == nil {
 		// add err for frontend
-		a.Log.Error("jwt not found in header")
+		a.log.Error("jwt not found in header")
 		return
 	}
 	err := jwt.InsertJwtBlacklist(a.PgConn, jwtString[0])
 	if err != nil {
-		a.Log.Error(err)
+		a.log.Error(err)
 		// add error for frontend
 	}
 }
