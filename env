@@ -1,16 +1,17 @@
 # Some of these vars might need to be changed on deployment or be defaulted to empty and filled in on deployment!
-REACT_APP_CLIENT_ID=b23cd1f8020e17a56ca5
 REACT_APP_REDIRECT_URI=http://localhost:3000/login
 REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
+REACT_APP_API_URI="http://localhost:8080"
 
-DB_STORE_DIR=./data
+DB_STORE_DIR="./db_data"
 
 POSTGRES_URL="postgres://postgres:postgres@db:5432/postgres"
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_USER=postgres # CHANGE
+POSTGRES_PASSWORD=postgres # CHANGE
 
-GITHUB_CLIENTID=""
-GITHUB_SECRET=""
+GITHUB_CLIENTID="REDACTED ADD YOUR CLIENT ID TO .ENV!"
+GITHUB_SECRET="REDACTED ADD YOUR SECRET TO .ENV!"
 
-# change in the future
-GITCOLLAB_SECRET="CUENGTARD123"
+GITCOLLAB_SECRET="REDACTED ADD YOUR SECRET TO .ENV!"
+
+
