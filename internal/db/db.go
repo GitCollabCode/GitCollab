@@ -20,4 +20,3 @@ func ConnectPostgres(connectionUrl string) (*PostgresDriver, error) {
 	}
 	return &PostgresDriver{Connection: *conn}, err
 }
- 
