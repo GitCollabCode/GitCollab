@@ -1,4 +1,4 @@
 *node_modules/*
 .env
 docker-compose-convert.yaml
-/data/
+/db_data/

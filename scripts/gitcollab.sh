@@ -75,6 +75,12 @@ function clean-db() {
     docker container rm gitcollab-db-1
 }
 
+function refresh-env-file() {
+    echo "Refreshing $(pwd)/.env..."
+    cp "$(pwd)/env" "$(pwd)/.env"
+    chmod 777 "$(pwd)/.env" # change to write permission
+}
+
 function parse_params() {
     local param
     while [[ $# -gt 0 ]]; do
@@ -89,12 +95,15 @@ function parse_params() {
                 is_verbose=true
                 ;;
             build)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 build
                 ;;
             start)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 start
                 ;;
             restart)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 restart
                 ;;
             stop)
@@ -109,6 +118,9 @@ function parse_params() {
                 clean-db
                 echo "done!"
                 exit 0
+                ;;
+            refresh-env-file)
+                refresh-env-file
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"
@@ -129,7 +141,6 @@ function main() {
 
     is_verbose=false
 
-    docker compose convert > "$(pwd)/docker-compose-convert.yaml"
     parse_params "$@"
 }
 
