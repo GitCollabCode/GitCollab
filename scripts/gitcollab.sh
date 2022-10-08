@@ -95,12 +95,15 @@ function parse_params() {
                 is_verbose=true
                 ;;
             build)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 build
                 ;;
             start)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 start
                 ;;
             restart)
+                docker compose convert > "$(pwd)/docker-compose-convert.yaml"
                 restart
                 ;;
             stop)
@@ -138,7 +141,6 @@ function main() {
 
     is_verbose=false
 
-    docker compose convert > "$(pwd)/docker-compose-convert.yaml"
     parse_params "$@"
 }
 
