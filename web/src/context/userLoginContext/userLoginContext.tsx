@@ -36,7 +36,7 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem('gitcollab_jwt')
     localStorage.removeItem('gitcollab_jwt')
 
-    fetch("http://localhost:8080"+LOGOUT, {
+    fetch(process.env.REACT_APP_API_URI+LOGOUT, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
