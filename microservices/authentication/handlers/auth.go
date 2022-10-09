@@ -30,26 +30,25 @@ type jsonGitOauth struct {
 	Code string // github code
 }
 
+// create refrence to new auth struct, hold logger
 func NewAuth(log *logrus.Logger, pg *db.PostgresDriver, oauthID string, redirectUrl string) *Auth {
-	// create refrence to new auth struct, hold logger
 	return &Auth{pg, log, oauthID, redirectUrl}
 }
 
+// get the redirect url for github, when login button is clicked, this will be returned
+// to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
-	// get the redirect url for github, when login button is clicked, this will be returned
-	// to the frontend
+
 	redirect := fmt.Sprintf(rUrl, a.gitOauthID, a.gitRedirectUrl)
 	w.Write([]byte(redirect))
 }
 
+// Handler for login, occurs when user returns from github redirect.
+// Will first attempt to get code from request body, if valid retrieve a
+// github access token. If this token is good, go ahead and create a JWT
+// for frontend.
+// TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	// Handler for login, occurs when user returns from github redirect.
-	// Will first attempt to get code from request body, if valid retrieve a
-	// github access token. If this token is good, go ahead and create a JWT
-	// for frontend.
-
-	// TODO: If user does not exist in DB, should create jwt and bring to new
-	// 		 user flow.
 	a.log.Info("Serving login request")
 	dec := json.NewDecoder(r.Body)
 	var oauth jsonGitOauth
@@ -97,9 +96,9 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(tokenString))
 }
 
+// add jwt's to the blacklist, these will be picked up by the blacklist
+// middleware and refuse access if found
 func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	// add jwt's to the blacklist, these will be picked up by the blacklist
-	// middleware and refuse access if found
 	jwtString := jwt.GetJwtFromHeader(r)
 	if jwtString == "" {
 		// add err for frontend

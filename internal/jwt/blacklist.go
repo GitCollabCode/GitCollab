@@ -17,7 +17,7 @@ func JWTBlackList(db *db.PostgresDriver, logger *logrus.Logger) func(http.Handle
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			jwtString := GetJwtFromHeader(r)
 			if jwtString == "" {
-				w.Write([]byte("not found"))
+				w.Write([]byte("not found")) // change to err?
 				return
 			}
 
