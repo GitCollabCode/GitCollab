@@ -27,11 +27,12 @@ func GetJwtFromHeader(r *http.Request) string {
 // Create a new JWT for the frontend (NOT GITHUB). All requests from
 // the frontend will contain this JWT, if modified or expired, will
 // return error to frontend
-func CreateGitCollabJwt(username string) (string, error) {
+func CreateGitCollabJwt(username string, gitID string) (string, error) {
 	claims := goJwt.MapClaims{}
 	claims["exp"] = time.Now().Add(48 * time.Hour) // todo update this
 	claims["authorized"] = true
 	claims["user"] = username
+	claims["githubID"] = gitID
 	// create token, return err and token string
 	token := goJwt.NewWithClaims(goJwt.SigningMethodHS256, claims)
 	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET") // check if ""
