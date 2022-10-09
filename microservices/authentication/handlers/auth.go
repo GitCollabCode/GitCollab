@@ -93,8 +93,8 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// serve token to frontend
-	jsonToken := fmt.Sprintf("{token:%s}", tokenString)
-	w.Write([]byte(jsonToken))
+	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
+	w.Write([]byte(tokenString))
 }
 
 func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
