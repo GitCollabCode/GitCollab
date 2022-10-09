@@ -9,17 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type contextKey struct {
-	name string
-}
-
 // Middleware to check if a given JWT is blacklisted
 // All private routes with JWT headers should pass through this
 // middleware
 func JWTBlackList(db *db.PostgresDriver, logger *logrus.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-			jwtString := r.URL.Query().Get("jwt")
+			jwtString := GetJwtFromHeader(r)
 			if jwtString == "" {
 				w.Write([]byte("not found"))
 				return
