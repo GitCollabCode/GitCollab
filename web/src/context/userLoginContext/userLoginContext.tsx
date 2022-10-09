@@ -1,6 +1,7 @@
 import React, { createContext, useReducer, ReactNode, useEffect } from 'react'
 
 import { userLoginContextState } from '../../constants/common'
+import { LOGOUT } from '../../constants/endpoints'
 import { reducer } from './userLoginValues'
 
 const isLoggedLS = localStorage.getItem('isLoggedIn')
@@ -32,6 +33,18 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const logOut = () => {
+    const token = localStorage.getItem('gitcollab_jwt')
+    localStorage.removeItem('gitcollab_jwt')
+
+    fetch(process.env.REACT_APP_API_URI+LOGOUT, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      }
+    }).then((response)=>console.log(response)).then(()=>localStorage.removeItem("gitcollab_jwt"))
+    
     dispatch({
       type: 'LOGOUT',
     })

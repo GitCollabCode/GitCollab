@@ -4,13 +4,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/golang-jwt/jwt"
 	goJwt "github.com/golang-jwt/jwt"
 )
+
+func GetJwtFromHeader(r *http.Request) string {
+	// retrieve bearer token from header
+	authString := r.Header.Get("Authorization")
+	splitToken := strings.Split(authString, "Bearer ")
+	return splitToken[1]
+}
 
 // todo, move to other package, not handlers
 func CreateGitCollabJwt(username string) (string, error) {

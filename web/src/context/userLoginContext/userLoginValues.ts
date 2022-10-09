@@ -34,7 +34,6 @@ export const reducer = (state: userValue, action: ValidAction): userValue => {
       }
     }
     case 'LOGOUT': {
-      localStorage.clear()
       return {
         ...state,
         isLoggedIn: false,
