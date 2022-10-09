@@ -25,19 +25,16 @@ const Login = () => {
         code: newUrl[1],
       }
 
-      type jwtToken = {
-        token: string
-      }
   
       // Use code parameter and other parameters to make POST request to BE
       fetch(process.env.REACT_APP_API_URI + SIGNIN, {
         method: 'POST',
         body: JSON.stringify(requestData),
       })
-        .then((response) => response.json())
-        .then((data: jwtToken) => {
+        .then((response) => response.text())
+        .then((data) => {
           console.log(data)
-          logIn(data.token, {})
+          logIn(data, {})
         })
         .catch((error) => {
           console.log(error)
