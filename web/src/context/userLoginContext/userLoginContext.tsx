@@ -42,7 +42,6 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token,
-        'Host': 'api.producthunt.com'
       }
     }).then((response)=>console.log(response)).then(()=>localStorage.removeItem("gitcollab_jwt"))
     
