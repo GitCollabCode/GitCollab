@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/golang-jwt/jwt"
 	goJwt "github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 )
@@ -13,55 +12,49 @@ import (
 type ctxKey string
 
 const (
-	USER_CTX_KEY  ctxKey = "username"
-	GITID_CTX_KEY ctxKey = "githubID"
+	CLAIMS_KEY ctxKey = "username"
 )
 
-func parseToken(tokenString string, secret string) (*goJwt.Token, error) {
-	if tokenString == "" {
-		return nil, fmt.Errorf("could not find jwt string")
-	}
-	// parse the token
+func (g *GitCollabJwtConf) parseToken(tokenString string) (*goJwt.Token, error) {
 	token, err := goJwt.Parse(tokenString, func(token *goJwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*goJwt.SigningMethodECDSA); !ok {
+		if _, ok := token.Method.(*goJwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unable to parse JWT")
 		}
-		return []byte(secret), nil // return secret
+		return []byte(g.jwtSecret), nil // return secret
 	})
 	// check if retrieved goJwt.Token was good
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, fmt.Errorf("could not parse token")
 	}
 	return token, nil
 }
 
-func VerifyJWT(secret string, logger *logrus.Logger) func(http.Handler) http.Handler {
+func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			tokenString := GetJwtFromHeader(r)
-			token, err := parseToken(tokenString, secret)
+			token, err := g.parseToken(tokenString)
 			if err != nil { // could not parse the token!
+				fmt.Println("Couldnt parse i stupodui")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			claims, ok := token.Claims.(jwt.MapClaims)
+			claims, ok := token.Claims.(goJwt.MapClaims)
 			if !ok { // claims not retrieved!
+				fmt.Println("claims not worky :(")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			if !token.Valid { // no good! backout
+				fmt.Println("Not valid!!! boy 7what the hwell")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			// set context\
-
-			username := claims["user"].(string)
-			gitID := claims["githubID"].(string)
-
-			ctx := context.WithValue(r.Context(), USER_CTX_KEY, username)
-			ctx = context.WithValue(ctx, GITID_CTX_KEY, gitID)
-			next.ServeHTTP(w, r.WithContext(ctx))
+			ctx := context.WithValue(r.Context(), CLAIMS_KEY, claims["username"])
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
 	}

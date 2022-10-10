@@ -31,6 +31,7 @@ services:
       - GITHUB_CLIENTID=${GITHUB_CLIENTID:?}
       - GITHUB_SECRET=${GITHUB_SECRET:?}
       - REACT_APP_REDIRECT_URI=${REACT_APP_REDIRECT_URI:?}
+      - GITCOLLAB_SECRET=${GITCOLLAB_SECRET:?}
     networks:
       - gitcollab
     ports:
