@@ -105,8 +105,11 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *Auth) TestHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Trying to run verify\n")
-	w.Write([]byte(r.Context().Value("username").(string)))
-	//w.Write([]byte("yagaaaa"))
+	username := r.Context().Value(jwt.ContextKeyUser)
+	gitId := r.Context().Value(jwt.ContextGitId)
+	fmt.Printf("Username from context is %s\n", username)
+	fmt.Printf("gitid from context is %s\n", gitId)
+	w.Write([]byte(fmt.Sprintf("sussy usernam is %s with id %f", username, gitId)))
 }
 
 // add jwt's to the blacklist, these will be picked up by the blacklist

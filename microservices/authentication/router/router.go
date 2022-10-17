@@ -21,6 +21,7 @@ func InitAuthRouter(r chi.Router, auth *handlers.Auth, conf *jwt.GitCollabJwtCon
 			r.Use(conf.VerifyJWT(auth.Log))
 			fmt.Println("Taco bell crunch wrap supreme")
 			r.Get("/verify", func(w http.ResponseWriter, r *http.Request) {
+				//w.Write([]byte("crungchy chickem"))
 				auth.TestHandler(w, r)
 			})
 		})

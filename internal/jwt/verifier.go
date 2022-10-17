@@ -9,10 +9,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ctxKey string
+type contextKey string
 
-const (
-	CLAIMS_KEY ctxKey = "username"
+func (c contextKey) String() string { // add custom shit here 😎
+	return "mypackage context key " + string(c)
+}
+
+var (
+	ContextKeyUser = contextKey("user")
+	ContextGitId   = contextKey("gitid")
 )
 
 func (g *GitCollabJwtConf) parseToken(tokenString string) (*goJwt.Token, error) {
@@ -52,9 +57,18 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), CLAIMS_KEY, claims["username"])
-			r = r.WithContext(ctx)
-			next.ServeHTTP(w, r)
+			username := claims["user"]
+			gitId := claims["githubID"]
+			if username == nil || gitId == nil {
+				fmt.Println("No username or git ID in jwt????? huhhhh")
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			// set context, change this bih to use map or sync map, kinda wack how im
+			// adding both of thees values
+			ctx := context.WithValue(r.Context(), ContextKeyUser, username.(string))
+			ctx2 := context.WithValue(ctx, ContextGitId, gitId.(float64))
+			next.ServeHTTP(w, r.WithContext(ctx2))
 		}
 		return http.HandlerFunc(fn)
 	}
