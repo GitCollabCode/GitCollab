@@ -16,10 +16,11 @@ import (
 
 // struct to hold info for handlers
 type Auth struct {
-	PgConn         *db.PostgresDriver
-	Log            *logrus.Logger
-	oauth          *oauth2.Config
-	gitRedirectUrl string
+	PgConn          *db.PostgresDriver
+	Log             *logrus.Logger
+	oauth           *oauth2.Config
+	gitRedirectUrl  string
+	gitCollabSecret string
 }
 
 const (
@@ -37,9 +38,9 @@ type jsonGitOauth struct {
 // oConf = config for oauth, holds secret and id
 // redirectUrl = redirect for frontend, github brings you back here
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
-	redirectUrl string) *Auth {
+	redirectUrl string, gitCollabSecret string) *Auth {
 
-	return &Auth{pg, log, oConf, redirectUrl}
+	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
 }
 
 // get the redirect url for github, when login button is clicked, this will be returned
@@ -91,7 +92,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new token for the frontend
-	tokenString, err := jwt.CreateGitCollabJwt(*username.Login, *username.ID)
+	tokenString, err := jwt.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -101,7 +101,7 @@ func main() {
 	})
 
 	// register all sub routers
-	auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect)
+	auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
 	authRouter.InitAuthRouter(r, auth, jwtConf)
 
 	profiles := profilesHandlers.NewProfiles(logger)
