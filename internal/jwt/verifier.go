@@ -42,6 +42,7 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 			token, err := g.parseToken(tokenString)
 			if err != nil { // could not parse the token!
 				fmt.Println("Couldnt parse i stupodui")
+				logger.Error("Majed momento")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}

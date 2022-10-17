@@ -47,9 +47,11 @@ func main() {
 	clientSecret := os.Getenv("GITHUB_SECRET")
 	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET")
 	gitRedirect := os.Getenv("REACT_APP_REDIRECT_URI")
+	dbUrl := os.Getenv("POSTGRES_URL")
+	httpPort := os.Getenv("HTTP_PORT")
 
 	// check environment variables
-	if err := verifyEnv(clientID, gitRedirect); err != nil {
+	if err := verifyEnv(clientID, gitRedirect, dbUrl); err != nil {
 		logger.Panic(err.Error())
 		return
 	}
@@ -82,7 +84,7 @@ func main() {
 	jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
 
 	// create db drivers
-	dbDriver, err := db.ConnectPostgres(os.Getenv("POSTGRES_URL"))
+	dbDriver, err := db.ConnectPostgres(dbUrl)
 	if err != nil {
 		logger.Error(err)
 		return
@@ -106,7 +108,6 @@ func main() {
 	profilesRouter.InitRouter(r, profiles)
 
 	// Start server
-	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = ":8080"
 	}
