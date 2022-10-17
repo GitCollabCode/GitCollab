@@ -4,14 +4,20 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
-	"github.com/golang-jwt/jwt"
 	goJwt "github.com/golang-jwt/jwt"
 )
+
+type GitCollabJwtConf struct {
+	jwtSecret string
+}
+
+func NewGitCollabJwtConf(secret string) *GitCollabJwtConf {
+	return &GitCollabJwtConf{secret}
+}
 
 // Retrieve JWT from the header, return empty string if no JWT
 func GetJwtFromHeader(r *http.Request) string {
@@ -27,27 +33,32 @@ func GetJwtFromHeader(r *http.Request) string {
 // Create a new JWT for the frontend (NOT GITHUB). All requests from
 // the frontend will contain this JWT, if modified or expired, will
 // return error to frontend
-func CreateGitCollabJwt(username string) (string, error) {
-	claims := goJwt.MapClaims{}
-	claims["exp"] = time.Now().Add(48 * time.Hour) // todo update this
+func CreateGitCollabJwt(username string, gitID int64, secret string) (string, error) {
+	// create token, return err and token string
+	token := goJwt.New(goJwt.SigningMethodHS256)
+	claims := token.Claims.(goJwt.MapClaims)
+	claims["exp"] = time.Now().Add(48 * time.Hour).Unix()
 	claims["authorized"] = true
 	claims["user"] = username
-	// create token, return err and token string
-	token := goJwt.NewWithClaims(goJwt.SigningMethodHS256, claims)
-	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET") // check if ""
-	return token.SignedString([]byte(gitCollabSecret))
+	claims["githubID"] = gitID
+
+	tokenStr, err := token.SignedString([]byte(secret))
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	return tokenStr, nil
 }
 
-// TODO: Fix, either this or jwt generation putting invalid time
 // Get the time a given JWT expires at. Takes the jwt string and returns
 // time it expires at as time.Time
 func getExpTime(tokenString string) (time.Time, error) {
-	token, _, err := new(goJwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+	token, _, err := new(goJwt.Parser).ParseUnverified(tokenString, goJwt.MapClaims{})
 	if err != nil {
 		return time.Time{}, err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(goJwt.MapClaims)
 	if !ok {
 		return time.Time{}, err
 	}

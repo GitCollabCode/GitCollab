@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	authHandlers "github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	authRouter "github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	profilesHandlers "github.com/GitCollabCode/GitCollab/microservices/profiles/handlers"
@@ -19,6 +20,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
+	githuboauth "golang.org/x/oauth2/github"
 )
 
 func verifyEnv(env ...string) error {
@@ -41,10 +44,14 @@ func main() {
 
 	// get environment variables
 	clientID := os.Getenv("GITHUB_CLIENTID")
+	clientSecret := os.Getenv("GITHUB_SECRET")
+	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET")
 	gitRedirect := os.Getenv("REACT_APP_REDIRECT_URI")
+	dbUrl := os.Getenv("POSTGRES_URL")
+	httpPort := os.Getenv("HTTP_PORT")
 
 	// check environment variables
-	if err := verifyEnv(clientID, gitRedirect); err != nil {
+	if err := verifyEnv(clientID, gitRedirect, dbUrl); err != nil {
 		logger.Panic(err.Error())
 		return
 	}
@@ -65,13 +72,24 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
+	// create oauth config for github
+	var GitOauthConfig = &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,                        // maybe store?
+		Scopes:       []string{"user:email", "user:name"}, // verify what we need
+		Endpoint:     githuboauth.Endpoint,
+	}
+
+	// create gitcollab jwt conf
+	jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
+
 	// create db drivers
-	authDB, err := db.ConnectPostgres(os.Getenv("POSTGRES_URL"))
+	dbDriver, err := db.ConnectPostgres(dbUrl)
 	if err != nil {
 		logger.Error(err)
 		return
 	}
-	defer authDB.Connection.Close(context.Background())
+	defer dbDriver.Connection.Close(context.Background())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi from Git Collab"))
@@ -83,14 +101,13 @@ func main() {
 	})
 
 	// register all sub routers
-	auth := authHandlers.NewAuth(logger, authDB, clientID, gitRedirect)
-	authRouter.InitAuthRouter(r, auth)
+	auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
+	authRouter.InitAuthRouter(r, auth, jwtConf)
 
 	profiles := profilesHandlers.NewProfiles(logger)
 	profilesRouter.InitRouter(r, profiles)
 
 	// Start server
-	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = ":8080"
 	}
