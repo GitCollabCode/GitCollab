@@ -52,6 +52,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 	err = data.ToJSON(profile, w) //change the returned profile struct later to NOT include github token
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
