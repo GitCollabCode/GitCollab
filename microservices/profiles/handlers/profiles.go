@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,7 +37,7 @@ type ValidationError struct {
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	username := chi.URLParam(r, "username")
 
-	profile, err := p.pd.GetProfile(username)
+	profile, err := p.pd.GetProfileByUsername(username)
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -63,7 +63,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
-	nProfile := r.Context().Value(Profiles{}).(data.Profile)
+	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
 	err := p.pd.AddProfile(nProfile.GitHubUserID,
 		nProfile.GitHubToken,
@@ -93,7 +93,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	username := chi.URLParam(r, "username")
 
-	profile, err := p.pd.GetProfile(username)
+	profile, err := p.pd.GetProfileByUsername(username)
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
