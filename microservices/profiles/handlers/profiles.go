@@ -36,7 +36,8 @@ type ValidationError struct {
 }
 
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
-	username := chi.URLParam(r, "username") //add a regex check to make sure username follows allowed username format
+	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
+	username := chi.URLParam(r, "username")
 
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
@@ -92,7 +93,8 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
-	username := chi.URLParam(r, "username") //add a regex check to make sure username follows allowed username format
+	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
+	username := chi.URLParam(r, "username")
 
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
