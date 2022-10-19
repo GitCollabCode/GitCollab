@@ -6,6 +6,7 @@ import (
 
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,19 +36,19 @@ type ValidationError struct {
 }
 
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
-	username := chi.URLParam(r, "username")
+	username := chi.URLParam(r, "username") //add a regex check to make sure username follows allowed username format
 
 	profile, err := p.pd.GetProfileByUsername(username)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		return
+	}
+
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
-		return
-	}
-
-	if profile == nil {
-		w.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
 		return
 	}
 
@@ -91,19 +92,19 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
-	username := chi.URLParam(r, "username")
+	username := chi.URLParam(r, "username") //add a regex check to make sure username follows allowed username format
 
 	profile, err := p.pd.GetProfileByUsername(username)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		return
+	}
+
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
-		return
-	}
-
-	if profile == nil {
-		w.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
 		return
 	}
 

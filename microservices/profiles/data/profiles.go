@@ -64,34 +64,11 @@ func (pd *ProfileData) profilesTransactOneRow(sqlStatement string, args ...any) 
 
 func (pd *ProfileData) profilesGetRow(sqlStatement string, args ...any) (*Profile, error) {
 	var p Profile
-	rows, err := pd.dbDriver.Connection.Query(context.Background(), sqlStatement, args...)
+
+	err := pd.dbDriver.Connection.QueryRow(context.Background(), sqlStatement, args...).Scan(&p.GitHubUserID, &p.GitHubToken, &p.Username, &p.AvatarURL, &p.Email)
 	if err != nil {
 		pd.log.Errorf("profilesGetRow Query failed: %s", err.Error())
 		return nil, err
-	}
-
-	defer rows.Close()
-
-	count := 0
-	for rows.Next() {
-		if count > 0 {
-			err = ErrProfiletMultipleRowsRetunred
-			pd.log.Errorf("profilesGetRow failed: %s", err.Error())
-			return nil, err
-		}
-
-		// NOTE: pgx does not support putting data in struct directly, if there is a better
-		// way please replace this.
-		err := rows.Scan(&p.GitHubUserID, &p.GitHubToken, &p.Username, &p.AvatarURL, &p.Email)
-		if err != nil {
-			pd.log.Errorf("profilesGetRow Scan failed: %s", err.Error())
-			return nil, err
-		}
-		count++
-	}
-
-	if count == 0 {
-		return nil, nil
 	}
 
 	return &p, nil
@@ -137,11 +114,11 @@ func (pd *ProfileData) DeleteProfile(githubUserID int) error {
 }
 
 func (pd *ProfileData) GetProfile(githubUserID int) (*Profile, error) {
-	sqlStatement := "SELECT * FROM profiles WHERE github_user_id=$1"
+	sqlStatement := "SELECT * FROM profiles WHERE github_user_id = $1"
 	return pd.profilesGetRow(sqlStatement, githubUserID)
 }
 
 func (pd *ProfileData) GetProfileByUsername(username string) (*Profile, error) {
-	sqlStatement := "SELECT * FROM profiles WHERE username=$1"
+	sqlStatement := "SELECT * FROM profiles WHERE username = $1"
 	return pd.profilesGetRow(sqlStatement, username)
 }
