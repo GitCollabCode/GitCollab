@@ -9,6 +9,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/GitCollabCode/GitCollab/internal/github"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
+	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
 	goGithub "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -92,13 +93,22 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new token for the frontend
-	tokenString, err := jwt.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
+	tokenString, err := helpers.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	isUser, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
+	if err != nil {
+		a.Log.Error(err) // crash or something happened???
+		return
+	}
+	if !isUser { // did not find the user, create new account
+		helpers.CreateNewUser(int(*username.ID), *username.Login, tokenString, *username.Email,
+			*username.AvatarURL, a.Log, a.PgConn)
+	}
 	// serve token to frontend
 	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
 	w.Write([]byte(tokenString))
@@ -109,12 +119,12 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	jwtString := jwt.GetJwtFromHeader(r)
 	if jwtString == "" {
-		// add err for frontend
+		// add err for frontendF
 		a.Log.Error("jwt not found in header")
 		return
 	}
 	a.Log.Info("Adding jwt %s to blacklist", jwtString)
-	err := jwt.InsertJwtBlacklist(a.PgConn, jwtString)
+	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
 		a.Log.Error(err)
 		// add error for frontend
