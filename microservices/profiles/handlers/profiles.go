@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
+	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,18 +15,17 @@ type ProfileCtx struct{}
 type Profiles struct {
 	log      *logrus.Logger
 	validate *data.Validation
-	//db  	 *data.MongoDriver
-
+	pd       *data.ProfileData
 }
 
-func NewProfiles(log *logrus.Logger) *Profiles {
-	return &Profiles{log, data.NewValidation()}
+func NewProfiles(log *logrus.Logger, pd *data.ProfileData) *Profiles {
+	return &Profiles{log, data.NewValidation(), pd}
 }
 
 // ErrInvalidProductPath is an error message when the product path is not valid
 var ErrInvalidProfilePath = fmt.Errorf("invalid path, path should be /profile/[username]")
 
-// GenericError is a generic error message returned by a server
+// ErrorMessage is a generic error message returned by a server
 type ErrorMessage struct {
 	Message string `json:"message"`
 }
@@ -35,51 +36,102 @@ type ValidationError struct {
 }
 
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
-	// username := chi.URLParam(r, "username")
+	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
+	username := chi.URLParam(r, "username")
 
-	// profile, err := p.db.GetProfile(username)
-	// if err != nil {
-	// 	p.log.Error(err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	models.ToJSON(&models.ErrorMessage{Message: "Failed to fetch user profile"}, w)
-	// 	return
-	// }
+	profile, err := p.pd.GetProfileByUsername(username)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		return
+	}
 
-	// if profile.GithubUsername == "" {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	models.ToJSON(&models.ErrorMessage{Message: "User does not exist"}, w)
-	// 	return
-	// }
+	if err != nil {
+		p.log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		return
+	}
 
-	// err = data.ToJSON(profile, w)
-	// if err != nil {
-	// 	p.log.Error(err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	models.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
-	// 	return
-	// }
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	err = data.ToJSON(profile, w) //change the returned profile struct later to NOT include github token
+	if err != nil {
+		p.log.Fatalf("GetProfile failed to send response: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		return
+	}
 }
 
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
+	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
-	//nProfile := r.Context().Value(Profiles{}).(data.Profile)
+	err := p.pd.AddProfile(nProfile.GitHubUserID,
+		nProfile.GitHubToken,
+		nProfile.Username,
+		nProfile.AvatarURL,
+		nProfile.Email)
+	if err != nil {
+		p.log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		return
+	}
 
-	// err := p.db.AddProfile(&nProfile)
-	// if err != nil {
-	// 	p.log.Error(err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	data.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
-	// 	return
-	// }
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
-}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	resp := make(map[string]string)
+	resp["message"] = "profile created"
 
-func (p *Profiles) PutProfile(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	data.ToJSON(resp, w)
+	if err != nil {
+		p.log.Fatalf("PostProfile failed to send success response: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+	}
 }
 
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
+	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
+	username := chi.URLParam(r, "username")
+
+	profile, err := p.pd.GetProfileByUsername(username)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		return
+	}
+
+	if err != nil {
+		p.log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		return
+	}
+
+	err = p.pd.DeleteProfile(profile.GitHubUserID)
+	if err != nil {
+		p.log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	resp := make(map[string]string)
+	resp["message"] = "profile deleted"
+
+	data.ToJSON(resp, w)
+	if err != nil {
+		p.log.Fatalf("DeleteProfile failed to send success response: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+	}
+}
+
+func (p *Profiles) PutProfile(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }
 

@@ -14,10 +14,11 @@ import (
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	authHandlers "github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	authRouter "github.com/GitCollabCode/GitCollab/microservices/authentication/router"
+	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	profilesHandlers "github.com/GitCollabCode/GitCollab/microservices/profiles/handlers"
 	profilesRouter "github.com/GitCollabCode/GitCollab/microservices/profiles/router"
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -104,7 +105,8 @@ func main() {
 	auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
 	authRouter.InitAuthRouter(r, auth, jwtConf)
 
-	profiles := profilesHandlers.NewProfiles(logger)
+	pd := data.NewProfileData(dbDriver, logger)
+	profiles := profilesHandlers.NewProfiles(logger, pd)
 	profilesRouter.InitRouter(r, profiles)
 
 	// Start server

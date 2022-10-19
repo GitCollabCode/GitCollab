@@ -1,8 +1,8 @@
+// Ignore this file for now, it is here just incase we want to run the a the microservice by itself.
 package profiles
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -42,9 +42,9 @@ func Init() {
 
 	//r := router.InitRouter(p)
 
-	if *docs {
-		fmt.Println("add swagger docs endpoint here")
-	}
+	// if *docs {
+	// 	fmt.Println("add swagger docs endpoint here")
+	// }
 
 	//http.ListenAndServe(":3000", r)
 
