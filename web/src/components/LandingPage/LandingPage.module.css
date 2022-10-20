@@ -1,3 +1,62 @@
 .container {
-  margin-top: 4rem;
+  margin-top: 10.1875rem;
+}
+
+.topText {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 164px;
+  line-height: 192px;
+  color: white;
+}
+
+.textContainer {
+  width: 712px;
+  height: 418px;
+}
+.animatedText {
+  width: 800px;
+  height: 216px;
+  overflow: hidden;
+}
+
+.line {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 9rem;
+  /* identical to box height */
+
+  background: linear-gradient(
+    82.76deg,
+    #2ac8eb -2.87%,
+    rgba(181, 44, 193, 0.62) 102.83%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.line:first-child {
+  animation: anim 8s infinite;
+}
+
+@keyframes anim {
+  0% {
+    margin-top: 0;
+  }
+  25% {
+    margin-top: -216px;
+  }
+  50% {
+    margin-top: -432px;
+  }
+  75% {
+    margin-top: -648px;
+  }
+  100% {
+    margin-top: -862px;
+  }
 }
