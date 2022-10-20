@@ -70,9 +70,10 @@ function clean() {
 }
 
 function clean-db() {
-    echo "Removing saved postgres data from $(pwd)/data..."
+    echo "Removing saved postgres db volume and container..."
     sudo rm -rf "$(pwd)/db_data"
     docker container rm gitcollab-db-1
+    docker volume rm gitcollab_db
 }
 
 function refresh-env-file() {
