@@ -17,8 +17,14 @@ code {
   box-sizing: border-box;
 }
 body {
-  background: grey !important;
-  min-height: 100vh;
+  background: linear-gradient(
+      73.67deg,
+      rgba(0, 41, 255, 0.156) 15.65%,
+      rgba(0, 0, 0, 0) 105.28%
+    ),
+    linear-gradient(252.96deg, #4b072c 14.27%, #000000 88.33%);
+  height: 100%;
+  width: 100%;
   display: flex;
   font-weight: 400;
   font-family: 'Fira Sans', sans-serif;

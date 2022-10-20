@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
-import { ReactComponent as GithubIcon } from '../../../public/github.svg'
-import style from './Login.module.css'
+import { ReactComponent as GithubIcon } from '../../assets/github.svg'
+import style from './LoginButton.module.css'
 
-const Login = () => {
+const LoginButton = () => {
   const { proxy_url, logIn, user, isLoggedIn, logOut } =
     useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
@@ -62,7 +62,7 @@ const Login = () => {
       {console.log(user)}
       {!isLoggedIn ? (
         <button className={style.button} onClick={() => redirectToGithub()}>
-          <GithubIcon /> Login with GitHub
+          <GithubIcon /> <p className={style.githubButtonText}>login</p>
         </button>
       ) : (
         <button className={'btn btn-primary'} onClick={() => logOut()}>
@@ -73,4 +73,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginButton

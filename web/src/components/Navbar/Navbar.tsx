@@ -2,7 +2,7 @@ import React from 'react'
 import NavItem from '../NavItem/NavItem'
 
 import style from '../Navbar/Navbar.module.css'
-import Login from '../Login/Login'
+import LoginButton from '../LoginButton/LoginButton'
 
 const Navbar = () => {
   return (
@@ -15,7 +15,7 @@ const Navbar = () => {
           <NavItem text="about" link="/#" />
         </div>
         <div className={style.loginBox}>
-          <Login />
+          <LoginButton />
         </div>
       </nav>
     </div>

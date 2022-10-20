@@ -3,6 +3,7 @@
   min-height: 6.25rem;
   justify-content: space-between;
   min-width: 100%;
+  border-bottom: 1px #d9d9d9;
 }
 
 .centerNavItems {
@@ -18,8 +19,8 @@
   font-family: 'Roboto Flex';
   font-style: normal;
   font-weight: 400;
-  font-size: 73px;
-  line-height: 86px;
+  font-size: 4.5rem;
+  line-height: 5.375rem;
 
   color: white;
   margin-top: 0.5rem;
