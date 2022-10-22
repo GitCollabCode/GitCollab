@@ -43,20 +43,8 @@ pipeline {
             when {
                 expression { false }
             }
-            steps {
-                echo 'Skipping, no steps Go tests not setup!'
-            }
-            // Will need to get updated when some tests are added
-            // steps {
-			// 	withCredentials([usernamePassword(credentialsId: 'TEST_CREDENTIALS', usernameVariable: 'TEST_USERNAME', passwordVariable: 'TEST_PASSWORD'), string(credentialsId: 'KOPANO_SERVER_DEFAULT_URI', variable: 'KOPANO_SERVER_DEFAULT_URI')]) {
-			// 		echo 'Testing..'
-			// 		sh 'echo Kopano Server URI: \$KOPANO_SERVER_DEFAULT_URI'
-			// 		sh 'echo Kopano Server Username: \$TEST_USERNAME'
-			// 		sh 'go test -v -count=1 | tee tests.output'
-			// 		sh 'PATH=$PATH:$GOBIN  go2xunit -fail -input tests.output -output tests.xml'
-			// 	}
-			// 	junit allowEmptyResults: true, testResults: 'tests.xml'
-			// }
+            echo 'UNIT TEST EXECUTION STARTED'
+            sh 'go test ./...'
         }
 
         stage('Go Code Analysis') {
