@@ -22,10 +22,10 @@ wget https://golang.org/dl/go1.19.1.linux-amd64.tar.gz -P /tmp/
 #Unpack go tar
 sudo tar -C /usr/local -xvf /tmp/go1.19.1.linux-amd64.tar.gz
 
-#Setting up .profile export path
-if ! grep -q "/usr/local/go/bin" ~/.profile
+#Setting up .bashrc export path
+if ! grep -q "/usr/local/go/bin" ~/.bashrc
 then
-    echo "export PATH=\$PATH:/usr/local/go/bin" >>  ~/.profile
+    echo "export PATH=\$PATH:/usr/local/go/bin" >>  ~/.bashrc
 fi
 
 #There is an issue with WSL paths in bash scripts for .profiles and .bashrc files
@@ -33,7 +33,7 @@ fi
 if grep -qi microsoft /proc/version
 then
     echo "############################################################################"
-    echo "  Please manually source ~/.profile for WSL environments"
+    echo "  Please manually source ~/.bashrc for WSL environments"
     echo "  Bash is unable to properly process .bashrc and .profile paths within WSL"
     echo "  https://askubuntu.com/questions/1354999/bad-variable-name-error-on-wsl"
     echo "############################################################################"
@@ -42,7 +42,7 @@ then
     exit 0
 fi
 
-. "/$HOME/.profile"
+. "/$HOME/.bashrc"
 
 go version
 

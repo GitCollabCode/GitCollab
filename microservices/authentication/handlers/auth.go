@@ -123,7 +123,7 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		a.Log.Error("jwt not found in header")
 		return
 	}
-	a.Log.Info("Adding jwt %s to blacklist", jwtString)
+	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
 	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
 		a.Log.Error(err)

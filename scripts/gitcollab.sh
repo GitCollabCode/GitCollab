@@ -39,14 +39,7 @@ EOF
 
 function run-test() {
     echo "Running Go Unit tests..."
-    GO=/usr/local/go/bin/go
-    modules=(
-        "github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
-    )
-    for i in "${modules[@]}"
-    do
-        $GO test "$(pwd)/tests/unit/$i"
-    done
+    go test ./... -v
 }
 
 function build() {
@@ -110,6 +103,7 @@ function parse_params() {
                 ;;
             test)
                 run-test
+                exit 0
                 ;;
             build)
                 docker compose convert > "$(pwd)/docker-compose-convert.yaml"

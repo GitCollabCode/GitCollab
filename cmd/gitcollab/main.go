@@ -131,7 +131,7 @@ func main() {
 
 		err := s.ListenAndServe()
 		if err != nil {
-			logger.Error("Error starting server: %s\n", err)
+			logger.Errorf("Error starting server: %s\n", err)
 			os.Exit(1)
 		}
 	}()
