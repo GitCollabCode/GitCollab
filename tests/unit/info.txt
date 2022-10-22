@@ -1,0 +1,8 @@
+This directory contains all unit tests for go microservices
+
+Tests are split up into a directory per microservices, allowing for
+unique setup/teardown per service.
+
+In <microservice>_test.go, setup/teardown can be added to the TestMain
+function. This will occur before all tests are ran. Additional files can
+be added per microservice directory if needed.
