@@ -100,14 +100,17 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isUser, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
+	userInfo, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
 	if err != nil {
 		a.Log.Error(err) // crash or something happened???
 		return
 	}
-	if !isUser { // did not find the user, create new account
-		helpers.CreateNewUser(int(*username.ID), *username.Login, tokenString, *username.Email,
-			*username.AvatarURL, a.Log, a.PgConn)
+
+	if userInfo == nil { // did not find the user, create new account
+		helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken,
+			*username.Email, *username.AvatarURL, a.Log, a.PgConn)
+	} else if userInfo.GitHubToken != gitAccessToken.AccessToken { // found user, but check if token doesnt match
+		helpers.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
 	}
 	// serve token to frontend
 	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
