@@ -40,8 +40,10 @@ EOF
 function run-test() {
     echo "Running Go Unit tests..."
     GO=/usr/local/go/bin/go
-    tests=("authentication_tests" "profiles_tests" "projects_tests")
-    for i in "${tests[@]}"
+    modules=(
+        "github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
+    )
+    for i in "${modules[@]}"
     do
         $GO test "$(pwd)/tests/unit/$i"
     done

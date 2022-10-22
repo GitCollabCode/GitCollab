@@ -1,10 +1,9 @@
-package authentication_tests
+package helpers
 
 import (
 	"os"
 	"testing"
 
-	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
 	goJwt "github.com/golang-jwt/jwt"
 )
 
@@ -33,7 +32,7 @@ func TestMain(m *testing.M) {
 
 func TestCreateToken(t *testing.T) {
 	// test if token generated can be made
-	JwtTest, err = helpers.CreateGitCollabJwt(USERNAME, GIT_ID, SECRET)
+	JwtTest, err = CreateGitCollabJwt(USERNAME, GIT_ID, SECRET)
 	if err != nil || JwtTest == "" {
 		t.Errorf("GitCollab JWT not created %q", err)
 	}
