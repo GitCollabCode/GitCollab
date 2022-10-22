@@ -75,16 +75,22 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 	return nil
 }
 
-func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (bool, error) {
+func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
 	pDb := data.NewProfileData(pg, log)
-	_, err := pDb.GetProfile(gitId)
+	profile, err := pDb.GetProfile(gitId)
 	if err == pgx.ErrNoRows {
-		return false, nil
+		return nil, nil
 	}
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, nil // user exists
+	return profile, nil // user exists, return data
+}
+
+func UpdateGitAccessToken(user *data.Profile, token string, pg *db.PostgresDriver, log *logrus.Logger) error {
+	// will update the current access token to match that returned by git
+	pDb := data.NewProfileData(pg, log)
+	return pDb.UpdateProfileToken(user.GitHubUserID, token)
 }
 
 func CreateNewUser(gitId int, gitUser string, gitToken string,
