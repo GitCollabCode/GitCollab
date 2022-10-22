@@ -33,7 +33,13 @@ GitCollab deployment script, used to control the docker functions of the project
     Arugments:
         build                    Disables colour output
         start                    Run silently unless we encounter an error
+        test                     Start a unit test suite
 EOF
+}
+
+function run-test() {
+    echo "Running Go Unit tests..."
+    go test ./... -v
 }
 
 function build() {
@@ -94,6 +100,10 @@ function parse_params() {
                 ;;
             -v | --verbose)
                 is_verbose=true
+                ;;
+            test)
+                run-test
+                exit 0
                 ;;
             build)
                 docker compose convert > "$(pwd)/docker-compose-convert.yaml"

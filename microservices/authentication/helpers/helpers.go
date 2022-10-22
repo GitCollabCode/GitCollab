@@ -34,7 +34,7 @@ func CreateGitCollabJwt(username string, gitID int64, secret string) (string, er
 
 // Get the time a given JWT expires at. Takes the jwt string and returns
 // time it expires at as time.Time
-func getExpTime(tokenString string) (time.Time, error) {
+func GetExpTime(tokenString string) (time.Time, error) {
 	token, _, err := new(goJwt.Parser).ParseUnverified(tokenString, goJwt.MapClaims{})
 	if err != nil {
 		return time.Time{}, err
@@ -57,7 +57,7 @@ func getExpTime(tokenString string) (time.Time, error) {
 // Insert a JWT to the blacklist table. Any requests with a header containing
 // this JWT will return an error to the frontend
 func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
-	expTime, err := getExpTime(jwtString)
+	expTime, err := GetExpTime(jwtString)
 	if err != nil {
 		return err
 	}
