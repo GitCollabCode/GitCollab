@@ -28,7 +28,7 @@ pipeline {
                 echo 'Installing dependencies...'
                 sh 'go version'
                 sh 'go mod vendor'
-                sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE golint'
+                sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
             }
         }
 
@@ -56,7 +56,7 @@ pipeline {
             }
             // steps {
             //     echo 'Preforming Go Code Analysis...'
-            //     sh '$WORKSPACE/golint/golangci-lint --timeout=5m run'
+            //     sh '$WORKSPACE/v1.49.0/golangci-lint --timeout=5m run'
             // }
         }
 
