@@ -42,7 +42,7 @@ if [ ! -d "$GICOLLAB_REPO_DIR" ]; then
     exit 1
 fi
 
-#add check to ensure gitcollab app is started
+# TODO: add check to ensure gitcollab app is started
 
 while true
 do 
@@ -58,24 +58,24 @@ do
     if [ "$message" = "update" ]; then
         DATE=$(date)
         echo "[$DATE] Updating live server build!"
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh stop || exit)
         (cd "$GICOLLAB_REPO_DIR" && git pull || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh build || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh start || exit)
     elif [ "$message" = "clean" ]; then
         DATE=$(date)
         echo "[$DATE] Cleaning docker content!"
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab clean || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh stop || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh clean || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh build || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh start || exit)
     elif [ "$message" = "clean-db" ]; then
         DATE=$(date)
         echo "[$DATE] Cleaning database!"
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab clean-db || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh stop || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh clean-db || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh build || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./scripts/gitcollab.sh start || exit)
     elif [ "$message" = "terminate" ]; then
         exit 0
     else

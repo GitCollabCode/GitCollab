@@ -77,7 +77,8 @@ function clean() {
     echo "Taking down active GitCollab docker containers..."
     docker compose down
     echo "Docker system prune..."
-    docker system prune -a
+    # TODO: add confirmation bypass instead of forcing confirmation
+    docker system prune -a -f
 }
 
 function clean-db() {
