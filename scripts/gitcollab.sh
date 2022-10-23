@@ -31,9 +31,14 @@ GitCollab deployment script, used to control the docker functions of the project
         -h | --help              Displays this help
         -v | --verbose           Displays verbose output, display docker logs
     Arugments:
-        build                    Disables colour output
+        build                    Build docker containers
         start                    Run silently unless we encounter an error
+        stop                     Stop running docker containers
+        restart                  Restart all runnign docker containers
+        clean                    Removes all docker related data [Volumes, Containers and Networks]
+        clean-db                 Remove db container and volume
         test                     Start a unit test suite
+        refresh-env-file         Refresh .env file with env file
 EOF
 }
 
