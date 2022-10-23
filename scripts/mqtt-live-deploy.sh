@@ -42,6 +42,8 @@ if [ ! -d "$GICOLLAB_REPO_DIR" ]; then
     exit 1
 fi
 
+#add check to ensure gitcollab app is started
+
 while true
 do 
     DATE=$(date)
@@ -59,21 +61,21 @@ do
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
         (cd "$GICOLLAB_REPO_DIR" && git pull || exit)
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab -v start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
     elif [ "$message" = "clean" ]; then
         DATE=$(date)
         echo "[$DATE] Cleaning docker content!"
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab clean || exit)
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab -v start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
     elif [ "$message" = "clean-db" ]; then
         DATE=$(date)
         echo "[$DATE] Cleaning database!"
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab stop || exit)
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab clean-db || exit)
         (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab build || exit)
-        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab -v start || exit)
+        (cd "$GICOLLAB_REPO_DIR" && ./script/gitcollab start || exit)
     elif [ "$message" = "terminate" ]; then
         exit 0
     else
