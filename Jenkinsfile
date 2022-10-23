@@ -48,16 +48,13 @@ pipeline {
 
         stage('Go Code Analysis') {
             // disable stage
-            when {
-                expression { false }
-            }
-            steps {
-                echo 'Skipping, broken on jenkins please make sure to run golangci-lint locally!'
-            }
-            // steps {
-            //     echo 'Preforming Go Code Analysis...'
-            //     sh '$WORKSPACE/v1.49.0/golangci-lint --timeout=5m run'
+            // when {
+            //     expression { false }
             // }
+            steps {
+                echo 'Preforming Go Code Analysis...'
+                sh '$WORKSPACE/golangci-lint --timeout=5m run'
+            }
         }
 
         stage('npm Install') {
