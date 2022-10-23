@@ -3,3 +3,4 @@
 docker-compose-convert.yaml
 /db_data/
 golangci-lint
+gitcollab_pyenv
