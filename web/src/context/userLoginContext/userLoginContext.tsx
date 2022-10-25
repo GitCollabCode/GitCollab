@@ -5,7 +5,6 @@ import { LOGOUT } from '../../constants/endpoints'
 import { reducer } from './userLoginValues'
 
 const isLoggedLS = localStorage.getItem('isLoggedIn')
-const user = localStorage.getItem('user')
 
 const initialState = {
   isLoggedIn: isLoggedLS ? JSON.parse(isLoggedLS) : false,
@@ -13,7 +12,7 @@ const initialState = {
   logOut: () => {
     /** */
   },
-  logIn: (token: string, user: any) => {
+  logIn: (token: string) => {
     /** */
   },
   setToken: (token: string) => {

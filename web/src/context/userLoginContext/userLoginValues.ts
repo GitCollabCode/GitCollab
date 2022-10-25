@@ -1,7 +1,6 @@
 import { userValue } from '../../constants/common'
 
 const isLoggedLS = localStorage.getItem('isLoggedIn')
-const user = localStorage.getItem('user')
 
 export const initialState = {
   isLoggedIn: isLoggedLS ? JSON.parse(isLoggedLS) : false,
