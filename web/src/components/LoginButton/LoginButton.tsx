@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import { ReactComponent as GithubIcon } from '../../assets/github.svg'
+import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
 import style from './LoginButton.module.css'
 
 const LoginButton = () => {
@@ -65,8 +66,8 @@ const LoginButton = () => {
           <GithubIcon /> <p className={style.githubButtonText}>login</p>
         </button>
       ) : (
-        <button className={'btn btn-primary'} onClick={() => logOut()}>
-          <i className="fa fa-trophy"></i> Logout
+        <button className={style.button} onClick={() => logOut()}>
+         <LogoutIcon /> <p className={style.githubButtonText}>logout</p>
         </button>
       )}
     </>
