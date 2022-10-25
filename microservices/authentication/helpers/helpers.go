@@ -34,7 +34,7 @@ func CreateGitCollabJwt(username string, gitID int64, secret string) (string, er
 
 // Get the time a given JWT expires at. Takes the jwt string and returns
 // time it expires at as time.Time
-func getExpTime(tokenString string) (time.Time, error) {
+func GetExpTime(tokenString string) (time.Time, error) {
 	token, _, err := new(goJwt.Parser).ParseUnverified(tokenString, goJwt.MapClaims{})
 	if err != nil {
 		return time.Time{}, err
@@ -57,7 +57,7 @@ func getExpTime(tokenString string) (time.Time, error) {
 // Insert a JWT to the blacklist table. Any requests with a header containing
 // this JWT will return an error to the frontend
 func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
-	expTime, err := getExpTime(jwtString)
+	expTime, err := GetExpTime(jwtString)
 	if err != nil {
 		return err
 	}
@@ -75,22 +75,27 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 	return nil
 }
 
-func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (bool, error) {
+func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
 	pDb := data.NewProfileData(pg, log)
-	_, err := pDb.GetProfile(gitId)
+	profile, err := pDb.GetProfile(gitId)
 	if err == pgx.ErrNoRows {
-		return false, nil
+		return nil, nil
 	}
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, nil // user exists
+	return profile, nil // user exists, return data
+}
+
+func UpdateGitAccessToken(user *data.Profile, token string, pg *db.PostgresDriver, log *logrus.Logger) error {
+	// will update the current access token to match that returned by git
+	pDb := data.NewProfileData(pg, log)
+	return pDb.UpdateProfileToken(user.GitHubUserID, token)
 }
 
 func CreateNewUser(gitId int, gitUser string, gitToken string,
-	gitEmail string, gitAvatarUrl string, log *logrus.Logger, pg *db.PostgresDriver) {
+	gitEmail string, gitAvatarUrl string, log *logrus.Logger, pg *db.PostgresDriver) error {
 
 	pDb := data.NewProfileData(pg, log)
-	pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl,
-		gitEmail)
+	return pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl, gitEmail)
 }

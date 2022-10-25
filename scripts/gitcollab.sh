@@ -31,9 +31,20 @@ GitCollab deployment script, used to control the docker functions of the project
         -h | --help              Displays this help
         -v | --verbose           Displays verbose output, display docker logs
     Arugments:
-        build                    Disables colour output
+        build                    Build docker containers
         start                    Run silently unless we encounter an error
+        stop                     Stop running docker containers
+        restart                  Restart all runnign docker containers
+        clean                    Removes all docker related data [Volumes, Containers and Networks]
+        clean-db                 Remove db container and volume
+        test                     Start a unit test suite
+        refresh-env-file         Refresh .env file with env file
 EOF
+}
+
+function run-test() {
+    echo "Running Go Unit tests..."
+    go test ./... -v
 }
 
 function build() {
@@ -66,7 +77,8 @@ function clean() {
     echo "Taking down active GitCollab docker containers..."
     docker compose down
     echo "Docker system prune..."
-    docker system prune -a
+    # TODO: add confirmation bypass instead of forcing confirmation
+    docker system prune -a -f
 }
 
 function clean-db() {
@@ -94,6 +106,10 @@ function parse_params() {
                 ;;
             -v | --verbose)
                 is_verbose=true
+                ;;
+            test)
+                run-test
+                exit 0
                 ;;
             build)
                 docker compose convert > "$(pwd)/docker-compose-convert.yaml"

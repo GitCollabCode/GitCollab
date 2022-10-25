@@ -25,56 +25,42 @@ pipeline {
         stage('Setup') {
             steps {
                 setBuildStatus("Build pending", "PENDING");
-                echo 'Installing dependencies'
+                echo 'Installing dependencies...'
                 sh 'go version'
                 sh 'go mod vendor'
-                sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOBIN) v1.49.0'
+                sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
             }
         }
 
         stage('Go Build') {
             steps {
-                echo 'Building [Go]..'
+                echo 'Running Go build...'
                 sh 'go build $WORKSPACE/cmd/gitcollab/main.go'
             }
         }
 
         stage('Go Test') {
-            when {
-                expression { false }
-            }
             steps {
-                echo 'Skipping, no steps Go tests not setup!'
+                echo 'Running Go tests...'
+                sh 'go test $WORKSPACE/... -v'
             }
-            // Will need to get updated when some tests are added
-            // steps {
-			// 	withCredentials([usernamePassword(credentialsId: 'TEST_CREDENTIALS', usernameVariable: 'TEST_USERNAME', passwordVariable: 'TEST_PASSWORD'), string(credentialsId: 'KOPANO_SERVER_DEFAULT_URI', variable: 'KOPANO_SERVER_DEFAULT_URI')]) {
-			// 		echo 'Testing..'
-			// 		sh 'echo Kopano Server URI: \$KOPANO_SERVER_DEFAULT_URI'
-			// 		sh 'echo Kopano Server Username: \$TEST_USERNAME'
-			// 		sh 'go test -v -count=1 | tee tests.output'
-			// 		sh 'PATH=$PATH:$GOBIN  go2xunit -fail -input tests.output -output tests.xml'
-			// 	}
-			// 	junit allowEmptyResults: true, testResults: 'tests.xml'
-			// }
         }
 
         stage('Go Code Analysis') {
-            when {
-                expression { false }
-            }
-            steps {
-                echo 'Skipping, broken on jenkins please make sure to run golangci-lint locally!'
-            }
-            // steps {
-            //     echo 'Preforming Code Analysis [Go]..'
-            //     sh '$(go env GOBIN)/golangci-lint --timeout=5m run'
+            // disable stage
+            // when {
+            //     expression { false }
             // }
+            steps {
+                echo 'Preforming Go Code Analysis...'
+                sh '$WORKSPACE/golangci-lint --timeout=5m run'
+            }
         }
 
         stage('npm Install') {
             steps {
                 dir('web') {
+                    echo 'Running npm install...'
                     sh 'npm install'
                 }
             }
@@ -83,6 +69,7 @@ pipeline {
         stage('npm Build') {
             steps {
                 dir('web') {
+                    echo 'Running npm build...'
                     sh 'npm run build'
                 }
             }
@@ -91,6 +78,7 @@ pipeline {
         stage('npm Test') {
             steps {
                 dir('web') {
+                    echo 'Running npm test...'
                     sh 'npm test'
                 }
             }
@@ -98,6 +86,7 @@ pipeline {
 
         stage('Update Live Deployment Server') {
             steps {
+                echo 'Updating live deployment server with new changes...'
                 withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
                                 usernameVariable: 'USER', 
                                 passwordVariable: 'PASSWORD')]) {

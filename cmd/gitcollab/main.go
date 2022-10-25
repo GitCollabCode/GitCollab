@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -93,12 +94,18 @@ func main() {
 	defer dbDriver.Connection.Close(context.Background())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi from Git Collab"))
+		_, err := w.Write([]byte("hi from Git Collab"))
+		if err != nil {
+			log.Panic(err)
+		}
 	})
 
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("pong!"))
+		_, err := w.Write([]byte("pong!"))
+		if err != nil {
+			log.Panic(err)
+		}
 	})
 
 	// register all sub routers
@@ -131,7 +138,7 @@ func main() {
 
 		err := s.ListenAndServe()
 		if err != nil {
-			logger.Error("Error starting server: %s\n", err)
+			logger.Errorf("Error starting server: %s\n", err)
 			os.Exit(1)
 		}
 	}()
@@ -146,6 +153,10 @@ func main() {
 
 	// Gracefully server shutdown wait 30 seconds for any ongoing operations to complete
 	// Check if the docker container is killed in away that allows for this to happen
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(ctx)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err = s.Shutdown(ctx)
+	if err != nil {
+		log.Panic(err)
+	}
 }

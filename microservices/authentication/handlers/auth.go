@@ -47,9 +47,11 @@ func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 // get the redirect url for github, when login button is clicked, this will be returned
 // to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
-
 	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
-	w.Write([]byte(redirect))
+	_, err := w.Write([]byte(redirect))
+	if err != nil {
+		a.Log.Panic(err)
+	}
 }
 
 // Handler for login, occurs when user returns from github redirect.
@@ -100,18 +102,35 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isUser, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
+	userInfo, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
 	if err != nil {
 		a.Log.Error(err) // crash or something happened???
 		return
 	}
-	if !isUser { // did not find the user, create new account
-		helpers.CreateNewUser(int(*username.ID), *username.Login, tokenString, *username.Email,
-			*username.AvatarURL, a.Log, a.PgConn)
+
+	if userInfo == nil { // did not find the user, create new account
+		err := helpers.CreateNewUser(int(*username.ID), *username.Login,
+			gitAccessToken.AccessToken, *username.Email, *username.AvatarURL,
+			a.Log, a.PgConn)
+		if err != nil {
+			a.Log.Error("Failed to create new user")
+			return
+		}
+	} else if userInfo.GitHubToken != gitAccessToken.AccessToken {
+		// found user, but check if token doesnt match
+		err := helpers.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
+		if err != nil {
+			a.Log.Panic(err)
+			return
+		}
 	}
 	// serve token to frontend
 	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
-	w.Write([]byte(tokenString))
+	_, err = w.Write([]byte(tokenString))
+	if err != nil {
+		a.Log.Panic(err)
+		return
+	}
 }
 
 // add jwt's to the blacklist, these will be picked up by the blacklist
@@ -123,7 +142,7 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		a.Log.Error("jwt not found in header")
 		return
 	}
-	a.Log.Info("Adding jwt %s to blacklist", jwtString)
+	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
 	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
 		a.Log.Error(err)
