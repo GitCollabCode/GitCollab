@@ -88,7 +88,6 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	oauthClient := a.oauth.Client(context.Background(), gitAccessToken)
 	client := goGithub.NewClient(oauthClient)
 	username, _, err := client.Users.Get(context.Background(), "")
-	fmt.Printf("%s -- %d\n\n",*username.Login, *username.ID)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
