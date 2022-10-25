@@ -42,9 +42,14 @@ GitCollab deployment script, used to control the docker functions of the project
 EOF
 }
 
-function run-test() {
+function test-unit() {
     echo "Running Go Unit tests..."
     go test ./... -v
+}
+
+function test-integration() {
+    echo "Running Integration tests..."
+    source gitcollab_pyenv/bin/activate && pytest
 }
 
 function build() {
@@ -108,9 +113,13 @@ function parse_params() {
             -v | --verbose)
                 is_verbose=true
                 ;;
-            test)
-                run-test
-                exit 0
+            test_unit)
+                test-unit
+                ;;
+            test_integration)
+                start
+                test-integration
+                stop
                 ;;
             build)
                 docker compose convert > "$(pwd)/docker-compose-convert.yaml"
