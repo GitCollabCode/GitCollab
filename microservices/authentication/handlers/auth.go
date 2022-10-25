@@ -70,7 +70,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println(authCode.Code)
 	// get github access token from git with code
 	gitAccessToken, err := github.GetGithubAccessToken(authCode.Code, *a.oauth)
 	if err != nil {
@@ -94,6 +94,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
+	fmt.Println(gitAccessToken)
 
 	// create a new token for the frontend
 	tokenString, err := helpers.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
@@ -116,8 +117,10 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		email=*username.Email
 	}
 	
+	fmt.Printf("%d\n%s\n%s\n%s\n%s\n%d\n%d",int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log!=nil, a.PgConn!=nil)
+
 	if userInfo == nil { // did not find the user, create new account
-		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email , *username.AvatarURL, a.Log, a.PgConn)
+		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log, a.PgConn)
 		if err != nil {
 			a.Log.Error("Failed to create new user")
 			return
@@ -132,23 +135,25 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type Resposne struct {
-		token	string
-		new 	bool
+		Token	string
+		NewUser 	bool
 	}
 
 	loginValue := Resposne{ tokenString, false} 
 
-	val , err := json.Marshal(loginValue);
+	value,err:=json.Marshal(loginValue)
 
-
-
-	// serve token to frontend
-	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
-	_, err := w.Write(val)
-	if err != nil {
+	
+	fmt.Printf(tokenString)
+	if err != nil{
 		a.Log.Panic(err)
 		return
 	}
+
+	// serve token to frontend
+	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(value)
 }
 
 // add jwt's to the blacklist, these will be picked up by the blacklist

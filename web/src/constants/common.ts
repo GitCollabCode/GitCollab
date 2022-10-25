@@ -14,4 +14,9 @@ export type userDispatch = {
   setToken: (token: string) => void
 }
 
+export type loginResponse = {
+  Token: string,
+  NewUser:boolean,
+}
+
 export type userLoginContextState = userValue & userDispatch

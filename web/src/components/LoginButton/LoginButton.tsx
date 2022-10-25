@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
+import {loginResponse} from "../../constants/common"
 import { ReactComponent as GithubIcon } from '../../assets/github.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
 import style from './LoginButton.module.css'
@@ -31,9 +32,12 @@ const LoginButton = () => {
         body: JSON.stringify(requestData),
       })
         .then((response) => response.json())
-        .then((data) => {
-          console.log(data)
-          logIn(data, {})
+        .then((data: loginResponse) => {
+          if(data.NewUser){
+            //TODO ADD the Modal for getting user stuff
+            console.log("New USER ")
+          }
+          logIn(data.Token, {})
         })
         .catch((error) => {
           console.log(error)
