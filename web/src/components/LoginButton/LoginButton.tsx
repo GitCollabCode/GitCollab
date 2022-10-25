@@ -30,7 +30,7 @@ const LoginButton = () => {
         method: 'POST',
         body: JSON.stringify(requestData),
       })
-        .then((response) => response.text())
+        .then((response) => response.json())
         .then((data) => {
           console.log(data)
           logIn(data, {})

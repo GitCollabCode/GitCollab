@@ -28,6 +28,7 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
+
 // Expected Http Body for login request
 type jsonGitOauth struct {
 	Code string // github code
@@ -124,9 +125,21 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	type Resposne struct {
+		token	string
+		new 	bool
+	}
+
+	loginValue := Resposne{ tokenString, false} 
+
+	val , err := json.Marshal(loginValue);
+
+
+
 	// serve token to frontend
 	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
-	_, err = w.Write([]byte(tokenString))
+	_, err := w.Write(val)
 	if err != nil {
 		a.Log.Panic(err)
 		return
