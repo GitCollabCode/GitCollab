@@ -2,7 +2,6 @@
 
 
 PYTHON_VENV_DIR="$(pwd)/gitcollab_pyenv"
-PYTHON_VENV_ACIVATE="$(pwd)/gitcollab_pyenv/bin/activate"
 
 'which python3'
 
@@ -21,6 +20,7 @@ if [ ! -d "$PYTHON_VENV_DIR" ]; then
 fi
 
 # install requirements in virtual environment, pytest
-. "$PYTHON_VENV_ACIVATE"
+echo "$(PYTHON_VENV_DIR)/bin/pip3"
+"$PYTHON_VENV_DIR/bin/pip3" install -r "$(pwd)/scripts/requirements.txt"
 pip3 install -r "$(find "$(pwd)" | grep requirements.txt)"
 deactivate
