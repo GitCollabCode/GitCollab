@@ -2,3 +2,4 @@
 .env
 docker-compose-convert.yaml
 /db_data/
+golangci-lint

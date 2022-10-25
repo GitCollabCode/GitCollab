@@ -11,8 +11,8 @@ jest.mock('react-router-dom', () => ({
 
 describe('Login', () => {
   it('Test Render', () => {
-    render(<Login />)
-    expect(screen.getByText('Login')).toBeInTheDocument()
-    expect(screen.getByText('Login with GitHub')).toBeInTheDocument()
+    render(
+    <Login />)
+    expect(screen.getByText('login')).toBeInTheDocument()
   })
 })
