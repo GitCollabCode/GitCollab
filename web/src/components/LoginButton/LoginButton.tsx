@@ -65,7 +65,7 @@ const LoginButton = () => {
           <GithubIcon /> <p className={style.githubButtonText}>login</p>
         </button>
       ) : (
-        <button className={'btn btn-primary'} onClick={() => logOut()}>
+        <button className={style.button} onClick={() => logOut()}>
           <i className="fa fa-trophy"></i> Logout
         </button>
       )}
