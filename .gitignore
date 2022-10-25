@@ -4,3 +4,5 @@ docker-compose-convert.yaml
 /db_data/
 golangci-lint
 gitcollab_pyenv
+integration_tests/__pycache__
+.pytest_cache

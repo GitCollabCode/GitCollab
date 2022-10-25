@@ -20,7 +20,5 @@ if [ ! -d "$PYTHON_VENV_DIR" ]; then
 fi
 
 # install requirements in virtual environment, pytest
-echo "$(PYTHON_VENV_DIR)/bin/pip3"
+echo "$PYTHON_VENV_DIR/bin/pip3"
 "$PYTHON_VENV_DIR/bin/pip3" install -r "$(pwd)/scripts/requirements.txt"
-pip3 install -r "$(find "$(pwd)" | grep requirements.txt)"
-deactivate
