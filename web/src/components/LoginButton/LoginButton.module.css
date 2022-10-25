@@ -6,6 +6,9 @@
   justify-content: center;
   flex-direction: column;
 }
+p {
+  margin-bottom: 0;
+}
 
 .container input[type='password'] {
   width: 500px;
@@ -17,8 +20,8 @@
   width: 11.5rem;
   height: 3.3125rem;
   margin-top: 1.8rem;
-  margin-bottom: 1.25rem;
   margin-right: 2.375rem;
+  align-items: center;
 
   background: #2da573;
   border-radius: 1rem;
