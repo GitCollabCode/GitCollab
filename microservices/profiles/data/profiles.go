@@ -39,12 +39,20 @@ func (pd *ProfileData) profilesTransactOneRow(sqlStatement string, args ...any) 
 		pd.log.Fatal(err)
 	}
 
-	defer tx.Rollback(context.Background())
+	defer func() {
+		rollbackErr := tx.Rollback(context.Background())
+		if rollbackErr != nil {
+			pd.log.Fatalf("profilesTransactOneRow rollback failed: %s", rollbackErr.Error())
+		}
+	}()
 
 	res, err := tx.Exec(context.Background(), sqlStatement, args...)
 	if err != nil {
 		pd.log.Errorf("profilesTransactOneRow database EXEC failed: %s", err.Error())
-		tx.Rollback(context.Background())
+		rollbackErr := tx.Rollback(context.Background())
+		if rollbackErr != nil {
+			pd.log.Fatalf("profilesTransactOneRow rollback failed: %s", rollbackErr.Error())
+		}
 		return err
 	}
 
@@ -59,7 +67,7 @@ func (pd *ProfileData) profilesTransactOneRow(sqlStatement string, args ...any) 
 		pd.log.Fatalf("profilesTransactOneRow commit failed: %s", err.Error())
 	}
 
-	return nil
+	return err
 }
 
 func (pd *ProfileData) profilesGetRow(sqlStatement string, args ...any) (*Profile, error) {
@@ -78,7 +86,7 @@ func (pd *ProfileData) AddProfile(githubUserID int, githubToken string, username
 	sqlString :=
 		"INSERT INTO profiles(github_user_id, github_token, username, avatar_url, email)" +
 			"VALUES($1, $2, $3, $4, $5)"
-			
+
 	_, err := pd.dbDriver.Connection.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email)
 	if err != nil {
 		pd.log.Errorf("AddProfile database INSERT failed: %s", err.Error())

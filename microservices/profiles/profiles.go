@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var docs = flag.Bool("docs", false, "Expose documentation endpoint")
+//var docs = flag.Bool("docs", false, "Expose documentation endpoint")
 
 func Init() {
 	flag.Parse()

@@ -25,14 +25,20 @@ func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 		if err != nil {
 			p.log.Error(err)
 			w.WriteHeader(http.StatusBadRequest)
-			data.ToJSON(&ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
+			err = data.ToJSON(&ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
+			if err != nil {
+				p.log.Error(err)
+			}
 			return
 		}
 
 		errs := p.validate.Validate(profile)
 		if len(errs) != 0 {
 			w.WriteHeader(http.StatusUnprocessableEntity)
-			data.ToJSON(&ValidationError{Messages: errs.Errors()}, w)
+			err = data.ToJSON(&ValidationError{Messages: errs.Errors()}, w)
+			if err != nil {
+				p.log.Error(err)
+			}
 			return
 		}
 
