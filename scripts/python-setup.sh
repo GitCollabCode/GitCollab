@@ -1,6 +1,13 @@
 #!/bin/sh
 
 
+if [ "$(basename "$(pwd)")" != "GitCollab" ]
+then
+    echo "Please run python-setup.sh from the GitCollab repo directory!"
+    echo "i.e. ./scripts/python-setup.sh"
+    exit 1
+fi
+
 PYTHON_VENV_DIR="$(pwd)/gitcollab_pyenv"
 
 'which python3'
