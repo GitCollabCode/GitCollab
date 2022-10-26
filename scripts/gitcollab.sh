@@ -115,11 +115,13 @@ function parse_params() {
                 ;;
             test_unit)
                 test-unit
+                exit
                 ;;
             test_integration)
                 start
                 test-integration
                 stop
+                exit
                 ;;
             build)
                 docker compose convert > "$(pwd)/docker-compose-convert.yaml"
