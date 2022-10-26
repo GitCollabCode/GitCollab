@@ -42,9 +42,14 @@ GitCollab deployment script, used to control the docker functions of the project
 EOF
 }
 
-function run-test() {
+function test-unit() {
     echo "Running Go Unit tests..."
     go test ./... -v
+}
+
+function test-integration() {
+    echo "Running Integration tests..."
+    source gitcollab_pyenv/bin/activate && pytest
 }
 
 function build() {
@@ -83,9 +88,10 @@ function clean() {
 
 function clean-db() {
     echo "Removing saved postgres db volume and container..."
+    docker compose down
     sudo rm -rf "$(pwd)/db_data"
-    docker container rm gitcollab-db-1
     docker volume rm gitcollab_db
+    docker container rm gitcollab-db-1
 }
 
 function refresh-env-file() {
@@ -107,8 +113,14 @@ function parse_params() {
             -v | --verbose)
                 is_verbose=true
                 ;;
-            test)
-                run-test
+            test_unit)
+                test-unit
+                exit 0
+                ;;
+            test_integration)
+                start
+                test-integration
+                stop
                 exit 0
                 ;;
             build)

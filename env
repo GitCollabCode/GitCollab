@@ -3,6 +3,8 @@ REACT_APP_REDIRECT_URI=http://localhost:3000/login
 REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
 REACT_APP_API_URI="http://localhost:8080"
 
+
+POSTGRES_NAME="postgres"
 POSTGRES_URL="postgres://postgres:postgres@db:5432/postgres"
 POSTGRES_USER=postgres # CHANGE
 POSTGRES_PASSWORD=postgres # CHANGE

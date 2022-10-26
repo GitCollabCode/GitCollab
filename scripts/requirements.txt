@@ -1,0 +1,4 @@
+pytest
+pytest-postgresql
+requests
+psycopg-binary

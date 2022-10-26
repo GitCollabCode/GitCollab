@@ -19,7 +19,7 @@ func CreateGitCollabJwt(username string, gitID int64, secret string) (string, er
 	// create token, return err and token string
 	token := goJwt.New(goJwt.SigningMethodHS256)
 	claims := token.Claims.(goJwt.MapClaims)
-	claims["exp"] = time.Now().Add(48 * time.Hour).Unix()
+	claims["exp"] = time.Now().Add(48 * time.Hour)
 	claims["authorized"] = true
 	claims["user"] = username
 	claims["githubID"] = gitID
