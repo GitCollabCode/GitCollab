@@ -54,7 +54,7 @@ func (v *Validation) Validate(i interface{}) ValidationErrors {
 
 	var returnErrs []ValidationError
 	for _, err := range errs.(validator.ValidationErrors) {
-		ve := ValidationError{err.(validator.FieldError)}
+		ve := ValidationError{err}
 		returnErrs = append(returnErrs, ve)
 	}
 

@@ -42,14 +42,21 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		if err != nil {
+			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
 	if err != nil {
+		// NOTE: Repetative code, clean this up and make sure error messages are descriptive
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
@@ -59,7 +66,10 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 }
@@ -75,7 +85,10 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
@@ -84,11 +97,14 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "profile created"
 
-	data.ToJSON(resp, w)
+	err = data.ToJSON(resp, w)
 	if err != nil {
 		p.log.Fatalf("PostProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
+		}
 	}
 }
 
@@ -99,14 +115,20 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		if err != nil {
+			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
@@ -114,7 +136,10 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
+		}
 		return
 	}
 
@@ -123,11 +148,15 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "profile deleted"
 
-	data.ToJSON(resp, w)
+	err = data.ToJSON(resp, w)
 	if err != nil {
 		p.log.Fatalf("DeleteProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		if err != nil {
+			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
+		}
+		return
 	}
 }
 
