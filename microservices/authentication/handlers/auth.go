@@ -140,16 +140,18 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	value, err := json.Marshal(loginValue)
 
-	fmt.Printf(tokenString)
 	if err != nil {
 		a.Log.Panic(err)
 		return
 	}
 
 	// serve token to frontend
-	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(value)
+	_, err = w.Write(value)
+
+	if err != nil {
+		a.Log.Error("failed to serve jwt")
+	}
 }
 
 // add jwt's to the blacklist, these will be picked up by the blacklist
