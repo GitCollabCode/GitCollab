@@ -1,0 +1,43 @@
+.container {
+  align-self: center;
+  margin-top: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+p {
+  margin-bottom: 0;
+}
+
+.container input[type='password'] {
+  width: 500px;
+}
+
+.button {
+  display: flex;
+  position: absolute;
+  width: 11.5rem;
+  height: 3.3125rem;
+  margin-top: 1.8rem;
+  margin-right: 2.375rem;
+  align-items: center;
+
+  background: #2da573;
+  border-radius: 1rem;
+}
+
+.githubButtonText {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 2.625rem;
+  line-height: 3.1rem;
+
+  color: #ffffff;
+}
+
+.github {
+  width: 3.375rem;
+  height: 2.875rem;
+}

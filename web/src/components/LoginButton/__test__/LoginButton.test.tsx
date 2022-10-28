@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 
-import Login from '../Login'
+import Login from '../LoginButton'
 
 const mockedUsedNavigate = jest.fn()
 jest.mock('react-router-dom', () => ({
@@ -11,8 +11,8 @@ jest.mock('react-router-dom', () => ({
 
 describe('Login', () => {
   it('Test Render', () => {
-    render(<Login />)
-    expect(screen.getByText('Login')).toBeInTheDocument()
-    expect(screen.getByText('Login with GitHub')).toBeInTheDocument()
+    render(
+    <Login />)
+    expect(screen.getByText('login')).toBeInTheDocument()
   })
 })

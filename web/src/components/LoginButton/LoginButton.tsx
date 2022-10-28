@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
-import styles from './Login.module.css'
+import { loginResponse } from '../../constants/common'
+import { ReactComponent as GithubIcon } from '../../assets/github.svg'
+import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
+import style from './LoginButton.module.css'
 
-const Login = () => {
-  const { proxy_url, logIn, user, isLoggedIn, logOut } =
-    useContext(UserLoginContext)
+const LoginButton = () => {
+  const { logIn, isLoggedIn, logOut } = useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
- 
 
   useEffect(() => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
     const hasCode = url.includes('?code=')
-    
 
     // If Github API returns the code parameter
     if (hasCode) {
@@ -25,16 +25,18 @@ const Login = () => {
         code: newUrl[1],
       }
 
-  
       // Use code parameter and other parameters to make POST request to BE
       fetch(process.env.REACT_APP_API_URI + SIGNIN, {
         method: 'POST',
         body: JSON.stringify(requestData),
       })
-        .then((response) => response.text())
-        .then((data) => {
-          console.log(data)
-          logIn(data, {})
+        .then((response) => response.json())
+        .then((data: loginResponse) => {
+          if (data.NewUser) {
+            //TODO ADD the Modal for getting user stuff
+            console.log('New USER ')
+          }
+          logIn(data.Token)
         })
         .catch((error) => {
           console.log(error)
@@ -44,8 +46,7 @@ const Login = () => {
           })
         })
     }
-  }, [isLoggedIn, data, logIn, proxy_url])
-
+  }, [isLoggedIn, data, logIn])
 
   const redirectToGithub = () => {
     fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
@@ -61,33 +62,18 @@ const Login = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <h3>Login</h3>
-      <div className="login-container">
-        {data.isLoading ? (
-          <div className="loader-container">
-            <div className="loader"></div>
-          </div>
-        ) : (
-          <>
-            {console.log(user)}
-            {!isLoggedIn ? (
-              <button
-                className={'btn btn-primary'}
-                onClick={() => redirectToGithub()}
-              >
-                <i className="fa fa-trophy"></i> Login with GitHub
-              </button>
-            ) : (
-              <button className={'btn btn-primary'} onClick={() => logOut()}>
-                <i className="fa fa-trophy"></i> Logout
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    <>
+      {!isLoggedIn ? (
+        <button className={style.button} onClick={() => redirectToGithub()}>
+          <GithubIcon /> <p className={style.githubButtonText}>login</p>
+        </button>
+      ) : (
+        <button className={style.button} onClick={() => logOut()}>
+          <LogoutIcon /> <p className={style.githubButtonText}>logout</p>
+        </button>
+      )}
+    </>
   )
 }
 
-export default Login
+export default LoginButton

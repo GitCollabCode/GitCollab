@@ -18,6 +18,16 @@
     "typescript": "^4.8.3",
     "web-vitals": "^2.1.4"
   },
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "include": [
+    "public/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
