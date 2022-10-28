@@ -28,7 +28,6 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
-
 // Expected Http Body for login request
 type jsonGitOauth struct {
 	Code string // github code
@@ -109,15 +108,13 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		a.Log.Error(err) // crash or something happened???
 		return
 	}
-	
+
 	var email string
-	if(username.Email == nil){
-		email=""
-	}else{
-		email=*username.Email
+	if username.Email == nil {
+		email = ""
+	} else {
+		email = *username.Email
 	}
-	
-	fmt.Printf("%d\n%s\n%s\n%s\n%s\n%d\n%d",int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log!=nil, a.PgConn!=nil)
 
 	if userInfo == nil { // did not find the user, create new account
 		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log, a.PgConn)
@@ -135,25 +132,24 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type Resposne struct {
-		Token	string
-		NewUser 	bool
+		Token   string
+		NewUser bool
 	}
 
-	loginValue := Resposne{ tokenString, false} 
+	loginValue := Resposne{tokenString, false}
 
-	value,err:=json.Marshal(loginValue)
+	value, err := json.Marshal(loginValue)
 
-	
 	fmt.Printf(tokenString)
-	if err != nil{
+	if err != nil {
 		a.Log.Panic(err)
 		return
 	}
 
 	// serve token to frontend
 	//jsonToken := fmt.Sprintf("{token:%s}", tokenString) // maybe fix json?
-    w.Header().Set("Content-Type", "application/json")
-    w.Write(value)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(value)
 }
 
 // add jwt's to the blacklist, these will be picked up by the blacklist
