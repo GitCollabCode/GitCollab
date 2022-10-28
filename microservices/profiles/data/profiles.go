@@ -39,13 +39,6 @@ func (pd *ProfileData) profilesTransactOneRow(sqlStatement string, args ...any) 
 		pd.log.Fatal(err)
 	}
 
-	defer func() {
-		rollbackErr := tx.Rollback(context.Background())
-		if rollbackErr != nil {
-			pd.log.Fatalf("profilesTransactOneRow rollback failed: %s", rollbackErr.Error())
-		}
-	}()
-
 	res, err := tx.Exec(context.Background(), sqlStatement, args...)
 	if err != nil {
 		pd.log.Errorf("profilesTransactOneRow database EXEC failed: %s", err.Error())
