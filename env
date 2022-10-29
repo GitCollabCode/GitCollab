@@ -1,7 +1,7 @@
 # Some of these vars might need to be changed on deployment or be defaulted to empty and filled in on deployment!
-REACT_APP_REDIRECT_URI=http://localhost:3000
+REACT_APP_REDIRECT_URI=http://localhost:3000/
 REACT_APP_PROXY_URL=http://localhost:8080/auth/logged_in
-REACT_APP_API_URI="http://localhost:8080"
+REACT_APP_API_URI="http://localhost:8080/api/"
 
 
 POSTGRES_NAME="postgres"

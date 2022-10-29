@@ -8,14 +8,13 @@ import (
 
 func InitRouter(r *chi.Mux, p *handlers.Profiles) {
 
-	r.Route("/profile", func(r chi.Router) {
+	r.Route("/api/profile", func(r chi.Router) {
 		r.Use(middleware.AllowContentEncoding("application/json"))
 		r.Use(handlers.SetContentType("application/json"))
 
 		r.With(p.MiddleWareValidateProfile).Post("/", p.PostProfile)
 
 		r.Get("/search", p.SearchProfile)
-
 		r.Route("/{username}", func(r chi.Router) {
 			r.Get("/", p.GetProfile)
 			r.Put("/", p.PutProfile)
