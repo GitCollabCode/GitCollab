@@ -118,14 +118,14 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		// found user, but check if token doesnt match
 		err := helpers.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
 		if err != nil {
-			a.Log.Panic(err)
+			a.Log.Panic("Failed to update users access token: %s", err.Error())
 			return
 		}
 	}
 
 	res, err := helpers.NewLoginResponse(tokenString, userInfo == nil)
 	if err != nil {
-		a.Log.Panic("failed to create redirect request: %v", err)
+		a.Log.Panic("failed to create redirect request: %s", err.Error())
 	}
 
 	err = helpers.WriteJsonResponse(w, res)
@@ -146,7 +146,10 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
 	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
-		a.Log.Error(err)
-		// add error for frontend
+		a.Log.Error("Failed to add jwt to blacklist: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	// frontend should look for ok after adding to blacklist
+	w.WriteHeader(http.StatusOK)
 }
