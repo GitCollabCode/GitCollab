@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
@@ -28,11 +26,6 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
-// Expected Http Body for login request
-type jsonGitOauth struct {
-	Code string // github code
-}
-
 // create refrence to new auth struct
 // pg = pinter to db driver
 // log = logger
@@ -40,17 +33,19 @@ type jsonGitOauth struct {
 // redirectUrl = redirect for frontend, github brings you back here
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 	redirectUrl string, gitCollabSecret string) *Auth {
-
 	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
 }
 
 // get the redirect url for github, when login button is clicked, this will be returned
 // to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
-	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
-	_, err := w.Write([]byte(redirect))
+	res, err := helpers.NewRedirectResponse(rUrl)
 	if err != nil {
-		a.Log.Panic(err)
+		a.Log.Panic("Failed to create redirect response: %v", err)
+	}
+
+	if helpers.WriteJsonResponse(w, res) != nil {
+		a.Log.Panic("Failed to write redirect: %v", err)
 	}
 }
 
@@ -61,17 +56,15 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Serving login request")
-	dec := json.NewDecoder(r.Body)
-	var authCode jsonGitOauth
-	err := dec.Decode(&authCode)
+	oauthReq, err := helpers.ParseGitOauthRequest(r)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.Log.Errorf("Request missing code: %v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println(authCode.Code)
+
 	// get github access token from git with code
-	gitAccessToken, err := github.GetGithubAccessToken(authCode.Code, *a.oauth)
+	gitAccessToken, err := github.GetGithubAccessToken(oauthReq.Code, *a.oauth)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -93,19 +86,18 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	fmt.Println(gitAccessToken)
 
 	// create a new token for the frontend
 	tokenString, err := helpers.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.Log.Errorf("Faild to create a new jwt: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	userInfo, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
 	if err != nil {
-		a.Log.Error(err) // crash or something happened???
+		a.Log.Fatalf("Failed check if user in db: %s", err.Error())
 		return
 	}
 
@@ -119,7 +111,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if userInfo == nil { // did not find the user, create new account
 		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log, a.PgConn)
 		if err != nil {
-			a.Log.Error("Failed to create new user")
+			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
 		}
 	} else if userInfo.GitHubToken != gitAccessToken.AccessToken {
@@ -131,26 +123,14 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	type Resposne struct {
-		Token   string
-		NewUser bool
+	res, err := helpers.NewLoginResponse(tokenString, userInfo == nil)
+	if err != nil {
+		a.Log.Panic("failed to create redirect request: %v", err)
 	}
 
-	loginValue := Resposne{tokenString, false}
-
-	value, err := json.Marshal(loginValue)
-
+	err = helpers.WriteJsonResponse(w, res)
 	if err != nil {
-		a.Log.Panic(err)
-		return
-	}
-
-	// serve token to frontend
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(value)
-
-	if err != nil {
-		a.Log.Error("failed to serve jwt")
+		a.Log.Fatalf("failed to serve jwt to frontend: %s", err.Error())
 	}
 }
 
