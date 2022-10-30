@@ -43,11 +43,11 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
 	res, err := helpers.NewRedirectResponse(redirect)
 	if err != nil {
-		a.Log.Panic("Failed to create redirect response: %v", err)
+		a.Log.Panicf("Failed to create redirect response: %s", err.Error())
 	}
 
 	if helpers.WriteJsonResponse(w, res) != nil {
-		a.Log.Panic("Failed to write redirect: %v", err)
+		a.Log.Panicf("Failed to write redirect: %s", err.Error())
 	}
 }
 
@@ -60,7 +60,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Serving login request")
 	oauthReq, err := helpers.ParseGitOauthRequest(r)
 	if err != nil {
-		a.Log.Errorf("Request missing code: %v", err)
+		a.Log.Errorf("Request missing code: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -120,14 +120,14 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		// found user, but check if token doesnt match
 		err := helpers.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
 		if err != nil {
-			a.Log.Panic("Failed to update users access token: %s", err.Error())
+			a.Log.Panicf("Failed to update users access token: %s", err.Error())
 			return
 		}
 	}
 
 	res, err := helpers.NewLoginResponse(tokenString, userInfo == nil)
 	if err != nil {
-		a.Log.Panic("failed to create redirect request: %s", err.Error())
+		a.Log.Panicf("failed to create redirect request: %s", err.Error())
 	}
 
 	err = helpers.WriteJsonResponse(w, res)
@@ -148,7 +148,7 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
 	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
-		a.Log.Error("Failed to add jwt to blacklist: %s", err)
+		a.Log.Errorf("Failed to add jwt to blacklist: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
