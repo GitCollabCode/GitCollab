@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
@@ -39,7 +40,8 @@ func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 // get the redirect url for github, when login button is clicked, this will be returned
 // to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := helpers.NewRedirectResponse(rUrl)
+	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
+	res, err := helpers.NewRedirectResponse(redirect)
 	if err != nil {
 		a.Log.Panic("Failed to create redirect response: %v", err)
 	}
