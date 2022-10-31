@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import { loginResponse } from '../../constants/common'
+import { GitHubRedirectResponse } from '../../constants/common'
 import { ReactComponent as GithubIcon } from '../../assets/github.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
 import style from './LoginButton.module.css'
@@ -52,9 +53,9 @@ const LoginButton = () => {
     fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
       method: 'GET',
     })
-      .then((response) => response.text())
-      .then((data) => {
-        window.location.replace(data)
+      .then((response) => response.json())
+      .then((data : GitHubRedirectResponse) => {
+        window.location.replace(data.RedirectUrl)
       })
       .catch((error) => {
         console.log(error)

@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/GitCollabCode/GitCollab/internal/github"
+	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
 	goGithub "github.com/google/go-github/github"
@@ -28,19 +28,27 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
-// Expected Http Body for login request
-type jsonGitOauth struct {
-	Code string // github code
+type LoginResponse struct {
+	Token   string `json:"Token"`
+	NewUser bool   `json:"NewUser"`
+}
+
+type GitHubRedirectResponse struct {
+	RedirectUrl string `json:"RedirectUrl"`
+}
+
+// Expected Http Body for login request to github
+type GitOauthRequest struct {
+	Code string `json:"code"`
 }
 
 // create refrence to new auth struct
 // pg = pinter to db driver
 // log = logger
-// oConf = config for oauth, holds secret and id
+// oConf = config for oauth, holds secret and id“
 // redirectUrl = redirect for frontend, github brings you back here
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 	redirectUrl string, gitCollabSecret string) *Auth {
-
 	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
 }
 
@@ -48,9 +56,9 @@ func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 // to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
-	_, err := w.Write([]byte(redirect))
+	err := jsonio.ToJSON(&GitHubRedirectResponse{RedirectUrl: redirect}, w)
 	if err != nil {
-		a.Log.Panic(err)
+		a.Log.Panicf("Failed to create redirect response: %s", err.Error())
 	}
 }
 
@@ -61,17 +69,17 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Serving login request")
-	dec := json.NewDecoder(r.Body)
-	var authCode jsonGitOauth
-	err := dec.Decode(&authCode)
+	var githubCodeRes GitOauthRequest
+	err := jsonio.FromJSON(&githubCodeRes, r.Body)
+
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.Log.Errorf("Request missing code: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println(authCode.Code)
+
 	// get github access token from git with code
-	gitAccessToken, err := github.GetGithubAccessToken(authCode.Code, *a.oauth)
+	gitAccessToken, err := github.GetGithubAccessToken(githubCodeRes.Code, *a.oauth)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -93,19 +101,18 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	fmt.Println(gitAccessToken)
 
 	// create a new token for the frontend
 	tokenString, err := helpers.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.Log.Errorf("Faild to create a new jwt: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	userInfo, err := helpers.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
 	if err != nil {
-		a.Log.Error(err) // crash or something happened???
+		a.Log.Fatalf("Failed check if user in db: %s", err.Error())
 		return
 	}
 
@@ -119,38 +126,22 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if userInfo == nil { // did not find the user, create new account
 		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log, a.PgConn)
 		if err != nil {
-			a.Log.Error("Failed to create new user")
+			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
 		}
 	} else if userInfo.GitHubToken != gitAccessToken.AccessToken {
 		// found user, but check if token doesnt match
 		err := helpers.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
 		if err != nil {
-			a.Log.Panic(err)
+			a.Log.Panicf("Failed to update users access token: %s", err.Error())
 			return
 		}
 	}
 
-	type Resposne struct {
-		Token   string
-		NewUser bool
-	}
-
-	loginValue := Resposne{tokenString, false}
-
-	value, err := json.Marshal(loginValue)
-
+	isNewUser := userInfo == nil
+	err = jsonio.ToJSON(&LoginResponse{Token: tokenString, NewUser: isNewUser}, w)
 	if err != nil {
-		a.Log.Panic(err)
-		return
-	}
-
-	// serve token to frontend
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(value)
-
-	if err != nil {
-		a.Log.Error("failed to serve jwt")
+		a.Log.Fatalf("failed to serve jwt to frontend: %s", err.Error())
 	}
 }
 
@@ -166,7 +157,10 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
 	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
-		a.Log.Error(err)
-		// add error for frontend
+		a.Log.Errorf("Failed to add jwt to blacklist: %s", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	// frontend should look for ok after adding to blacklist
+	w.WriteHeader(http.StatusOK)
 }

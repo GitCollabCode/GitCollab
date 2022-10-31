@@ -14,4 +14,8 @@ export type loginResponse = {
   NewUser: boolean
 }
 
+export type GitHubRedirectResponse = {
+  RedirectUrl: string
+}
+
 export type userLoginContextState = userValue & userDispatch
