@@ -7,6 +7,7 @@ import (
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/GitCollabCode/GitCollab/internal/github"
+	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
 	goGithub "github.com/google/go-github/github"
@@ -27,10 +28,24 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
+type LoginResponse struct {
+	Token   string `json:"Token"`
+	NewUser bool   `json:"NewUser"`
+}
+
+type GitHubRedirectResponse struct {
+	RedirectUrl string `json:"RedirectUrl"`
+}
+
+// Expected Http Body for login request to github
+type GitOauthRequest struct {
+	Code string `json:"code"`
+}
+
 // create refrence to new auth struct
 // pg = pinter to db driver
 // log = logger
-// oConf = config for oauth, holds secret and id
+// oConf = config for oauth, holds secret and id“
 // redirectUrl = redirect for frontend, github brings you back here
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 	redirectUrl string, gitCollabSecret string) *Auth {
@@ -41,13 +56,9 @@ func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
 // to the frontend
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
-	res, err := helpers.NewRedirectResponse(redirect)
+	err := jsonio.ToJSON(&GitHubRedirectResponse{RedirectUrl: redirect}, w)
 	if err != nil {
 		a.Log.Panicf("Failed to create redirect response: %s", err.Error())
-	}
-
-	if helpers.WriteJsonResponse(w, res) != nil {
-		a.Log.Panicf("Failed to write redirect: %s", err.Error())
 	}
 }
 
@@ -58,7 +69,9 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Serving login request")
-	oauthReq, err := helpers.ParseGitOauthRequest(r)
+	var githubCodeRes GitOauthRequest
+	err := jsonio.FromJSON(&githubCodeRes, r.Body)
+
 	if err != nil {
 		a.Log.Errorf("Request missing code: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -66,7 +79,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get github access token from git with code
-	gitAccessToken, err := github.GetGithubAccessToken(oauthReq.Code, *a.oauth)
+	gitAccessToken, err := github.GetGithubAccessToken(githubCodeRes.Code, *a.oauth)
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -125,12 +138,8 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	res, err := helpers.NewLoginResponse(tokenString, userInfo == nil)
-	if err != nil {
-		a.Log.Panicf("failed to create redirect request: %s", err.Error())
-	}
-
-	err = helpers.WriteJsonResponse(w, res)
+	isNewUser := userInfo == nil
+	err = jsonio.ToJSON(&LoginResponse{Token: tokenString, NewUser: isNewUser}, w)
 	if err != nil {
 		a.Log.Fatalf("failed to serve jwt to frontend: %s", err.Error())
 	}

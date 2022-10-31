@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -42,7 +43,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		err = data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -53,7 +54,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 		// NOTE: Repetative code, clean this up and make sure error messages are descriptive
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -62,11 +63,11 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	err = data.ToJSON(profile, w) //change the returned profile struct later to NOT include github token
+	err = jsonio.ToJSON(profile, w) //change the returned profile struct later to NOT include github token
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -85,7 +86,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
 		}
@@ -97,11 +98,11 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "profile created"
 
-	err = data.ToJSON(resp, w)
+	err = jsonio.ToJSON(resp, w)
 	if err != nil {
 		p.log.Fatalf("PostProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
 		}
@@ -115,7 +116,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		err = data.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -125,7 +126,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -136,7 +137,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -148,11 +149,11 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]string)
 	resp["message"] = "profile deleted"
 
-	err = data.ToJSON(resp, w)
+	err = jsonio.ToJSON(resp, w)
 	if err != nil {
 		p.log.Fatalf("DeleteProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = data.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
