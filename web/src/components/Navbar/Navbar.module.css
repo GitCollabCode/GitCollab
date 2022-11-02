@@ -7,8 +7,6 @@
 }
 
 .centerNavItems {
-  margin-left: 17.5rem;
-  margin-right: 24rem;
   width: 46rem;
   display: flex;
   align-items: center;
@@ -31,9 +29,16 @@
 .loginBox {
   display: flex;
   margin-right: 2rem;
+  width: auto;
 }
 
 nav {
   width: 100%;
   display: flex;
+}
+
+.container {
+  display:flex;
+  flex-direction: row;
+  width:100%;
 }

@@ -17,6 +17,7 @@ const Navbar = () => {
         <div className={style.loginBox}>
           <LoginButton />
         </div>
+        
       </nav>
     </div>
   )
