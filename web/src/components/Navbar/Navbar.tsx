@@ -9,7 +9,6 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'
 
 const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false)
-  console.log(isLoading)
   return (
     <>
       <Media query={{ minWidth: 1023 }}>

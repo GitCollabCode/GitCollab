@@ -12,12 +12,11 @@ const LoadingSpinner = ({ isLoading }: { isLoading: boolean }) => {
     justifySelf: 'center',
   }
 
-  console.log(isLoading)
   return (
     <div className={style.overlay}>
       heelllo
       <RingLoader
-        loading={true}
+        loading={isLoading}
         color={'#ffffff'}
         cssOverride={override}
         size={150}
