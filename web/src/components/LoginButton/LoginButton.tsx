@@ -15,6 +15,7 @@ const LoginButton = ({
   const { logIn, isLoggedIn, logOut } = useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
 
+
   useEffect(() => {
     // After requesting Github access, Github redirects back to your app with a code parameter
     const url = window.location.href
@@ -23,7 +24,7 @@ const LoginButton = ({
     // If Github API returns the code parameter
     if (hasCode) {
       setIsLoading(true)
-      setTimeout(() => {}, 5000)
+      
       const newUrl = url.split('?code=')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })

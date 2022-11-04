@@ -23,7 +23,7 @@ const Navbar = () => {
               <NavItem text="about" link="/#" />
             </div>
             <div className={style.loginBox}>
-              <LoginButton setIsLoading={() => setIsLoading} />
+              <LoginButton setIsLoading={setIsLoading} />
             </div>
           </nav>
         </div>

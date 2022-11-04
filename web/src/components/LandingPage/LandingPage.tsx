@@ -12,7 +12,7 @@ const LandingPage = () => {
         <Media query={{ maxWidth: 1023 }}>
           <div className={style.login}>
             <div className={style.logo}>GitCollab</div>
-            <LoginButton setIsLoading={() => setIsLoading} />
+            <LoginButton setIsLoading={setIsLoading} />
             {isLoading && <LoadingSpinner isLoading={isLoading} />}
           </div>
         </Media>
