@@ -1,6 +1,5 @@
 import React from 'react'
 import { bubble as Menu } from 'react-burger-menu'
-import LoginButton from '../LoginButton/LoginButton'
 
 import style from './Sidebar.module.css'
 
@@ -23,10 +22,6 @@ const Sidebar = () => {
           <a href="/" className={style.link}>
             about
           </a>
-        </div>
-
-        <div className={style.loginBox}>
-          <LoginButton />
         </div>
       </div>
     </Menu>

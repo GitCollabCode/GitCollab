@@ -43,6 +43,8 @@ body {
       rgba(0, 0, 0, 0) 105.28%
     ),
     linear-gradient(252.96deg, #4b072c 14.27%, #000000 88.33%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   height: 100%;
   width: 100%;
   display: flex;

@@ -25,7 +25,7 @@ const Navbar = () => {
         </div>
       </Media>
       <Media query={{ maxWidth: 1024 }}>
-        <div className={style.navbar}>
+        <div className={style.navbarMobile}>
           <Sidebar />
         </div>
       </Media>

@@ -6,6 +6,12 @@
   border-bottom: 1px #d9d9d9;
 }
 
+.navbarMobile {
+  display: flex;
+  min-height: 6.25rem;
+  width: 100%;
+}
+
 .centerNavItems {
   width: 50%;
   display: flex;
