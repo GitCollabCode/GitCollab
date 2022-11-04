@@ -23,6 +23,7 @@ const LoginButton = ({
     // If Github API returns the code parameter
     if (hasCode) {
       setIsLoading(true)
+      setTimeout(() => {}, 5000)
       const newUrl = url.split('?code=')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })
