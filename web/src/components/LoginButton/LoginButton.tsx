@@ -7,7 +7,11 @@ import { ReactComponent as GithubIcon } from '../../assets/github.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
 import style from './LoginButton.module.css'
 
-const LoginButton = () => {
+const LoginButton = ({
+  setIsLoading,
+}: {
+  setIsLoading: (value: boolean) => void
+}) => {
   const { logIn, isLoggedIn, logOut } = useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
 
@@ -18,6 +22,7 @@ const LoginButton = () => {
 
     // If Github API returns the code parameter
     if (hasCode) {
+      setIsLoading(true)
       const newUrl = url.split('?code=')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })
@@ -37,7 +42,9 @@ const LoginButton = () => {
             //TODO ADD the Modal for getting user stuff
             console.log('New USER ')
           }
+
           logIn(data.Token)
+          setIsLoading(false)
         })
         .catch((error) => {
           console.log(error)
@@ -45,19 +52,23 @@ const LoginButton = () => {
             isLoading: false,
             errorMessage: 'Sorry! Login failed',
           })
+          setIsLoading(false)
         })
     }
-  }, [isLoggedIn, data, logIn])
+  }, [isLoggedIn, data, logIn, setIsLoading])
 
   const redirectToGithub = () => {
+    setIsLoading(true)
     fetch(process.env.REACT_APP_API_URI + GITHUB_REDIRECT, {
       method: 'GET',
     })
       .then((response) => response.json())
-      .then((data : GitHubRedirectResponse) => {
+      .then((data: GitHubRedirectResponse) => {
+        setIsLoading(false)
         window.location.replace(data.RedirectUrl)
       })
       .catch((error) => {
+        setIsLoading(false)
         console.log(error)
       })
   }
