@@ -16,6 +16,26 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.bm-burger-button {
+  position: fixed;
+  width: 35px;
+  height: 35px;
+  left: 36px;
+  top: 36px;
+  stroke: white;
+  background-image: url('../src/assets/hamburger.svg');
+}
+
+/* Styling of overlay */
+.bm-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.bm-menu {
+  width: 100%;
+}
+
 body {
   background: linear-gradient(
       73.67deg,
