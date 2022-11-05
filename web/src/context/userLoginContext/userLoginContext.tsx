@@ -37,7 +37,7 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
       },
     }).then((res) => {
       // Verify was actually done
-      if (res.status == 200){
+      if (res.status === 200) {
         localStorage.removeItem('gitcollab_jwt')
         dispatch({
           type: 'LOGOUT',
