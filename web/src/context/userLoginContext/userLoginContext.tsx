@@ -29,16 +29,20 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
   const logOut = () => {
     const token = localStorage.getItem('gitcollab_jwt')
     fetch(process.env.REACT_APP_API_URI + LOGOUT, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
       },
-    }).then(() => localStorage.removeItem('gitcollab_jwt'))
-
-    dispatch({
-      type: 'LOGOUT',
+    }).then((res) => {
+      // Verify was actually done
+      if (res.status == 200){
+        localStorage.removeItem('gitcollab_jwt')
+        dispatch({
+          type: 'LOGOUT',
+        })
+      }
     })
   }
 
