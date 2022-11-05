@@ -6,13 +6,19 @@
   border-bottom: 1px #d9d9d9;
 }
 
+.navbarMobile {
+  display: flex;
+  min-height: 6.25rem;
+  width: 100%;
+}
+
 .centerNavItems {
-  margin-left: 17.5rem;
-  margin-right: 24rem;
-  width: 46rem;
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .logo {
@@ -21,6 +27,7 @@
   font-weight: 400;
   font-size: 4.5rem;
   line-height: 5.375rem;
+  width: 25%;
 
   color: white;
   margin-top: 0.5rem;
@@ -31,9 +38,17 @@
 .loginBox {
   display: flex;
   margin-right: 2rem;
+  width: 25%;
+  justify-content: flex-end;
 }
 
 nav {
   width: 100%;
   display: flex;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
 }

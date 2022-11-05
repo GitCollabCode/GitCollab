@@ -12,7 +12,12 @@ jest.mock('react-router-dom', () => ({
 describe('Login', () => {
   it('Test Render', () => {
     render(
-    <Login />)
+      <Login
+        setIsLoading={() => {
+          /**/
+        }}
+      />
+    )
     expect(screen.getByText('login')).toBeInTheDocument()
   })
 })

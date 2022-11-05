@@ -1,9 +1,31 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from './App'
+import { act } from 'react-dom/test-utils'
 
-test('renders learn react link', () => {
+const mockMatches = true
+
+window.matchMedia = (query) => ({
+  matches: mockMatches,
+  media: query,
+  onchange: null,
+  addListener: jest.fn(), // deprecated
+  removeListener: jest.fn(), // deprecated
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  dispatchEvent: jest.fn(),
+})
+
+test('renders', () => {
   render(<App />)
-  const linkElement = screen.getByText('GitCollab')
-  expect(linkElement).toBeInTheDocument()
+  act(() => {
+    fireEvent.click(screen.getByText('Open Menu'))
+  })
+
+  waitFor(() => {
+    expect(screen.getByText('discover')).toBeInTheDocument()
+  })
+
+  const links = document.getElementsByClassName('link')
+  expect(links.length).toBe(3)
 })
