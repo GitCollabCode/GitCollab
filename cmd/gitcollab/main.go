@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
-	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	authHandlers "github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	authRouter "github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
@@ -82,8 +81,8 @@ func main() {
 		Endpoint:     githuboauth.Endpoint,
 	}
 
-	// create gitcollab jwt conf
-	jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
+	// create gitcollab jwt conf, for midddleware
+	//jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
 
 	// create db drivers
 	dbDriver, err := db.ConnectPostgres(dbUrl)
@@ -108,13 +107,17 @@ func main() {
 		}
 	})
 
-	// register all sub routers
-	auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
-	authRouter.InitAuthRouter(r, auth, jwtConf)
+	// register all sub routers under /api
+	r.Route("/api", func(r chi.Router) {
+		// authentication subrouter
+		auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
+		r.Mount("/auth", authRouter.AuthRouter(auth))
 
-	pd := data.NewProfileData(dbDriver, logger)
-	profiles := profilesHandlers.NewProfiles(logger, pd)
-	profilesRouter.InitRouter(r, profiles)
+		// profiles subrouter
+		pd := data.NewProfileData(dbDriver, logger)
+		profiles := profilesHandlers.NewProfiles(logger, pd)
+		r.Mount("/profile", profilesRouter.ProfileRouter(profiles))
+	})
 
 	// Start server
 	if httpPort == "" {
