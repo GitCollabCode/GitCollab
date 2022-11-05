@@ -3,29 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@svgr/plugin-svgo": "^6.5.1",
-    "@svgr/webpack": "^6.5.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.58",
     "@types/react": "^18.0.19",
+    "@types/react-burger-menu": "^2.8.3",
     "@types/react-dom": "^18.0.6",
     "bootstrap": "^5.2.1",
-    "loader-utils": "^3.2.0",
-    "minimatch": "^5.1.0",
-    "nth-check": "^2.1.1",
     "react": "^18.2.0",
     "react-burger-menu": "^3.0.8",
     "react-dom": "^18.2.0",
     "react-media": "^1.10.0",
-    "react-refresh": "^0.14.0",
     "react-router-dom": "^6.3.0",
-    "react-script": "^2.0.5",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "react-spinners": "^0.13.6",
-    "recursive-readdir": "^2.2.3",
     "typescript": "^4.8.3",
     "web-vitals": "^2.1.4"
   },
@@ -66,7 +59,6 @@
     ]
   },
   "devDependencies": {
-    "@types/react-burger-menu": "^2.8.3",
     "eslint": "^8.23.0",
     "prettier": "2.7.1"
   }
