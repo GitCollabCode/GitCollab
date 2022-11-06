@@ -40,6 +40,7 @@ func main() {
 	// initialize logger
 	logger := logrus.New()
 	logger.Out = os.Stdout
+	logger.SetReportCaller(true)
 
 	logger.Info("Starting Logger!")
 
