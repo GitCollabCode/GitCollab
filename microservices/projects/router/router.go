@@ -6,13 +6,12 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func InitAuthRouter(r chi.Router, auth *handlers.Auth, conf *jwt.GitCollabJwtConf) {
+func InitAuthRouter(r chi.Router, projects *handlers.Projects, conf *jwt.GitCollabJwtConf) {
 	// add all routes and handlers below
 
 	r.Route("/project", func(r chi.Router) {
-		r.Get("/get", )
-		r.Post("/signin", auth.LoginHandler)
-		r.Get("/logout", auth.LogoutHandler)
+		r.Get("/project", projects.ProjectsForProfileHandler )
+		
 	})
 
 }
