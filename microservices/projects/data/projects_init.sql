@@ -1,15 +1,14 @@
 Create TABLE IF NOT EXISTS projects (
-    project_id          INTEGER         NOT NULL,
-    github_owner_id     INTEGER         NOT NULL,
-    project_name        VARCHAR         NOT NULL,
-    description         VARCHAR         NOT NULL,
-    date_created        DATE            NOT NULL,
-    description         VARCHAR          NOT NULL,
+    project_id            INTEGER         NOT NULL AUTO,
+    github_owner_id       INTEGER         NOT NULL,
+    project_name          VARCHAR         NOT NULL,
+    project_description   VARCHAR         NOT NULL,
+    date_created          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     PRIMARY Key (project_id)
+
     CONSTRAINT fk_projectOwner
-        FOREIGN KEY(github_owner_id) 
-	        REFERENCES profiles(github_user_id)
-    
+    FOREIGN KEY(github_owner_id) 
+    REFERENCES profiles(github_user_id)
 );
 
 Create TABLE IF NOT EXISTS skills (
@@ -18,6 +17,9 @@ Create TABLE IF NOT EXISTS skills (
     PRIMARY Key (skill_id)   
 );
 
+/*
+ * Create skills for projects
+ */
 INSERT INTO skills(skill_id, skill_name)
 values (default, "Frontend"),
 (default, "Backend"),
@@ -25,25 +27,29 @@ values (default, "Frontend"),
 (default, "Testing"),
 (default, "Documentation");     
 
-
+/*
+ * Associative table for projects->users
+ */
 Create TABLE IF NOT EXISTS project_members(
-    id          INTEGER         NOT NULL AUTO,
-    project_id   INTEGER        NOT NULL,
-    user_id     INTEGER         NOT NULL,
-    role        INTEGER         NOT NULL,
-    
+    id           INTEGER         NOT NULL AUTO,
+    project_id   INTEGER         NOT NULL,
+    user_id      INTEGER         NOT NULL,
+    user_role    INTEGER         NOT NULL,
     PRIMARY KEY (id)
-    CONSTRAINT fk_projectId
-        FOREIGN KEY(project_id)
-            REFERENCES projects(project_id)
-    CONSTRAINT fk_userId
-        FOREIGN KEY(user_id)
-            REFERENCES profiles(user_id)
 
+    /* Foreign key for project that members are a part of */
+    CONSTRAINT fk_projectId
+    FOREIGN KEY(project_id)
+    REFERENCES projects(project_id)
+
+    /* Foreign key for profile that belongs to */
+    CONSTRAINT fk_userId
+    FOREIGN KEY(user_id)
+    REFERENCES profiles(user_id)
 )
 
 
-Create TABLE IF NOT EXISTS tasks (
+/* Create TABLE IF NOT EXISTS tasks (
     task_id             VARCHAR       NOT NULL,
     project_id          VARCHAR       NOT NULL,
     task_creator_id     INTEGER       NOT NULL,
@@ -64,4 +70,4 @@ Create TABLE IF NOT EXISTS tasks (
     CONSTRAINT fk_taskAssignee
         FOREIGN KEY(assignee_id)
             REFERENCES profiles(github_user_id)  
-);
+); */
