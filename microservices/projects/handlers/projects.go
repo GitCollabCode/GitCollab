@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/GitCollabCode/GitCollab/internal/db"
-	"github.com/GitCollabCode/GitCollab/internal/github"
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
-	"github.com/GitCollabCode/GitCollab/internal/jwt"
-	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
-	goGithub "github.com/google/go-github/github"
+	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
+	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/oauth2"
 
 )
 
@@ -20,8 +17,6 @@ import (
 type Project struct {
 	PgConn          *db.PostgresDriver
 	Log             *logrus.Logger
-	oauth           *oauth2.Config
-
 }
 
 
@@ -47,9 +42,9 @@ type Projects struct {
 // log = logger
 // oConf = config for oauth, holds secret and id“
 // redirectUrl = redirect for frontend, github brings you back here
-func NewProjects(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config,
+func NewProjects(pg *db.PostgresDriver, log *logrus.Logger,
 	redirectUrl string, gitCollabSecret string) *Auth {
-	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
+	return &Project{pg, log}
 }
 
 
@@ -67,6 +62,18 @@ func NewProjects(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config
 // TODO: 
 func (p *Projects) ProjectsForProfileHandler(w http.ResponseWriter, r *http.Request) {
 	a.Log.Info("Getting Projects for Profile")
+
+	username := chi.URLParam(r, "username")
+
+	project, err := p.PgConn.GetProjectsForProfile(username)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		if err != nil {
+			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
+		}
+		return
+	}
 	
 }
 

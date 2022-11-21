@@ -2,6 +2,7 @@ Create TABLE IF NOT EXISTS projects (
     project_id          INTEGER         NOT NULL,
     github_owner_id     INTEGER         NOT NULL,
     project_name        VARCHAR         NOT NULL,
+    description         VARCHAR         NOT NULL,
     date_created        DATE            NOT NULL,
     description         VARCHAR          NOT NULL,
     PRIMARY Key (project_id)
