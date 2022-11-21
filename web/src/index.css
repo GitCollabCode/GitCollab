@@ -16,6 +16,26 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.bm-burger-button {
+  position: fixed;
+  width: 35px;
+  height: 35px;
+  left: 36px;
+  top: 36px;
+  stroke: white;
+  background-image: url('../src/assets/hamburger.svg');
+}
+
+/* Styling of overlay */
+.bm-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.bm-menu {
+  width: 100%;
+}
+
 body {
   background: linear-gradient(
       73.67deg,
@@ -23,11 +43,14 @@ body {
       rgba(0, 0, 0, 0) 105.28%
     ),
     linear-gradient(252.96deg, #4b072c 14.27%, #000000 88.33%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   height: 100%;
   width: 100%;
   display: flex;
   font-weight: 400;
   font-family: 'Fira Sans', sans-serif;
+  z-index: 1;
 }
 h1,
 h2,

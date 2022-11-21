@@ -43,6 +43,29 @@
   animation: anim 8s infinite;
 }
 
+.login {
+  position: fixed;
+  top: 0;
+  right: 14.8rem;
+}
+
+.logo {
+  position: fixed;
+  top: 0;
+  left: 72px;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 4.5rem;
+  line-height: 5.375rem;
+  width: 25%;
+
+  color: white;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  margin-left: 2rem;
+}
+
 @keyframes anim {
   0% {
     margin-top: 0;

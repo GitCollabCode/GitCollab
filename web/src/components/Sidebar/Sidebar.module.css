@@ -1,0 +1,31 @@
+.sidebar {
+  margin-left: 2rem;
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.link {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 2.1875rem;
+  line-height: 3.75rem;
+  color: white;
+  text-decoration: none;
+}
+
+.logo {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 4.5rem;
+  line-height: 5.375rem;
+  width: 25%;
+
+  color: white;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  margin-left: 2rem;
+}

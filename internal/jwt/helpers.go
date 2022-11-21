@@ -15,7 +15,6 @@ func NewGitCollabJwtConf(secret string) *GitCollabJwtConf {
 
 // Retrieve JWT from the header, return empty string if no JWT
 func GetJwtFromHeader(r *http.Request) string {
-	// retrieve bearer token from header
 	authString := r.Header.Get("Authorization")
 	if authString == "" {
 		return ""
