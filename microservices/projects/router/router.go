@@ -10,7 +10,7 @@ import (
 
 const MAX_GIT_TRANSACTIONS = 5 // per min
 
-func ProjectRouter(project *handlers.ProjectData) chi.Router {
+func ProjectRouter(project *handlers.Projects) chi.Router {
 	r := chi.NewRouter()
 	// github related endpoints, should not be called often,
 	r.Route("/github", func(r chi.Router) {
