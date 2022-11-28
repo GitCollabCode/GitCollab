@@ -121,7 +121,7 @@ func main() {
 		r.Mount("/profile", profilesRouter.ProfileRouter(profiles))
 
 		// projects subrouter
-		project := projectsHandlers.NewProjectData(dbDriver, logger)
+		project := projectsHandlers.NewProjects(dbDriver, logger)
 		r.Mount("/projects", projectsRouter.ProjectRouter(project))
 	})
 
