@@ -36,6 +36,24 @@ type ValidationError struct {
 	Messages []string `json:"messages"`
 }
 
+type ProfileSearchReq struct {
+	Username string `json:"username"`
+}
+
+type ProfilePatchReq struct {
+	Username  string `json:"username"`
+	GithubId  int    `json:"gitID"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatarUrl"`
+}
+
+type ProfilesResponse struct {
+	Username  string `json:"username"`
+	GithubId  int    `json:"gitID"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatarUrl"`
+}
+
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
@@ -162,13 +180,44 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) PutProfile(w http.ResponseWriter, r *http.Request) {
+	/*
+	 *	NOT NEEDED, LEAVING IN INCASE OF FUTURE USE
+	 */
 	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }
 
 func (p *Profiles) PatchProfile(w http.ResponseWriter, r *http.Request) {
+	var profileReq ProfilePatchReq
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil || profileReq.Username == "" {
+		p.log.Errorf("Failed to parse json username: %s", err.Error())
+	}
+	// TODO: NOTHING TO UPDATE YET
 	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }
 
 func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	var profileReq ProfileSearchReq
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil {
+		p.log.Errorf("Failed to parse json username: %s", err.Error())
+	}
+	profile, err := p.pd.GetProfileByUsername(profileReq.Username)
+	if err != nil {
+		p.log.Errorf("Failed to find user by username: %s", err.Error())
+	}
+
+	res := ProfilesResponse{
+		Username:  profile.Username,
+		GithubId:  profile.GitHubUserID,
+		Email:     profile.Email,
+		AvatarURL: profile.AvatarURL,
+	}
+	err = jsonio.ToJSON(&res, w)
+	if err != nil {
+		p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
+		w.WriteHeader(http.StatusNotFound) // idlk what error to use, change later on
+		// when kevin decides
+	}
+
 }
