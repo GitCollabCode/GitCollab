@@ -88,12 +88,12 @@ func main() {
 	//jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
 
 	// create db drivers
-	dbDriver, err := db.ConnectPostgres(dbUrl)
+	dbDriver, err := db.NewPostgresDriver(dbUrl, logger)
 	if err != nil {
 		logger.Error(err)
 		return
 	}
-	defer dbDriver.Connection.Close(context.Background())
+	defer dbDriver.Pool.Close()
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("hi from Git Collab"))
@@ -117,7 +117,7 @@ func main() {
 		r.Mount("/auth", authRouter.AuthRouter(auth))
 
 		// profiles subrouter
-		pd := data.NewProfileData(dbDriver, logger)
+		pd := data.NewProfileData(dbDriver)
 		profiles := profilesHandlers.NewProfiles(logger, pd)
 		r.Mount("/profile", profilesRouter.ProfileRouter(profiles))
 
