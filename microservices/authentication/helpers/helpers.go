@@ -63,7 +63,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 	}
 
 	// Attempting to insert new jwt
-	_, err = pg.Connection.Exec(context.Background(),
+	_, err = pg.Pool.Exec(context.Background(),
 		`INSERT INTO jwt_blacklist (jwt, invalidated_time)
 		 VALUES ($1, $2) ON CONFLICT (jwt) DO NOTHING`,
 		jwtString, expTime)
@@ -76,7 +76,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 }
 
 func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
-	pDb := data.NewProfileData(pg, log)
+	pDb := data.NewProfileData(pg)
 	profile, err := pDb.GetProfile(gitId)
 	if err == pgx.ErrNoRows {
 		return nil, nil
@@ -89,13 +89,12 @@ func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data
 
 func UpdateGitAccessToken(user *data.Profile, token string, pg *db.PostgresDriver, log *logrus.Logger) error {
 	// will update the current access token to match that returned by git
-	pDb := data.NewProfileData(pg, log)
+	pDb := data.NewProfileData(pg)
 	return pDb.UpdateProfileToken(user.GitHubUserID, token)
 }
 
 func CreateNewUser(gitId int, gitUser string, gitToken string,
 	gitEmail string, gitAvatarUrl string, log *logrus.Logger, pg *db.PostgresDriver) error {
-	
-	pDb := data.NewProfileData(pg, log)
+	pDb := data.NewProfileData(pg)
 	return pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl, gitEmail)
 }

@@ -33,7 +33,7 @@ type Project struct {
 
 // move to db.go
 func (pd *ProjectData) projectsTransactOneRow(sqlStatement string, args ...any) error {
-	tx, err := pd.dbDriver.Connection.Begin(context.Background())
+	tx, err := pd.dbDriver.Pool.Begin(context.Background())
 	if err != nil {
 		pd.log.Fatal(err)
 	}
@@ -65,7 +65,7 @@ func (pd *ProjectData) projectsTransactOneRow(sqlStatement string, args ...any) 
 func (pd *ProjectData) projectGetRow(sqlStatement string, args ...any) (*Project, error) {
 	var p Project
 
-	err := pd.dbDriver.Connection.QueryRow(context.Background(), sqlStatement, args...).Scan(&p.ProjectID,
+	err := pd.dbDriver.Pool.QueryRow(context.Background(), sqlStatement, args...).Scan(&p.ProjectID,
 		&p.ProjectOwner, &p.ProjectName, &p.ProjectDescription, &p.ProjectSkills, &p.DateCreated)
 	if err != nil {
 		pd.log.Errorf("projectGetRow Query failed: %s", err.Error())
@@ -80,7 +80,7 @@ func (pd *ProjectData) AddProject(ownerID int, projectName string, projectDescri
 		"INSERT INTO projects(project_owner, project_name, project_description)" +
 			"VALUES($1, $2, $3)"
 
-	_, err := pd.dbDriver.Connection.Exec(context.Background(), sqlString, ownerID, projectName, projectDescription)
+	_, err := pd.dbDriver.Pool.Exec(context.Background(), sqlString, ownerID, projectName, projectDescription)
 	if err != nil {
 		pd.log.Errorf("AddProject database INSERT failed: %s", err.Error())
 		return err
