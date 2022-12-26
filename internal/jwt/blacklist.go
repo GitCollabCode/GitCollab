@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
@@ -17,33 +16,32 @@ func JWTBlackList(db *db.PostgresDriver, logger *logrus.Logger) func(http.Handle
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			jwtString := GetJwtFromHeader(r)
 			if jwtString == "" {
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			rows, err := db.Connection.Query(context.Background(),
-				"select jwt from jwt_blacklist where jwt=$1",
-				jwtString)
+				"select jwt from jwt_blacklist where jwt=$1", jwtString)
+
 			if err != nil {
-				logger.Error(err) // TODO: maybe set context
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			defer rows.Close() // todo check above for errors
 
+			logger.Errorf("err is %s", err.Error())
+
 			for rows.Next() {
 				var retrievedJwt string
 				err := rows.Scan(&retrievedJwt)
-				fmt.Println(retrievedJwt)
-				if err != nil {
-					logger.Error(err) // TODO: maybe set context
-					return
-				}
-				for jwtString == retrievedJwt { // found blacklist!
-					fmt.Println("This shit in the blacklist")
+				logger.Infof("jwt is %s", retrievedJwt)
+				logger.Errorf("error is %s", err.Error())
+
+				if err != nil || jwtString == retrievedJwt {
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 			}
-			fmt.Println("No blkackist pretty epic")
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	authHandlers "github.com/GitCollabCode/GitCollab/microservices/authentication/handlers"
 	authRouter "github.com/GitCollabCode/GitCollab/microservices/authentication/router"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
@@ -123,6 +124,14 @@ func main() {
 		// projects subrouter
 		project := projectsHandlers.NewProjects(dbDriver, logger)
 		r.Mount("/projects", projectsRouter.ProjectRouter(project))
+
+		// test routes
+		r.Route("/test", func(r chi.Router) {
+			r.Use(jwt.JWTBlackList(dbDriver, logger))
+			r.Get("/test-blacklist", func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("cheese"))
+			})
+		})
 	})
 
 	// Start server
