@@ -72,7 +72,7 @@ func (pd *PostgresDriver) QueryRow(sqlStatement string, structure interface{}, a
 		return err
 	}
 
-	pgxscan.ScanOne(structure, rows)
+	err = pgxscan.ScanOne(structure, rows)
 	if err != nil {
 		pd.Log.Errorf("QueryRow ScanOne failed: %s", err.Error())
 		return err
@@ -88,7 +88,7 @@ func (pd *PostgresDriver) QueryRows(sqlStatement string, structure interface{}, 
 		return err
 	}
 
-	pgxscan.ScanAll(structure, rows)
+	err = pgxscan.ScanAll(structure, rows)
 	if err != nil {
 		pd.Log.Errorf("QueryRows ScanAll failed: %s", err.Error())
 		return err
