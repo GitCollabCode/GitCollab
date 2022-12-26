@@ -44,6 +44,6 @@ sudo usermod -aG docker "$USER"
 
 #Start Docker and run hello-world
 sudo service docker start
-sudo systemctl enable docker
+sudo systemctl enable docker #NOTE: systemctl enable does not work within WSL
 sleep 3
 sudo docker run hello-world

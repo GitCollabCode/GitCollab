@@ -40,6 +40,7 @@ type Validation struct {
 func NewValidation() *Validation {
 	validate := validator.New()
 
+	//This an example of custom validatation registration
 	//validate.RegisterValidation("github_username", validateGithubUsername)
 
 	return &Validation{validate}
@@ -61,6 +62,7 @@ func (v *Validation) Validate(i interface{}) ValidationErrors {
 	return returnErrs
 }
 
+// This an example of a custom validator
 // func validateGithubUsername(fl validator.FieldLevel) bool {
 // 	re := regexp.MustCompile(`/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i`)
 // 	sku := re.FindAllString(fl.Field().String(), -1)
