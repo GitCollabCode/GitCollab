@@ -17,6 +17,8 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	profilesHandlers "github.com/GitCollabCode/GitCollab/microservices/profiles/handlers"
 	profilesRouter "github.com/GitCollabCode/GitCollab/microservices/profiles/router"
+	projectsHandlers "github.com/GitCollabCode/GitCollab/microservices/projects/handlers"
+	projectsRouter "github.com/GitCollabCode/GitCollab/microservices/projects/router"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -118,6 +120,10 @@ func main() {
 		pd := data.NewProfileData(dbDriver, logger)
 		profiles := profilesHandlers.NewProfiles(logger, pd)
 		r.Mount("/profile", profilesRouter.ProfileRouter(profiles))
+
+		// projects subrouter
+		project := projectsHandlers.NewProjects(dbDriver, logger)
+		r.Mount("/projects", projectsRouter.ProjectRouter(project))
 	})
 
 	// Start server
