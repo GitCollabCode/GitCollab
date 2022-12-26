@@ -20,7 +20,7 @@ func JWTBlackList(db *db.PostgresDriver, logger *logrus.Logger) func(http.Handle
 				return
 			}
 
-			rows, err := db.Connection.Query(context.Background(),
+			rows, err := db.Pool.Query(context.Background(),
 				"select jwt from jwt_blacklist where jwt=$1",
 				jwtString)
 			if err != nil {

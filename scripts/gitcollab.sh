@@ -37,7 +37,8 @@ GitCollab deployment script, used to control the docker functions of the project
         restart                  Restart all runnign docker containers
         clean                    Removes all docker related data [Volumes, Containers and Networks]
         clean-db                 Remove db container and volume
-        test                     Start a unit test suite
+        test_unit                Run unit test suite
+        test_integration         Run integration test suite
         refresh-env-file         Refresh .env file with env file
 EOF
 }
