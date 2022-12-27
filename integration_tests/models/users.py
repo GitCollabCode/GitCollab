@@ -13,10 +13,3 @@ class Profiles(Base):
     email = Column(String)
     avatar_url = Column(String)
 
-
-#class Profiles(Base):
-#    github_user_id = factory.sequence(lambda n: '%s' % n)
-#    github_token = factory.Faker('github_token')
-#    username = factory.Faker('username')
-#    email = factory.Faker('email')
-#    avatar_url = factory.Faker('avatar_url')

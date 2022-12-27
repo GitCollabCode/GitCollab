@@ -1,11 +1,11 @@
 from db_fixtures import *
-from models.users import Profiles
+from models.blacklist import BlacklistFactory, BlacklistModel
 import requests
 
 
 
 class TestAuthentication:
-
+    
     def test_get_login_redirect(self, api_route):
         '''
         Ensure redirect url is created and returned
@@ -21,21 +21,31 @@ class TestAuthentication:
         '''
         url = api_route + "test/test-blacklist"
         resp = requests.get(url)
-        # check if blocked, make sure not a 404 error
-        assert resp.status_code != 200 and resp.status_code != 404
+        assert resp.status_code == 401
 
-    def test_blacklist_invalid_jwt(self, api_route):
+    def test_blacklist_valid_jwt(self, api_route):
         '''
-        Ensure request with invalid jwt is blocked by blacklist
+        Check if request served with jwt not in blacklist
         '''
         url = api_route + "test/test-blacklist"
-        resp = requests.get(url, headers={"Authorization":"Bearer ILoveCrackCocaine"})
-        # check if blocked, make sure not a 404 error
-        assert resp.status_code != 200 and resp.status_code != 404
+        resp = requests.get(url, headers={"Authorization":"Bearer CringeBurgerKing"})
+        assert resp.status_code == 200
 
-    def test_login_db(self, session):
+    def test_blacklist_blocked_jwt(self, api_route, session):
         '''
-        Ensure 
+        Check if request blocked when jwt in blacklist
         '''
-        result = session.query(Profiles).one_or_none()
-        assert result is not None
+        url = api_route + "test/test-blacklist"
+        session.add(BlacklistFactory(jwt="abc"))
+        session.commit()
+        #connection.execute("INSERT INTO jwt_blacklist VALUES (1234, 'abc')")
+
+        resp = requests.get(url, headers={"Authorization":"Bearer abc"})
+        assert resp.status_code == 401
+
+ #   def test_login_db(self, session):
+ #       '''
+ #       Ensure s
+ #       '''
+ #       result = session.query(Profiles).one_or_none()
+ #       assert result is not None

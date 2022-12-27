@@ -57,16 +57,21 @@ func GetExpTime(tokenString string) (time.Time, error) {
 // Insert a JWT to the blacklist table. Any requests with a header containing
 // this JWT will return an error to the frontend
 func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
-	expTime, err := GetExpTime(jwtString)
-	if err != nil {
-		return err
-	}
+	//expTime, err := GetExpTime(jwtString)
+	//if err != nil {
+	//	return err
+	//}
 
 	// Attempting to insert new jwt
-	_, err = pg.Pool.Exec(context.Background(),
-		`INSERT INTO jwt_blacklist (jwt, invalidated_time)
-		 VALUES ($1, $2) ON CONFLICT (jwt) DO NOTHING`,
-		jwtString, expTime)
+	//_, err = pg.Pool.Exec(context.Background(),
+	//	`INSERT INTO jwt_blacklist (jwt, invalidated_time)
+	//	 VALUES ($1, $2) ON CONFLICT (jwt) DO NOTHING`,
+	//	jwtString, expTime)
+
+	_, err := pg.Pool.Exec(context.Background(),
+		`INSERT INTO jwt_blacklist (jwt)
+		 VALUES ($1) ON CONFLICT (jwt) DO NOTHING`,
+		jwtString)
 
 	if err != nil {
 		return fmt.Errorf("failed to add jwt to blacklist")

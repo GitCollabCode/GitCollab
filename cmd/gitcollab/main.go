@@ -128,7 +128,7 @@ func main() {
 
 		// test routes
 		r.Route("/test", func(r chi.Router) {
-			r.Use(jwt.JWTBlackList(dbDriver, logger))
+			r.Use(jwt.JWTBlackList(dbDriver))
 			r.Get("/test-blacklist", func(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("cheese"))
 			})
