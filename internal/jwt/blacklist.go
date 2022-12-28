@@ -2,48 +2,46 @@ package jwt
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
-	"github.com/sirupsen/logrus"
+	"github.com/jackc/pgx/v5"
 )
 
 // Middleware to check if a given JWT is blacklisted
 // All private routes with JWT headers should pass through this
 // middleware
-func JWTBlackList(db *db.PostgresDriver, logger *logrus.Logger) func(http.Handler) http.Handler {
+func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			jwtString := GetJwtFromHeader(r)
 			if jwtString == "" {
+				db.Log.Info("Empty jwt")
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
-			rows, err := db.Pool.Query(context.Background(),
-				"select jwt from jwt_blacklist where jwt=$1",
-				jwtString)
-			if err != nil {
-				logger.Error(err) // TODO: maybe set context
+			var jwt string
+			db.Log.Infof("The jwt searched is: %s", jwtString)
+
+			err := db.Pool.QueryRow(context.Background(),
+				"SELECT jwt FROM jwt_blacklist WHERE jwt='abc';").Scan(&jwt)
+
+			if err != nil && err != pgx.ErrNoRows {
+				db.Log.Error(err.Error())
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			defer rows.Close() // todo check above for errors
 
-			for rows.Next() {
-				var retrievedJwt string
-				err := rows.Scan(&retrievedJwt)
-				fmt.Println(retrievedJwt)
-				if err != nil {
-					logger.Error(err) // TODO: maybe set context
-					return
-				}
-				for jwtString == retrievedJwt { // found blacklist!
-					fmt.Println("This shit in the blacklist")
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
+			db.Log.Infof("retreived jwt is %s\n\n", jwt)
+
+			if jwt == jwtString {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
 			}
-			fmt.Println("No blkackist pretty epic")
+
+			// made it through blacklist, good to continue
+			db.Log.Info("Request being served")
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)

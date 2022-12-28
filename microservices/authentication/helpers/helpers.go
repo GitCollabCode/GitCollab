@@ -78,7 +78,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
 	pDb := data.NewProfileData(pg)
 	profile, err := pDb.GetProfile(gitId)
-	if err == pgx.ErrNoRows {
+	if err.Error() == pgx.ErrNoRows.Error() {
 		return nil, nil
 	}
 	if err != nil {
