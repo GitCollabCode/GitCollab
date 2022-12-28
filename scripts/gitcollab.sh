@@ -55,6 +55,7 @@ function test-integration() {
 
 function build() {
     echo "Building GitCollab docker images..."
+    docker rmi "$(docker images -f "dangling=true" -q)" #delete dangling images
     docker compose -f "$(pwd)/docker-compose-convert.yaml" build
 }
 
