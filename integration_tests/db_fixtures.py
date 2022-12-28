@@ -8,20 +8,21 @@ from models.blacklist import BlacklistFactory
 Session = sessionmaker()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def engine():
     return create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def session(engine):
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
     connection = engine.connect()
     transaction = connection.begin()
-    session = Session(bind=connection)
+    engine.create_scoped_session()
+    session = Session(bind=engine)
     BlacklistFactory._meta.sqlalchemy_session = session
     yield session
     session.close()
-    transaction.rollback()
+    session.rollback()
     connection.close()
 
 @pytest.fixture(scope='session')
