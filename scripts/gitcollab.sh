@@ -50,7 +50,7 @@ function test-unit() {
 
 function test-integration() {
     echo "Running Integration tests..."
-    source gitcollab_pyenv/bin/activate && pytest
+    source gitcollab_pyenv/bin/activate && pytest ./integration_tests/
 }
 
 function build() {
