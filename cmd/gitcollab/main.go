@@ -130,7 +130,10 @@ func main() {
 		r.Route("/test", func(r chi.Router) {
 			r.Use(jwt.JWTBlackList(dbDriver))
 			r.Get("/test-blacklist", func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("cheese"))
+				_, err := w.Write([]byte("cheese"))
+				if err != nil {
+					logger.Info("Burgre King")
+				}
 			})
 		})
 	})
