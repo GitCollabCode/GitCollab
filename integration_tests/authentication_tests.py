@@ -31,21 +31,14 @@ class TestAuthentication:
         resp = requests.get(url, headers={"Authorization":"Bearer CringeBurgerKing"})
         assert resp.status_code == 200
 
-    def test_blacklist_blocked_jwt(self, api_route, session):
-        '''
-        Check if request blocked when jwt in blacklist
-        '''
-        url = api_route + "test/test-blacklist"
-        session.add(BlacklistFactory(jwt="abc"))
-        session.commit()
-        #connection.execute("INSERT INTO jwt_blacklist VALUES (1234, 'abc')")
-
-        resp = requests.get(url, headers={"Authorization":"Bearer abc"})
-        assert resp.status_code == 401
-
- #   def test_login_db(self, session):
- #       '''
- #       Ensure s
- #       '''
- #       result = session.query(Profiles).one_or_none()
- #       assert result is not None
+    #def test_blacklist_blocked_jwt(self, api_route, session):
+    #    '''
+    #    Check if request blocked when jwt in blacklist
+    #    '''
+    #    url = api_route + "test/test-blacklist"
+    #    session.add(BlacklistFactory(jwt="abc"))
+    #    session.commit()
+#
+    #    resp = requests.get(url, headers={"Authorization":"Bearer abc"})
+    #    assert resp.status_code == 401
+#

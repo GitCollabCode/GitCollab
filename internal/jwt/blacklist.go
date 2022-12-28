@@ -1,8 +1,8 @@
 package jwt
 
 import (
-	"context"
 	"net/http"
+	"time"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	"github.com/jackc/pgx/v5"
@@ -21,21 +21,24 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 				return
 			}
 
-			var jwt string
-			db.Log.Infof("The jwt searched is: %s", jwtString)
+			type blacklistData struct {
+				uuid       int
+				expiryTime time.Time
+				jwt        string
+			}
 
-			err := db.Pool.QueryRow(context.Background(),
-				"SELECT jwt FROM jwt_blacklist WHERE jwt='abc';").Scan(&jwt)
+			var cheese blacklistData
 
-			if err != nil && err != pgx.ErrNoRows {
+			err := db.QueryRow("SELECT * FROM jwt_blacklist WHERE jwt=$1", &cheese, jwtString)
+
+			if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 				db.Log.Error(err.Error())
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
-			db.Log.Infof("retreived jwt is %s\n\n", jwt)
-
-			if jwt == jwtString {
+			if cheese.jwt == jwtString {
+				db.Log.Info("Jwt im blacklist!")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
