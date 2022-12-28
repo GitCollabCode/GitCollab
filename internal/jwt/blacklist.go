@@ -27,9 +27,9 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 				jwt        string
 			}
 
-			var cheese blacklistData
+			var jwtData blacklistData
 
-			err := db.QueryRow("SELECT * FROM jwt_blacklist WHERE jwt=$1", &cheese, jwtString)
+			err := db.QueryRow("SELECT * FROM jwt_blacklist WHERE jwt=$1", &jwtData, jwtString)
 
 			if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 				db.Log.Error(err.Error())
@@ -37,7 +37,7 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 				return
 			}
 
-			if cheese.jwt == jwtString {
+			if jwtData.jwt == jwtString {
 				db.Log.Info("Jwt im blacklist!")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
