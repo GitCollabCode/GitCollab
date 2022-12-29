@@ -24,7 +24,11 @@ pipeline {
     stages {
         stage('Setup') {
             steps {
-                setBuildStatus("Build pending", "PENDING");
+                script {
+                    if (env.BRANCH_NAME == "main") {
+                        setBuildStatus("Build pending", "PENDING");
+                    }
+                }
                 echo 'Installing dependencies...'
                 sh 'go version'
                 sh 'go mod vendor'
@@ -102,10 +106,18 @@ pipeline {
 			cleanWs()
 		}
         success {
-            setBuildStatus("Build succeeded", "SUCCESS");
+            script {
+                if (env.BRANCH_NAME == "main") {
+                    setBuildStatus("Build succeeded", "SUCCESS");
+                }
+            }
         }
         failure {
-            setBuildStatus("Build failed", "FAILURE");
+            script {
+                if (env.BRANCH_NAME == "main") {
+                    setBuildStatus("Build failed", "FAILURE");
+                }
+            }
         }
     }
 }
