@@ -124,7 +124,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userInfo == nil { // did not find the user, create new account
-		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, a.Log, a.PgConn)
+		err := helpers.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
 		if err != nil {
 			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
