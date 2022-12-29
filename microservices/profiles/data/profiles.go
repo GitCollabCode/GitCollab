@@ -15,21 +15,22 @@ func NewProfileData(dbDriver *db.PostgresDriver) *ProfileData {
 }
 
 type Profile struct {
-	GitHubUserID int    `json:"github_user_id"`
-	GitHubToken  string `json:"github_token"`
-	Username     string `json:"username"`
-	AvatarURL    string `json:"avatar_url"`
-	Email        string `json:"email" validate:"email"`
+	GitHubUserID int
+	GitHubToken  string
+	Username     string
+	AvatarURL    string
+	Email        string
+	Bio          string
 }
 
 type Profiles []*Profile
 
-func (pd *ProfileData) AddProfile(githubUserID int, githubToken string, username string, avatarURL string, email string) error {
+func (pd *ProfileData) AddProfile(githubUserID int, githubToken string, username string, avatarURL string, email string, bio string) error {
 	sqlString :=
-		"INSERT INTO profiles(github_user_id, github_token, username, avatar_url, email)" +
+		"INSERT INTO profiles(github_user_id, github_token, username, avatar_url, email, bio)" +
 			"VALUES($1, $2, $3, $4, $5)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email, bio)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddProfile database INSERT failed: %s", err.Error())
 		return err
@@ -56,6 +57,11 @@ func (pd *ProfileData) UpdateProfileAvatarURL(githubUserID int, avatarURL string
 func (pd *ProfileData) UpdateProfileEmail(githubUserID int, email string) error {
 	sqlStatement := "UPDATE profiles SET avatar_url = $1 WHERE github_user_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, email, githubUserID)
+}
+
+func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
+	sqlStatement := "UPDATE profiles SET bio = $1 WHERE github_user_id = $2"
+	return pd.PDriver.TransactOneRow(sqlStatement, bio, githubUserID)
 }
 
 func (pd *ProfileData) DeleteProfile(githubUserID int) error {

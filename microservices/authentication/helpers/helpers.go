@@ -94,7 +94,7 @@ func UpdateGitAccessToken(user *data.Profile, token string, pg *db.PostgresDrive
 }
 
 func CreateNewUser(gitId int, gitUser string, gitToken string,
-	gitEmail string, gitAvatarUrl string, log *logrus.Logger, pg *db.PostgresDriver) error {
+	gitEmail string, gitAvatarUrl string, gitBio string, log *logrus.Logger, pg *db.PostgresDriver) error {
 	pDb := data.NewProfileData(pg)
-	return pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl, gitEmail)
+	return pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl, gitEmail, gitBio)
 }

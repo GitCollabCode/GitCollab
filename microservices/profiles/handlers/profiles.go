@@ -40,6 +40,16 @@ type ProfileSearchReq struct {
 	Username string `json:"username"`
 }
 
+type ProfileGetResponse struct {
+	Username  string   `json:"username"`
+	GithubId  int      `json:"gitID"`
+	Email     string   `json:"email"`
+	AvatarURL string   `json:"avatarUrl"`
+	Bio       string   `json:"bio"`
+	Skills    []string `json:"skills"`
+	Languages []string `json:"languages"`
+}
+
 type ProfilePatchReq struct {
 	Username  string `json:"username"`
 	GithubId  int    `json:"gitID"`
@@ -81,7 +91,19 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	err = jsonio.ToJSON(profile, w) //change the returned profile struct later to NOT include github token
+
+	res := ProfileGetResponse{
+		Username:  profile.Username,
+		GithubId:  profile.GitHubUserID,
+		Email:     profile.Email,
+		AvatarURL: profile.AvatarURL,
+		Bio:       profile.Bio,
+		Skills:    nil, // do this, add to db too
+		Languages: nil, // do this, add to db too
+	}
+
+	// send response to frontend
+	err = jsonio.ToJSON(res, w)
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -96,11 +118,13 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
-	err := p.pd.AddProfile(nProfile.GitHubUserID,
+	err := p.pd.AddProfile(
+		nProfile.GitHubUserID,
 		nProfile.GitHubToken,
 		nProfile.Username,
 		nProfile.AvatarURL,
-		nProfile.Email)
+		nProfile.Email,
+		nProfile.Bio)
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
