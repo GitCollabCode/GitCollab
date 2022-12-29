@@ -45,7 +45,7 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 			}
 
 			// made it through blacklist, good to continue
-			db.Log.Infof("Request being served to %s\n", jwtData.uuid)
+			db.Log.Infof("Request being served to %d\n", jwtData.uuid)
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
