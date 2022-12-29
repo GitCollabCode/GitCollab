@@ -55,8 +55,17 @@ function test-integration() {
 
 function build() {
     echo "Building GitCollab docker images..."
-    docker rmi "$(docker images -f "dangling=true" -q)" #delete dangling images
     docker compose -f "$(pwd)/docker-compose-convert.yaml" build
+
+    # delete dangling images
+    # dangling_images=$(docker images -f "dangling=true" -q)
+    # if [[ -n "$dangling_images" ]]; then
+    #     docker rmi "$dangling_images" #delete dangling images
+    # fi
+    docker image prune -f 
+
+    # bandaid fix to growing build cache size after many build cycles
+    docker builder prune --filter "until=24h" 
 }
 
 function start() {
