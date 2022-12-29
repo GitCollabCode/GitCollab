@@ -39,29 +39,29 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			tokenString := GetJwtFromHeader(r)
+			fmt.Println(tokenString)
 			token, err := g.parseToken(tokenString)
 			if err != nil { // could not parse the token!
-				fmt.Println("Couldnt parse i stupodui")
-				logger.Error("Majed momento")
+				logger.Errorf("Could not validate token %s", err.Error())
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			claims, ok := token.Claims.(goJwt.MapClaims)
 			if !ok { // claims not retrieved!
-				fmt.Println("claims not worky :(")
+				logger.Error("Could not unpack claims")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			if !token.Valid { // no good! backout
-				fmt.Println("Not valid!!! boy 7what the hwell")
+				logger.Error("Invalid JWT")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			username := claims["user"]
 			gitId := claims["githubID"]
 			if username == nil || gitId == nil {
-				fmt.Println("No username or git ID in jwt????? huhhhh")
+				logger.Error("Not username or GitID found in jwt")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
