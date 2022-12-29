@@ -38,13 +38,14 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 			}
 
 			if jwtData.jwt == jwtString {
-				db.Log.Info("Jwt im blacklist!")
+				db.Log.Info("Jwt in blacklist")
+				db.Log.Info(jwtData.expiryTime)
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			// made it through blacklist, good to continue
-			db.Log.Info("Request being served")
+			db.Log.Infof("Request being served to %s\n", jwtData.uuid)
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
