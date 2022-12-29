@@ -86,7 +86,7 @@ func main() {
 	}
 
 	// create gitcollab jwt conf, for midddleware
-	//jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
+	jwtConf := jwt.NewGitCollabJwtConf(gitCollabSecret)
 
 	// create db drivers
 	dbDriver, err := db.NewPostgresDriver(dbUrl, logger)
@@ -120,7 +120,7 @@ func main() {
 		// profiles subrouter
 		pd := data.NewProfileData(dbDriver)
 		profiles := profilesHandlers.NewProfiles(logger, pd)
-		r.Mount("/profile", profilesRouter.ProfileRouter(profiles))
+		r.Mount("/profile", profilesRouter.ProfileRouter(profiles, jwtConf))
 
 		// projects subrouter
 		project := projectsHandlers.NewProjects(dbDriver, logger)
