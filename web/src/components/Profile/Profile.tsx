@@ -4,7 +4,7 @@ import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
 import { profileResponse } from '../../constants/common'
 
-const Profile = ({ username }: { username: '' | string }) => {
+const Profile = () => {
   let initialProfile: profileResponse = {
     username: '',
     gitID: -1,
@@ -15,11 +15,10 @@ const Profile = ({ username }: { username: '' | string }) => {
     skills: [''],
   }
 
-  window.history.pushState({}, '', '/profile/' + username)
-
   const [profile, setProfile] = useState(initialProfile)
 
   useEffect(() => {
+    const username = window.location.href.split('profile/')[1]
     console.log(`Testing with username ${username}`)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
@@ -34,11 +33,15 @@ const Profile = ({ username }: { username: '' | string }) => {
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
-        <p>{profile.username}</p>
         <div className={styles.circle}>
-          <img className={styles.image} src={profile.avatarUrl}></img>
+          <img
+            className={styles.image}
+            alt="profile"
+            src={profile.avatarUrl}
+          ></img>
         </div>
-        <strong>{profile.bio}</strong>
+        <p className={styles.username}>{profile.username}</p>
+        <p className={styles.bioText}>{profile.bio}</p>
       </div>
       <Media query={{ maxWidth: 1023 }}>
         <div className={styles.tables}>
