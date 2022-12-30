@@ -5,24 +5,29 @@ import { GET_PROFILE } from '../../constants/endpoints'
 import { profileResponse } from '../../constants/common'
 
 const Profile = ({ username }: { username: '' | string }) => {
-let profile = {}
+  let profile: profileResponse = {
+    username: '',
+    gitID: -1,
+    email: '',
+    avatarUrl: '',
+  }
 
-  useEffect(()=>{
-    console.log("Testing with username ${username}");
+  useEffect(() => {
+    console.log(`Testing with username ${username}`)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
     })
-    .then((response) => response.json())
-    .then((data:profileResponse) => {
-      profile = data;
-      console.log(data)
-    })
-  }
-  ),[]);
+      .then((response) => response.json())
+      .then((data: profileResponse) => {
+        // eslint-disable-next-line
+        profile = data
+        console.log(data)
+      })
+  }, [profile])
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
-        <p>User profile</p>
+        <p>User profile {profile.username}</p>
         <div className={styles.circle}></div>
         <strong>user Name</strong>
       </div>
