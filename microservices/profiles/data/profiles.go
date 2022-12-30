@@ -103,7 +103,7 @@ func (pd *ProfileData) GetProfile(githubUserID int) (*Profile, error) {
 
 func (pd *ProfileData) GetProfileByUsername(username string) (*Profile, error) {
 	var p Profile
-	sqlStatement := "SELECT * FROM profiles WHERE username = $1"
+	sqlStatement := "SELECT * FROM profiles WHERE LOWER(username) = $1"
 	err := pd.PDriver.QueryRow(sqlStatement, &p, username)
 	return &p, err
 }
