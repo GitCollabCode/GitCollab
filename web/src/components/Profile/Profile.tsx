@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
 import { profileResponse } from '../../constants/common'
 
 const Profile = ({ username }: { username: '' | string }) => {
-  let profile: profileResponse = {
+  let initialProfile: profileResponse = {
     username: '',
     gitID: -1,
     email: '',
@@ -15,6 +15,8 @@ const Profile = ({ username }: { username: '' | string }) => {
     skills: [''],
   }
 
+  const [profile, setProfile] = useState(initialProfile)
+
   useEffect(() => {
     console.log(`Testing with username ${username}`)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
@@ -22,8 +24,7 @@ const Profile = ({ username }: { username: '' | string }) => {
     })
       .then((response) => response.json())
       .then((data: profileResponse) => {
-        // eslint-disable-next-line
-        profile = data
+        setProfile(data)
         console.log(data)
       })
   }, [profile])
