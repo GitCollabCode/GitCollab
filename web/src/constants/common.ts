@@ -19,6 +19,9 @@ export type profileResponse = {
   gitID: number
   email: string
   avatarUrl: string
+  languages: string[]
+  skills: string[]
+  bio: string
 }
 
 export type GitHubRedirectResponse = {

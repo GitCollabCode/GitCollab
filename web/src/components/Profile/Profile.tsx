@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { LinkHTMLAttributes, useEffect } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
@@ -10,6 +10,9 @@ const Profile = ({ username }: { username: '' | string }) => {
     gitID: -1,
     email: '',
     avatarUrl: '',
+    bio: '',
+    languages: [''],
+    skills: [''],
   }
 
   useEffect(() => {
@@ -27,9 +30,11 @@ const Profile = ({ username }: { username: '' | string }) => {
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
-        <p>User profile {profile.username}</p>
-        <div className={styles.circle}></div>
-        <strong>user Name</strong>
+        <p>{profile.username}</p>
+        <div className={styles.circle}>
+          <img src={profile.avatarUrl}></img>
+        </div>
+        <strong>{profile.bio}</strong>
       </div>
       <Media query={{ maxWidth: 1023 }}>
         <div className={styles.tables}>
