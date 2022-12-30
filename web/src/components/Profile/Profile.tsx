@@ -1,4 +1,4 @@
-import React, { LinkHTMLAttributes, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
