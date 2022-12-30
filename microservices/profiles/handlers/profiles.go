@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
+	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -51,11 +52,11 @@ type ProfileGetResponse struct {
 }
 
 type ProfilePatchReq struct {
-	Username  string     `json:"username"`
-	GithubId  int        `json:"gitID"`
-	Email     string     `json:"email"`
-	AvatarURL string     `json:"avatarUrl"`
-	Skills    data.Skill `json:"skills"`
+	Username  string   `json:"username"`
+	GithubId  int      `json:"gitID"`
+	Email     string   `json:"email"`
+	AvatarURL string   `json:"avatarUrl"`
+	Skills    []string `json:"skills"`
 }
 
 type ProfilesResponse struct {
@@ -64,12 +65,6 @@ type ProfilesResponse struct {
 	Email     string `json:"email"`
 	AvatarURL string `json:"avatarUrl"`
 }
-
-type ContextKey string
-
-const (
-	ContextUserIdKey ContextKey = "gitid"
-)
 
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
@@ -257,16 +252,36 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	// used to insert a set of skills, does not replace, only appends
 	var profileReq ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
-	if err != nil || profileReq.Username == "" {
-		p.log.Errorf("Failed to parse json username: %s", err.Error())
-		w.WriteHeader(http.StatusNotFound)
+	if err != nil {
+		p.log.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	userId := r.Context().Value(ContextUserIdKey)
-	if userId == nil && userId.(int) > 0 {
-		w.WriteHeader(http.StatusNotFound)
+	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	p.Pd.AddProfileSkills(userId.(int), profileReq.Skills)
+	p.Pd.AddProfileSkills(int(userId), profileReq.Skills...)
+}
+
+func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
+	// used to remove a set of skills
+	var profileReq ProfilePatchReq
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil {
+		p.log.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...)
 }

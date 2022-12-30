@@ -29,7 +29,6 @@ func (g *GitCollabJwtConf) parseToken(tokenString string) (*goJwt.Token, error) 
 	})
 	// check if retrieved goJwt.Token was good
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, fmt.Errorf("could not parse token")
 	}
 	return token, nil
@@ -39,7 +38,7 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			tokenString := GetJwtFromHeader(r)
-			fmt.Println(tokenString)
+
 			token, err := g.parseToken(tokenString)
 			if err != nil { // could not parse the token!
 				logger.Errorf("Could not validate token %s", err.Error())
@@ -67,9 +66,9 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 			}
 			// set context, change this bih to use map or sync map, kinda wack how im
 			// adding both of thees values
-			ctx := context.WithValue(r.Context(), ContextKeyUser, username.(string))
-			ctx2 := context.WithValue(ctx, ContextGitId, gitId.(float64))
-			next.ServeHTTP(w, r.WithContext(ctx2))
+			r = r.WithContext(context.WithValue(r.Context(), ContextKeyUser, username.(string)))
+			r = r.WithContext(context.WithValue(r.Context(), ContextGitId, gitId.(float64)))
+			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
 	}
