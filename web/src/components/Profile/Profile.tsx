@@ -15,6 +15,8 @@ const Profile = ({ username }: { username: '' | string }) => {
     skills: [''],
   }
 
+  window.history.pushState({}, '', '/newPathname')
+
   const [profile, setProfile] = useState(initialProfile)
 
   useEffect(() => {
