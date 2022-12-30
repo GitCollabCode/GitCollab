@@ -19,7 +19,9 @@ const Profile = () => {
 
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
+    console.log(window.location.href)
     console.log(`Testing with username ${username}`)
+    console.log(process.env.REACT_APP_API_URI + GET_PROFILE + username)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
     })
@@ -43,7 +45,7 @@ const Profile = () => {
         <p className={styles.username}>{profile.username}</p>
         <p className={styles.bioText}>{profile.bio}</p>
       </div>
-      <Media query={{ maxWidth: 1023 }}>
+      <Media query={{ minWidth: 1024 }}>
         <div className={styles.tables}>
           <div className={styles.row}>
             <div className={styles.card}>
@@ -66,7 +68,7 @@ const Profile = () => {
           </div>
         </div>
       </Media>
-      <Media query={{ minWidth: 1024 }}>
+      <Media query={{ maxWidth: 1023 }}>
         <div className={styles.tables}>
           <div className={styles.card}>
             <div>Card 1</div>
