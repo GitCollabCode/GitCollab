@@ -17,10 +17,8 @@ const Profile = ({ username }: { username: '' | string }) => {
     fetch(
       process.env.REACT_APP_API_URI +
         GET_PROFILE +
-        '/' +
-        new URLSearchParams({
-          username: username,
-        }),
+        '/' 
+       ,
       {
         method: 'GET',
       }
