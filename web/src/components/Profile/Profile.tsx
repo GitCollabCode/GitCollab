@@ -15,7 +15,7 @@ const Profile = ({ username }: { username: '' | string }) => {
     skills: [''],
   }
 
-  window.history.pushState({}, '', '/newPathname')
+  window.history.pushState({}, '', '/profile/' + username)
 
   const [profile, setProfile] = useState(initialProfile)
 
