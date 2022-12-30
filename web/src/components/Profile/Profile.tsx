@@ -27,14 +27,13 @@ const Profile = ({ username }: { username: '' | string }) => {
         setProfile(data)
         console.log(data)
       })
-  }, [profile])
+  }, [])
+
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
         <p>{profile.username}</p>
-        <div className={styles.circle}>
-          <img src={profile.avatarUrl}></img>
-        </div>
+        <img className={styles.circle} src={profile.avatarUrl}></img>
         <strong>{profile.bio}</strong>
       </div>
       <Media query={{ maxWidth: 1023 }}>
