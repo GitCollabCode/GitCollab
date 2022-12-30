@@ -4,4 +4,3 @@ requests
 psycopg2-binary
 SQLAlchemy
 factory-boy
-TempdirFactory
