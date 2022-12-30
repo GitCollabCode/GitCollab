@@ -33,7 +33,9 @@ const Profile = ({ username }: { username: '' | string }) => {
     <div className={styles.container}>
       <div className={styles.bio}>
         <p>{profile.username}</p>
-        <img className={styles.circle} src={profile.avatarUrl}></img>
+        <div className={styles.circle}>
+          <img className={styles.image} src={profile.avatarUrl}></img>
+        </div>
         <strong>{profile.bio}</strong>
       </div>
       <Media query={{ maxWidth: 1023 }}>
