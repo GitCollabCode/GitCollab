@@ -25,6 +25,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		r.Use(jwt.JWTBlackList(p.Pd.PDriver))
 		r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
 		r.Patch("/", p.PatchSkills)
+		r.Delete("/", p.DeleteSkills)
 	})
 	return r
 }

@@ -14,25 +14,14 @@ func NewProfileData(dbDriver *db.PostgresDriver) *ProfileData {
 	return &ProfileData{dbDriver}
 }
 
-// list of available skills, maybe move somewhere
-type Skill string
-
-const (
-	Backend  Skill = "Backend"
-	Testing  Skill = "Testing"
-	Devops   Skill = "DevOps"
-	Frontend Skill = "Frontend"
-	Embedded Skill = "Embedded"
-)
-
 type Profile struct {
-	GitHubUserID int     `db:"github_user_id"`
-	GitHubToken  string  `db:"github_token"`
-	Username     string  `db:"username"`
-	Email        string  `db:"email"`
-	AvatarURL    string  `db:"avatar_url"`
-	Bio          string  `db:"bio"`
-	Skills       []Skill `db:"skills"`
+	GitHubUserID int      `db:"github_user_id"`
+	GitHubToken  string   `db:"github_token"`
+	Username     string   `db:"username"`
+	Email        string   `db:"email"`
+	AvatarURL    string   `db:"avatar_url"`
+	Bio          string   `db:"bio"`
+	Skills       []string `db:"skills"`
 }
 
 type Profiles []*Profile
@@ -76,10 +65,22 @@ func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
 	return pd.PDriver.TransactOneRow(sqlStatement, bio, githubUserID)
 }
 
-func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...Skill) error {
+func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) error {
+	// TODO: Make sure duplicates dont exist
 	// can probably change to one statement instead of iterating
 	for _, skill := range skills {
-		sqlStatement := "INSERT INTO profiles (skills) VALUES (ARRAY[$1])"
+		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
+		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) error {
+	for _, skill := range skills {
+		sqlStatement := "UPDATE profiles SET skills = array_remove(skills, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
 		if err != nil {
 			return err
