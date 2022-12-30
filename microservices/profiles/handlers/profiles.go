@@ -264,7 +264,10 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	p.Pd.AddProfileSkills(int(userId), profileReq.Skills...)
+
+	if p.Pd.AddProfileSkills(int(userId), profileReq.Skills...) != nil {
+		p.log.Error(err.Error())
+	}
 }
 
 func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
@@ -283,5 +286,7 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...)
+	if p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...) != nil {
+		p.log.Error(err.Error())
+	}
 }
