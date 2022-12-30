@@ -33,6 +33,8 @@ pipeline {
                 sh 'go version'
                 sh 'go mod vendor'
                 sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
+                sh 'python3 -m venv $WORKSPACE/gitcollab_pyenv'
+                sh '$WORKSPACE/gitcollab_pyenv/bin/pip3 install -r $WORKSPACE/scripts/requirements.txt'
             }
         }
 
@@ -88,7 +90,19 @@ pipeline {
             }
         }
 
+        stage('Integration Test') {
+            steps {
+                dir('web') {
+                    echo 'Running Integration Tests...'
+                    sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest ./$WORKSPACE/integration_tests/'
+                }
+            }
+        }
+
         stage('Update Live Deployment Server') {
+            when {
+                expression { env.BRANCH_NAME == "main" }
+            }
             steps {
                 echo 'Updating live deployment server with new changes...'
                 withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
@@ -99,7 +113,7 @@ pipeline {
                 }
             }
         }
-    }
+    } 
 
     post {
         always {
