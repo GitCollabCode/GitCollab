@@ -14,9 +14,16 @@ const Profile = ({ username }: { username: '' | string }) => {
 
   useEffect(() => {
     console.log(`Testing with username ${username}`)
-    fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
-      method: 'GET',
-    })
+    fetch(
+      process.env.REACT_APP_API_URI +
+        GET_PROFILE +
+        new URLSearchParams({
+          username: username,
+        }),
+      {
+        method: 'GET',
+      }
+    )
       .then((response) => response.json())
       .then((data: profileResponse) => {
         // eslint-disable-next-line
