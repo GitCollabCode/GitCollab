@@ -38,15 +38,6 @@ pipeline {
             }
         }
 
-        stage('Integration Test') {
-            steps {
-                dir('web') {
-                    echo 'Running Integration Tests...'
-                    sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest .$WORKSPACE/integration_tests/'
-                }
-            }
-        }
-
         stage('Go Build') {
             steps {
                 echo 'Running Go build...'
@@ -96,6 +87,13 @@ pipeline {
                     echo 'Running npm test...'
                     sh 'npm test'
                 }
+            }
+        }
+
+        stage('Integration Test') {
+            steps {
+                echo 'Running Integration Tests...'
+                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest .$WORKSPACE/integration_tests/'
             }
         }
 
