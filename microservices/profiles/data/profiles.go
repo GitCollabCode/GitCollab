@@ -15,12 +15,13 @@ func NewProfileData(dbDriver *db.PostgresDriver) *ProfileData {
 }
 
 type Profile struct {
-	GitHubUserID int
-	GitHubToken  string
-	Username     string
-	AvatarURL    string
-	Email        string
-	Bio          string
+	GitHubUserID int      `db:"github_user_id"`
+	GitHubToken  string   `db:"github_token"`
+	Username     string   `db:"username"`
+	Email        string   `db:"email"`
+	AvatarURL    string   `db:"avatar_url"`
+	Bio          string   `db:"bio"`
+	Skills       []string `db:"skills"`
 }
 
 type Profiles []*Profile
@@ -28,7 +29,7 @@ type Profiles []*Profile
 func (pd *ProfileData) AddProfile(githubUserID int, githubToken string, username string, avatarURL string, email string, bio string) error {
 	sqlString :=
 		"INSERT INTO profiles(github_user_id, github_token, username, avatar_url, email, bio)" +
-			"VALUES($1, $2, $3, $4, $5)"
+			"VALUES($1, $2, $3, $4, $5, $6)"
 
 	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email, bio)
 	if err != nil {
@@ -62,6 +63,30 @@ func (pd *ProfileData) UpdateProfileEmail(githubUserID int, email string) error 
 func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
 	sqlStatement := "UPDATE profiles SET bio = $1 WHERE github_user_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, bio, githubUserID)
+}
+
+func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) error {
+	// TODO: Make sure duplicates dont exist
+	// can probably change to one statement instead of iterating
+	for _, skill := range skills {
+		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
+		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) error {
+	for _, skill := range skills {
+		sqlStatement := "UPDATE profiles SET skills = array_remove(skills, $1) WHERE github_user_id = $2"
+		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (pd *ProfileData) DeleteProfile(githubUserID int) error {

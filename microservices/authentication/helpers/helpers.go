@@ -19,7 +19,7 @@ func CreateGitCollabJwt(username string, gitID int64, secret string) (string, er
 	// create token, return err and token string
 	token := goJwt.New(goJwt.SigningMethodHS256)
 	claims := token.Claims.(goJwt.MapClaims)
-	claims["exp"] = time.Now().Add(48 * time.Hour)
+	claims["exp"] = time.Now().Add(48 * time.Hour).Unix()
 	claims["authorized"] = true
 	claims["user"] = username
 	claims["githubID"] = gitID
@@ -78,7 +78,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
 	pDb := data.NewProfileData(pg)
 	profile, err := pDb.GetProfile(gitId)
-	if err.Error() == pgx.ErrNoRows.Error() {
+	if err != nil && err.Error() == pgx.ErrNoRows.Error() {
 		return nil, nil
 	}
 	if err != nil {
