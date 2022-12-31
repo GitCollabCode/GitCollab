@@ -90,13 +90,6 @@ pipeline {
             }
         }
 
-        stage('Integration Test') {
-            steps {
-                echo 'Running Integration Tests...'
-                sh './scripts/gitcollab.sh test_integration'
-            }
-        }
-
         stage('Update Live Deployment Server') {
             when {
                 expression { env.BRANCH_NAME == "main" }
