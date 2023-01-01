@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
+	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -16,7 +17,7 @@ type ProfileCtx struct{}
 type Profiles struct {
 	log      *logrus.Logger
 	validate *data.Validation
-	pd       *data.ProfileData
+	Pd       *data.ProfileData
 }
 
 func NewProfiles(log *logrus.Logger, pd *data.ProfileData) *Profiles {
@@ -51,10 +52,11 @@ type ProfileGetResponse struct {
 }
 
 type ProfilePatchReq struct {
-	Username  string `json:"username"`
-	GithubId  int    `json:"gitID"`
-	Email     string `json:"email"`
-	AvatarURL string `json:"avatarUrl"`
+	Username  string   `json:"username"`
+	GithubId  int      `json:"gitID"`
+	Email     string   `json:"email"`
+	AvatarURL string   `json:"avatarUrl"`
+	Skills    []string `json:"skills"`
 }
 
 type ProfilesResponse struct {
@@ -68,7 +70,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
 
-	profile, err := p.pd.GetProfileByUsername(username)
+	profile, err := p.Pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
 		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
@@ -118,7 +120,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
-	err := p.pd.AddProfile(
+	err := p.Pd.AddProfile(
 		nProfile.GitHubUserID,
 		nProfile.GitHubToken,
 		nProfile.Username,
@@ -155,7 +157,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
 
-	profile, err := p.pd.GetProfileByUsername(username)
+	profile, err := p.Pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
 		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
@@ -175,7 +177,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = p.pd.DeleteProfile(profile.GitHubUserID)
+	err = p.Pd.DeleteProfile(profile.GitHubUserID)
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -226,7 +228,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Errorf("Failed to parse json username: %s", err.Error())
 	}
-	profile, err := p.pd.GetProfileByUsername(profileReq.Username)
+	profile, err := p.Pd.GetProfileByUsername(profileReq.Username)
 	if err != nil {
 		p.log.Errorf("Failed to find user by username: %s", err.Error())
 	}
@@ -244,4 +246,47 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		// when kevin decides
 	}
 
+}
+
+func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
+	// used to insert a set of skills, does not replace, only appends
+	var profileReq ProfilePatchReq
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil {
+		p.log.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if p.Pd.AddProfileSkills(int(userId), profileReq.Skills...) != nil {
+		p.log.Error(err.Error())
+	}
+}
+
+func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
+	// used to remove a set of skills
+	var profileReq ProfilePatchReq
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil {
+		p.log.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...) != nil {
+		p.log.Error(err.Error())
+	}
 }

@@ -8,6 +8,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type blacklistData struct {
+	expiryTime time.Time `db:"invalidated_time"`
+	jwt        string    `db:"jwt"`
+}
+
 // Middleware to check if a given JWT is blacklisted
 // All private routes with JWT headers should pass through this
 // middleware
@@ -19,12 +24,6 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 				db.Log.Info("Empty jwt")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
-			}
-
-			type blacklistData struct {
-				uuid       int
-				expiryTime time.Time
-				jwt        string
 			}
 
 			var jwtData blacklistData
@@ -45,7 +44,7 @@ func JWTBlackList(db *db.PostgresDriver) func(http.Handler) http.Handler {
 			}
 
 			// made it through blacklist, good to continue
-			db.Log.Infof("Request being served to %d\n", jwtData.uuid)
+			db.Log.Info("Request being served")
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)

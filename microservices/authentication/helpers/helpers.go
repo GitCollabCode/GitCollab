@@ -19,7 +19,7 @@ func CreateGitCollabJwt(username string, gitID int64, secret string) (string, er
 	// create token, return err and token string
 	token := goJwt.New(goJwt.SigningMethodHS256)
 	claims := token.Claims.(goJwt.MapClaims)
-	claims["exp"] = time.Now().Add(48 * time.Hour)
+	claims["exp"] = time.Now().Add(48 * time.Hour).Unix()
 	claims["authorized"] = true
 	claims["user"] = username
 	claims["githubID"] = gitID
@@ -57,16 +57,16 @@ func GetExpTime(tokenString string) (time.Time, error) {
 // Insert a JWT to the blacklist table. Any requests with a header containing
 // this JWT will return an error to the frontend
 func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
-	expTime, err := GetExpTime(jwtString)
-	if err != nil {
-		return err
-	}
+	//expTime, err := GetExpTime(jwtString)
+	//if err != nil {
+	//	return err
+	//}
 
 	// Attempting to insert new jwt
-	_, err = pg.Pool.Exec(context.Background(),
-		`INSERT INTO jwt_blacklist (jwt, invalidated_time)
-		 VALUES ($1, $2) ON CONFLICT (jwt) DO NOTHING`,
-		jwtString, expTime)
+	_, err := pg.Pool.Exec(context.Background(),
+		`INSERT INTO jwt_blacklist (jwt)
+		 VALUES ($1) ON CONFLICT (jwt) DO NOTHING`,
+		jwtString)
 
 	if err != nil {
 		return fmt.Errorf("failed to add jwt to blacklist")
@@ -78,7 +78,7 @@ func InsertJwtBlacklist(pg *db.PostgresDriver, jwtString string) error {
 func IsExistingUser(pg *db.PostgresDriver, gitId int, log *logrus.Logger) (*data.Profile, error) {
 	pDb := data.NewProfileData(pg)
 	profile, err := pDb.GetProfile(gitId)
-	if err.Error() == pgx.ErrNoRows.Error() {
+	if err != nil && err.Error() == pgx.ErrNoRows.Error() {
 		return nil, nil
 	}
 	if err != nil {
