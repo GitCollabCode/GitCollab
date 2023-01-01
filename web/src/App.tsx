@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
@@ -8,16 +8,20 @@ import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
 import Modal from './components/Modal/Modal'
-
-
+import { ModalContextStateContext } from './context/modalContext/modalContext'
 
 const App = () => {
+  const { modalContents, setModalContents } = useContext(
+    ModalContextStateContext
+  )
+
+  setModalContents(<p>Cheese</p>)
+
+  setModalContents(<p>I am gay</p>)
   return (
     <Router>
       <div>
-        <Modal>
-          <></>
-        </Modal>
+        <Modal>{modalContents}</Modal>
         <Navbar />
         <Routes>
           <Route path="" element={<LandingPage></LandingPage>}></Route>

@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 export type userValue = {
   isLoggedIn: boolean | null
   jwtToken: string | undefined
@@ -19,3 +21,11 @@ export type GitHubRedirectResponse = {
 }
 
 export type userLoginContextState = userValue & userDispatch
+
+export type modalContextState = {
+  modalContents: ReactNode
+  setModalContents: (content: ReactNode) => void
+  displayModal: boolean
+  showModal: () => void
+  hideModal: () => void
+}
