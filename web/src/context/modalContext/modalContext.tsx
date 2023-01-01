@@ -1,10 +1,10 @@
 import React, { createContext, ReactNode, useState } from 'react'
 
-import { modalContextState } from '../../constants/common'
+import { modalContextState, ModalType } from '../../constants/common'
 
 const initialState: modalContextState = {
-  modalContents: <></>,
-  setModalContents: () => {
+  modalType: ModalType.LoggedOutModal,
+  setModalType: (type: ModalType) => {
     /** */
   },
   displayModal: false,
@@ -24,8 +24,10 @@ export const ModalContextStateProvider = ({
 }: {
   children: ReactNode
 }) => {
-  const [displayModal, setdisplayModal] = useState(false)
-  const [modalStuff, setModalStuff] = useState<ReactNode>()
+  const [displayModal, setdisplayModal] = useState(true)
+  const [modalType, setModalType] = useState<ModalType>(
+    ModalType.LoggedOutModal
+  )
 
   const showModal = () => {
     setdisplayModal(true)
@@ -35,15 +37,11 @@ export const ModalContextStateProvider = ({
     setdisplayModal(false)
   }
 
-  const setModalContents = (reactNode: ReactNode) => {
-    setModalStuff(reactNode)
-  }
-
   return (
     <ModalContextStateContext.Provider
       value={{
-        modalContents: modalStuff,
-        setModalContents,
+        modalType: modalType,
+        setModalType,
         displayModal,
         showModal,
         hideModal,

@@ -1,4 +1,8 @@
-import { ReactNode } from 'react'
+/* eslint-disable  no-unused-vars */
+export enum ModalType {
+  LoggedOutModal,
+  SkillSelectModal,
+}
 
 export type userValue = {
   isLoggedIn: boolean | null
@@ -23,8 +27,8 @@ export type GitHubRedirectResponse = {
 export type userLoginContextState = userValue & userDispatch
 
 export type modalContextState = {
-  modalContents: ReactNode
-  setModalContents: (content: ReactNode) => void
+  modalType: ModalType
+  setModalType: (type: ModalType) => void
   displayModal: boolean
   showModal: () => void
   hideModal: () => void
