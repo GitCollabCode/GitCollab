@@ -23,7 +23,7 @@ pipeline {
                 echo 'Running Integration Tests...'
                 sh 'ls /home/agent/workspace/GitCollab_Integration_PR'
                 sh 'ls /home/agent/workspace/GitCollab_Integration_PR/integration_tests'
-                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest .$WORKSPACE/integration_tests/*'
+                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest /home/agent/workspace/GitCollab_Integration_PR/integration_tests'
             }
         }
     } 
