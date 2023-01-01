@@ -57,3 +57,9 @@
     margin-left: 32px;
     margin-top: 140px;
 }
+
+.bg {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+}

@@ -7,7 +7,7 @@ import LandingPage from './components/LandingPage/LandingPage'
 import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
-import OverlayCard from './components/OverlayCard/OverlayCard'
+import Modal from './components/Modal/Modal'
 
 
 
@@ -15,7 +15,9 @@ const App = () => {
   return (
     <Router>
       <div>
-        <OverlayCard></OverlayCard>
+        <Modal>
+          <></>
+        </Modal>
         <Navbar />
         <Routes>
           <Route path="" element={<LandingPage></LandingPage>}></Route>
