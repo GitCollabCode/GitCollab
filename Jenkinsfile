@@ -33,8 +33,6 @@ pipeline {
                 sh 'go version'
                 sh 'go mod vendor'
                 sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
-                sh 'python3.8 -m venv $WORKSPACE/gitcollab_pyenv'
-                sh '$WORKSPACE/gitcollab_pyenv/bin/pip3 install -r $WORKSPACE/scripts/requirements.txt'
             }
         }
 
