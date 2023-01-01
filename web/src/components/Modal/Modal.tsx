@@ -5,8 +5,13 @@ import style from '../Modal/Modal.module.css'
 //import octocat from  "../../assets/octocat.png"
 //const modalRoot = document.getElementById('modal-root');
 
+enum ModalType {
+    LoggedOutModal,
+    SkillSelectModal,
+}
+
 const Modal = ({children}:{children : ReactNode}) => {
-    const [displayModal, setdisplayModal] = useState(true);
+    const [displayModal, setdisplayModal] = useState(false);
     const navigate = useNavigate();
     
     const hideModal = () => {
@@ -22,13 +27,30 @@ const Modal = ({children}:{children : ReactNode}) => {
         hideModal();
     }
     
+    const renderModalType = (modalType : any) => {
+        switch(modalType){
+            case ModalType.LoggedOutModal:
+                return (
+                    <>
+                    </>
+                )
+            
+            case ModalType.SkillSelectModal:
+                return (
+                    <>
+                    </>
+                )
+        }
+    }
+
+
     return ( displayModal ? 
         ReactDOM.createPortal(
             <>
                 <div className={style.modalContainer} > 
                     <div className={style.bg} onClick={onBackgroundClick}></div>
                     <div className={style.overlayCard}>
-                        {children}
+                        {renderModalType()}
                     </div>
                 </div>,
             </>,
