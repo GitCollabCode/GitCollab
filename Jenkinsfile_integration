@@ -13,7 +13,7 @@ pipeline {
                 sh 'python3.9 -m venv $WORKSPACE/gitcollab_pyenv'
                 sh '$WORKSPACE/gitcollab_pyenv/bin/pip3 install -r $WORKSPACE/scripts/requirements.txt'
                 sh 'docker compose convert > "$WORKSPACE/docker-compose-convert.yaml"'
-                sh 'docker compose -f "$WORKSPACE/docker-compose-convert.yaml" up'
+                sh 'docker compose -f "$WORKSPACE/docker-compose-convert.yaml" up -d'
             }
         }
 
