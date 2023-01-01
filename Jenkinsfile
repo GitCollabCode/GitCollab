@@ -89,6 +89,9 @@ pipeline {
         }
 
         stage('Update Live Deployment Server') {
+            when {
+                expression { env.BRANCH_NAME == "main" }
+            }
             steps {
                 echo 'Updating live deployment server with new changes...'
                 withCredentials([usernamePassword(credentialsId: 'mqtt-server', 
@@ -99,7 +102,7 @@ pipeline {
                 }
             }
         }
-    }
+    } 
 
     post {
         always {

@@ -1,0 +1,37 @@
+
+pipeline {
+    agent {
+        label 'integration'
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                echo 'Installing dependencies...'
+                sh 'cp $WORKSPACE/env $WORKSPACE/.env'
+                sh 'chmod 777 $WORKSPACE/.env'
+                sh 'python3.9 -m venv $WORKSPACE/gitcollab_pyenv'
+                sh '$WORKSPACE/gitcollab_pyenv/bin/pip3 install -r $WORKSPACE/scripts/requirements.txt'
+                sh 'docker compose convert > "$WORKSPACE/docker-compose-convert.yaml"'
+                sh 'docker compose -f "$WORKSPACE/docker-compose-convert.yaml" up -d'
+            }
+        }
+
+
+        stage('Integration Test') {
+            steps {
+                echo 'Running Integration Tests...'
+                // NOTE: Had to hard code the pytest directory for whatever reason $WORKSPACE/integration_tests did not work work cringe
+                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest /home/agent/workspace/GitCollab_Integration_PR/integration_tests'
+            }
+        }
+    } 
+
+    post {
+        always {
+            sh 'docker compose stop'
+            sh 'docker system prune -a -f'
+			cleanWs()
+		}
+    }
+}
