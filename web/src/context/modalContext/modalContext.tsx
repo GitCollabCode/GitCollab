@@ -24,7 +24,7 @@ export const ModalContextStateProvider = ({
 }: {
   children: ReactNode
 }) => {
-  const [displayModal, setdisplayModal] = useState(true)
+  const [displayModal, setdisplayModal] = useState(false)
   const [modalType, setModalType] = useState<ModalType>(
     ModalType.LoggedOutModal
   )
