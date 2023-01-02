@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import style from '../Modal/Modal.module.css'
 import { ModalContextStateContext } from '../../context/modalContext/modalContext'
 import { ModalType } from '../../constants/common'
-//import octocat from  "../../assets/octocat.png"
-//const modalRoot = document.getElementById('modal-root');
+import LoggedOutModal from './ModalTypes/LoggedOutModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -21,8 +20,9 @@ const Modal = () => {
   const renderModalType = (modalType: any) => {
     switch (modalType) {
       case ModalType.LoggedOutModal:
-        return <>cheese</>
-
+        return (
+        <LoggedOutModal/>
+        )
       case ModalType.SkillSelectModal:
         return <></>
     }
