@@ -22,7 +22,7 @@ pipeline {
             steps {
                 echo 'Running Integration Tests...'
                 // NOTE: Had to hard code the pytest directory for whatever reason $WORKSPACE/integration_tests did not work work cringe
-                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest /home/agent/workspace/GitCollab_Integration_PR/integration_tests'
+                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest /home/agent/workspace/GitCollab_Integration_Tests_PR/integration_tests'
             }
         }
     } 
