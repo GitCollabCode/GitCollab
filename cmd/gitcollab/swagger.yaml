@@ -1,0 +1,43 @@
+paths:
+    /repo-info/:
+        get:
+            description: '# Retrieve basic info about a repo, including name, descriptiom, contributers'
+            operationId: info
+            responses:
+                "200":
+                    $ref: '#/responses/ThingResponse'
+            summary: retrieve information about a given repo
+            tags:
+                - Get
+                - repo
+    /repo-issues/:
+        get:
+            description: Request all repos that a user owns on github. Will require valid access token
+            operationId: user
+            responses:
+                "200":
+                    $ref: '#/responses/ThingResponse'
+            summary: retrieve list of github repos associated to a given user
+            tags:
+                - Get
+                - repos
+                - associated
+                - to
+                - a
+                - github
+    /user-repos/:
+        get:
+            description: Request all repos that a user owns on github. Will require valid access token
+            operationId: user
+            responses:
+                "200":
+                    $ref: '#/responses/ThingResponse'
+            summary: retrieve list of github repos associated to a given user
+            tags:
+                - Get
+                - repos
+                - associated
+                - to
+                - a
+                - github
+swagger: "2.0"
