@@ -119,7 +119,7 @@ function generate-swagger() {
     echo "Generating Swagger yaml documentation inside $(pwd)/cmd/gitcollab/swagger.ymal"
     docker pull quay.io/goswagger/swagger > /dev/null 2>&1
     #swagger version
-    swagger generate spec -o ./cmd/gitcollab/swagger.yaml
+    swagger generate spec -o ./swagger/swagger.yaml
 }
 
 function parse_params() {
