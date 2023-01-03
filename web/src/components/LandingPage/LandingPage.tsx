@@ -9,6 +9,7 @@ const LandingPage = () => {
   return (
     <>
       <div className={style.container}>
+        
         <Media query={{ maxWidth: 1023 }}>
           <div className={style.login}>
             <div className={style.logo}>GitCollab</div>

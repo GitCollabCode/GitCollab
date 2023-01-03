@@ -1,3 +1,9 @@
+/* eslint-disable  no-unused-vars */
+export enum ModalType {
+  LoggedOutModal,
+  SkillSelectModal,
+}
+
 export type userValue = {
   isLoggedIn: boolean | null
   jwtToken: string | undefined
@@ -19,3 +25,11 @@ export type GitHubRedirectResponse = {
 }
 
 export type userLoginContextState = userValue & userDispatch
+
+export type modalContextState = {
+  modalType: ModalType
+  setModalType: (type: ModalType) => void
+  displayModal: boolean
+  showModal: () => void
+  hideModal: () => void
+}
