@@ -40,6 +40,7 @@ GitCollab deployment script, used to control the docker functions of the project
         test_unit                Run unit test suite
         test_integration         Run integration test suite
         refresh-env-file         Refresh .env file with env file
+        swagger                  Generate Swagger documentation yaml
 EOF
 }
 
@@ -110,6 +111,17 @@ function refresh-env-file() {
     chmod 777 "$(pwd)/.env" # change to write permission
 }
 
+function swagger() {
+    docker run --rm -it  --user $(id -u):$(id -g) -e GOCACHE=/tmp -e  GOPATH=$(go env GOPATH):/go -v $HOME:$HOME -w $(pwd) quay.io/goswagger/swagger "$@"
+}
+
+function generate-swagger() {
+    echo "Generating Swagger yaml documentation inside $(pwd)/cmd/gitcollab/swagger.ymal"
+    docker pull quay.io/goswagger/swagger > /dev/null 2>&1
+    #swagger version
+    swagger generate spec -o ./swagger/swagger.yaml
+}
+
 function parse_params() {
     local param
     while [[ $# -gt 0 ]]; do
@@ -160,6 +172,9 @@ function parse_params() {
                 ;;
             refresh-env-file)
                 refresh-env-file
+                ;;
+            swagger)
+                generate-swagger
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"

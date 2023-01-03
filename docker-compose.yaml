@@ -63,6 +63,16 @@ services:
       backend:
         condition: service_healthy
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger
+    ports:
+        - "3001:8080"
+    volumes:
+        - ./swagger:/usr/share/nginx/html/doc
+    environment:
+        API_URL: doc/swagger.yaml
+
 networks:
   gitcollab:
     name: gitcollab_network

@@ -7,15 +7,18 @@ import LandingPage from './components/LandingPage/LandingPage'
 import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
+import Modal from './components/Modal/Modal'
+
 
 const App = () => {
   return (
     <Router>
       <div>
+        <Modal></Modal>
         <Navbar />
         <Routes>
-          <Route path="" element={<LandingPage />}></Route>
-          <Route path="/profile/*" element={<Profile />}></Route>
+          <Route path="" element={<LandingPage/>}></Route>
+          <Route path="/profile" element={<Profile />}></Route>
           {/* star catches any route that is not found */}
           <Route path="/*" element={<NotFound />}></Route>
           <Route path="/dashboard"></Route>
