@@ -17,7 +17,7 @@ const App = () => {
         <Modal></Modal>
         <Navbar />
         <Routes>
-          <Route path="" element={<LandingPage></LandingPage>}></Route>
+          <Route path="" element={<LandingPage/>}></Route>
           <Route path="/profile" element={<Profile />}></Route>
           {/* star catches any route that is not found */}
           <Route path="/*" element={<NotFound />}></Route>

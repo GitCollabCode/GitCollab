@@ -51,7 +51,7 @@ const LoggedOutModal = () => {
         // after login close modal
         modalContext.hideModal()
     }
-  }, [isLoggedIn, data, logIn])
+  }, [isLoggedIn, modalContext, data, logIn])
 
 
   const redirectToGithub = () => {
@@ -71,7 +71,7 @@ const LoggedOutModal = () => {
   return (
       <>
       <div className={style.modalText}>
-          <img className={style.modalLogo} src={octocat}/>
+          <img className={style.modalLogo} src={octocat} alt="i love chesburger"/>
           <p className={style.modalTextContent}>
               Sorry! You’re currently logged out, sign in to continue
           </p>
