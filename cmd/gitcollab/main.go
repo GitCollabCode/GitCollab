@@ -1,4 +1,34 @@
-// Test main.go file to create docker image
+// GitCollab API
+//
+// # GitCollab API Swagger documentation
+//
+// Terms Of Service:
+//
+// there are no TOS at this moment, use at your own risk we take no responsibility
+//
+//	Schemes: https
+//	BasePath: /v1
+//	Version: 0.0.1
+//	License: MIT http://opensource.org/licenses/MIT
+//	Contact: John Doe<john.doe@example.com> http://john.doe.com
+//	Host: gitcollab.io
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//
+//	Security:
+//	- bearer
+//
+//	SecurityDefinitions:
+//	bearer:
+//	     type: apiKey
+//	     name: Authorization
+//	     in: header
+//
+// swagger:meta
 package main
 
 import (

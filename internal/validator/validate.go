@@ -1,4 +1,4 @@
-package data
+package validator
 
 import (
 	"fmt"
@@ -36,7 +36,6 @@ type Validation struct {
 	validate *validator.Validate
 }
 
-// NewValidation creates a new Validation type
 func NewValidation() *Validation {
 	validate := validator.New()
 

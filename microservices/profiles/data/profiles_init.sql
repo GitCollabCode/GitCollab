@@ -1,4 +1,4 @@
-Create TABLE IF NOT EXISTS profiles (
+CREATE TABLE IF NOT EXISTS profiles (
     github_user_id      INTEGER             UNIQUE NOT NULL,
     github_token        VARCHAR             NOT NULL, /* candidate for hashing */
     username            VARCHAR             NOT NULL,

@@ -6,6 +6,7 @@ import (
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
+	validate "github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -16,12 +17,12 @@ type ProfileCtx struct{}
 
 type Profiles struct {
 	log      *logrus.Logger
-	validate *data.Validation
+	validate *validate.Validation
 	Pd       *data.ProfileData
 }
 
 func NewProfiles(log *logrus.Logger, pd *data.ProfileData) *Profiles {
-	return &Profiles{log, data.NewValidation(), pd}
+	return &Profiles{log, validate.NewValidation(), pd}
 }
 
 // ErrInvalidProductPath is an error message when the product path is not valid
@@ -41,7 +42,7 @@ type ProfileSearchReq struct {
 	Username string `json:"username"`
 }
 
-type ProfileGetResponse struct {
+type ProfileGetResp struct {
 	Username  string   `json:"username"`
 	GithubId  int      `json:"gitID"`
 	Email     string   `json:"email"`
@@ -59,13 +60,14 @@ type ProfilePatchReq struct {
 	Skills    []string `json:"skills"`
 }
 
-type ProfilesResponse struct {
+type ProfilesResp struct {
 	Username  string `json:"username"`
 	GithubId  int    `json:"gitID"`
 	Email     string `json:"email"`
 	AvatarURL string `json:"avatarUrl"`
 }
 
+// GetProfile returns profile provided username
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
@@ -94,7 +96,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	res := ProfileGetResponse{
+	res := ProfileGetResp{
 		Username:  profile.Username,
 		GithubId:  profile.GitHubUserID,
 		Email:     profile.Email,
@@ -104,7 +106,6 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 		Languages: nil, // do this, add to db too
 	}
 
-	// send response to frontend
 	err = jsonio.ToJSON(res, w)
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
@@ -117,6 +118,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostProfile creates a profile entry in the database, should not be exposed only for testing
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
@@ -153,6 +155,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteProfile deletes a users profile from database
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
@@ -205,23 +208,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *Profiles) PutProfile(w http.ResponseWriter, r *http.Request) {
-	/*
-	 *	NOT NEEDED, LEAVING IN INCASE OF FUTURE USE
-	 */
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
-}
-
-func (p *Profiles) PatchProfile(w http.ResponseWriter, r *http.Request) {
-	var profileReq ProfilePatchReq
-	err := jsonio.FromJSON(&profileReq, r.Body)
-	if err != nil || profileReq.Username == "" {
-		p.log.Errorf("Failed to parse json username: %s", err.Error())
-	}
-	// TODO: NOTHING TO UPDATE YET
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
-}
-
+// SearchProfile returns a profiles information based on input search parameters
 func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 	var profileReq ProfileSearchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
@@ -233,7 +220,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		p.log.Errorf("Failed to find user by username: %s", err.Error())
 	}
 
-	res := ProfilesResponse{
+	res := ProfilesResp{
 		Username:  profile.Username,
 		GithubId:  profile.GitHubUserID,
 		Email:     profile.Email,
@@ -242,14 +229,13 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 	err = jsonio.ToJSON(&res, w)
 	if err != nil {
 		p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
-		w.WriteHeader(http.StatusNotFound) // idlk what error to use, change later on
-		// when kevin decides
+		w.WriteHeader(http.StatusNotFound)
 	}
 
 }
 
+// PatchSkills insert a set of skills into a profile, does not replace, only appends
 func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
-	// used to insert a set of skills, does not replace, only appends
 	var profileReq ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
 	if err != nil {
@@ -270,8 +256,8 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteSkills deletes selected skills from a profile
 func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
-	// used to remove a set of skills
 	var profileReq ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
 	if err != nil {
