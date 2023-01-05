@@ -11,6 +11,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/data"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
+	authModels "github.com/GitCollabCode/GitCollab/microservices/authentication/models"
 	goGithub "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -28,20 +29,6 @@ const (
 	rUrl = "https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s"
 )
 
-type LoginResponse struct {
-	Token   string `json:"Token"`
-	NewUser bool   `json:"NewUser"`
-}
-
-type GitHubRedirectResponse struct {
-	RedirectUrl string `json:"RedirectUrl"`
-}
-
-// Expected Http Body for login request to github
-type GitOauthRequest struct {
-	Code string `json:"code"`
-}
-
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config, redirectUrl string, gitCollabSecret string) *Auth {
 	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
 }
@@ -50,7 +37,7 @@ func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config, re
 // clicked, this will be returned to the frontend.
 func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	redirect := fmt.Sprintf(rUrl, a.oauth.ClientID, a.gitRedirectUrl)
-	err := jsonio.ToJSON(&GitHubRedirectResponse{RedirectUrl: redirect}, w)
+	err := jsonio.ToJSON(&authModels.GitHubRedirectResponse{RedirectUrl: redirect}, w)
 	if err != nil {
 		a.Log.Panicf("Failed to create redirect response: %s", err.Error())
 	}
@@ -62,7 +49,7 @@ func (a *Auth) GithubRedirectHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 	a.Log.Info("Serving login request")
-	var githubCodeRes GitOauthRequest
+	var githubCodeRes authModels.GitOauthRequest
 	err := jsonio.FromJSON(&githubCodeRes, r.Body)
 
 	if err != nil {
@@ -133,7 +120,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	isNewUser := userInfo == nil
-	err = jsonio.ToJSON(&LoginResponse{Token: tokenString, NewUser: isNewUser}, w)
+	err = jsonio.ToJSON(&authModels.LoginResponse{Token: tokenString, NewUser: isNewUser}, w)
 	if err != nil {
 		a.Log.Fatalf("failed to serve jwt to frontend: %s", err.Error())
 	}

@@ -11,6 +11,11 @@ type ValidationError struct {
 	validator.FieldError
 }
 
+// ValidationError is a collection of validation error messages
+type ValidationErrorResp struct {
+	Messages []string `json:"messages"`
+}
+
 func (v ValidationError) Error() string {
 	return fmt.Sprintf(
 		"Key: '%s' Error: Field validation for '%s' failed on the '%s' tag",

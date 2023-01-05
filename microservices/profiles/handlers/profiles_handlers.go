@@ -6,8 +6,10 @@ import (
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
+	"github.com/GitCollabCode/GitCollab/internal/models"
 	validate "github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
+	profilesModels "github.com/GitCollabCode/GitCollab/microservices/profiles/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
@@ -28,45 +30,6 @@ func NewProfiles(log *logrus.Logger, pd *data.ProfileData) *Profiles {
 // ErrInvalidProductPath is an error message when the product path is not valid
 var ErrInvalidProfilePath = fmt.Errorf("invalid path, path should be /profile/[username]")
 
-// ErrorMessage is a generic error message returned by a server
-type ErrorMessage struct {
-	Message string `json:"message"`
-}
-
-// ValidationError is a collection of validation error messages
-type ValidationError struct {
-	Messages []string `json:"messages"`
-}
-
-type ProfileSearchReq struct {
-	Username string `json:"username"`
-}
-
-type ProfileGetResp struct {
-	Username  string   `json:"username"`
-	GithubId  int      `json:"gitID"`
-	Email     string   `json:"email"`
-	AvatarURL string   `json:"avatarUrl"`
-	Bio       string   `json:"bio"`
-	Skills    []string `json:"skills"`
-	Languages []string `json:"languages"`
-}
-
-type ProfilePatchReq struct {
-	Username  string   `json:"username"`
-	GithubId  int      `json:"gitID"`
-	Email     string   `json:"email"`
-	AvatarURL string   `json:"avatarUrl"`
-	Skills    []string `json:"skills"`
-}
-
-type ProfilesResp struct {
-	Username  string `json:"username"`
-	GithubId  int    `json:"gitID"`
-	Email     string `json:"email"`
-	AvatarURL string `json:"avatarUrl"`
-}
-
 // GetProfile returns profile provided username
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
@@ -75,7 +38,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.Pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "profile does not exist"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -86,7 +49,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 		// NOTE: Repetative code, clean this up and make sure error messages are descriptive
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -96,7 +59,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	res := ProfileGetResp{
+	res := profilesModels.ProfileGetResp{
 		Username:  profile.Username,
 		GithubId:  profile.GitHubUserID,
 		Email:     profile.Email,
@@ -110,7 +73,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("GetProfile failed to send response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("GetProfile failed to convert error response to JSON: %s", err)
 		}
@@ -132,7 +95,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
 		}
@@ -148,7 +111,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("PostProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("PostProfile failed to convert error response to JSON: %s", err)
 		}
@@ -163,7 +126,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	profile, err := p.Pd.GetProfileByUsername(username)
 	if err == pgx.ErrNoRows {
 		w.WriteHeader(http.StatusNotFound)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "profile does not exist"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "profile does not exist"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -173,7 +136,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -184,7 +147,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -200,7 +163,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("DeleteProfile failed to send success response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&ErrorMessage{Message: "Internal Server Error"}, w)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Internal Server Error"}, w)
 		if err != nil {
 			p.log.Errorf("DeleteProfile failed to convert error response to JSON: %s", err)
 		}
@@ -210,7 +173,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 // SearchProfile returns a profiles information based on input search parameters
 func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
-	var profileReq ProfileSearchReq
+	var profileReq profilesModels.ProfileSearchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
 	if err != nil {
 		p.log.Errorf("Failed to parse json username: %s", err.Error())
@@ -220,7 +183,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		p.log.Errorf("Failed to find user by username: %s", err.Error())
 	}
 
-	res := ProfilesResp{
+	res := profilesModels.ProfilesResp{
 		Username:  profile.Username,
 		GithubId:  profile.GitHubUserID,
 		Email:     profile.Email,
@@ -236,7 +199,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 
 // PatchSkills insert a set of skills into a profile, does not replace, only appends
 func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
-	var profileReq ProfilePatchReq
+	var profileReq profilesModels.ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
 	if err != nil {
 		p.log.Error(err.Error())
@@ -258,7 +221,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 
 // DeleteSkills deletes selected skills from a profile
 func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
-	var profileReq ProfilePatchReq
+	var profileReq profilesModels.ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
 	if err != nil {
 		p.log.Error(err.Error())

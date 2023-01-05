@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
+	"github.com/GitCollabCode/GitCollab/internal/models"
+	"github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 )
 
@@ -17,7 +19,7 @@ func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 		if err != nil {
 			p.log.Error(err)
 			w.WriteHeader(http.StatusBadRequest)
-			err = jsonio.ToJSON(&ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
+			err = jsonio.ToJSON(&models.ErrorMessage{Message: "Invalid Request: Bad JSON"}, w)
 			if err != nil {
 				p.log.Error(err)
 			}
@@ -27,7 +29,7 @@ func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 		errs := p.validate.Validate(profile)
 		if len(errs) != 0 {
 			w.WriteHeader(http.StatusUnprocessableEntity)
-			err = jsonio.ToJSON(&ValidationError{Messages: errs.Errors()}, w)
+			err = jsonio.ToJSON(&validator.ValidationErrorResp{Messages: errs.Errors()}, w)
 			if err != nil {
 				p.log.Error(err)
 			}
