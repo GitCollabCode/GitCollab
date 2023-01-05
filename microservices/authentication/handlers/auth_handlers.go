@@ -10,7 +10,6 @@ import (
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/data"
-	"github.com/GitCollabCode/GitCollab/microservices/authentication/helpers"
 	authModels "github.com/GitCollabCode/GitCollab/microservices/authentication/models"
 	goGithub "github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
@@ -83,7 +82,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new token for the frontend
-	tokenString, err := helpers.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
+	tokenString, err := jwt.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
 	if err != nil {
 		a.Log.Errorf("Faild to create a new jwt: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -136,7 +135,7 @@ func (a *Auth) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.Log.Infof("Adding jwt %s to blacklist", jwtString)
-	err := helpers.InsertJwtBlacklist(a.PgConn, jwtString)
+	err := jwt.InsertJwtBlacklist(a.PgConn, jwtString)
 	if err != nil {
 		a.Log.Errorf("Failed to add jwt to blacklist: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
