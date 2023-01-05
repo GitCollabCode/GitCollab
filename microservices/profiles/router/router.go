@@ -23,7 +23,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 
 	r.Route("/skills", func(r chi.Router) {
 		r.Use(jwt.JWTBlackList(p.Pd.PDriver))
-		r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
+		r.Use(jwtConf.VerifyJWT(p.Pd))
 		r.Patch("/", p.PatchSkills)
 		r.Delete("/", p.DeleteSkills)
 	})

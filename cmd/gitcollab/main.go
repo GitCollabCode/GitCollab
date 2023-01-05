@@ -18,6 +18,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 	profilesHandlers "github.com/GitCollabCode/GitCollab/microservices/profiles/handlers"
 	profilesRouter "github.com/GitCollabCode/GitCollab/microservices/profiles/router"
+	projectsData "github.com/GitCollabCode/GitCollab/microservices/projects/data"
 	projectsHandlers "github.com/GitCollabCode/GitCollab/microservices/projects/handlers"
 	projectsRouter "github.com/GitCollabCode/GitCollab/microservices/projects/router"
 	"github.com/go-chi/chi/v5"
@@ -123,8 +124,9 @@ func main() {
 		r.Mount("/profile", profilesRouter.ProfileRouter(profiles, jwtConf))
 
 		// projects subrouter
-		project := projectsHandlers.NewProjects(dbDriver, logger)
-		r.Mount("/projects", projectsRouter.ProjectRouter(project))
+		projectData := projectsData.NewProjectData(dbDriver)
+		project := projectsHandlers.AddNewProjects(projectData, logger)
+		r.Mount("/projects", projectsRouter.ProjectRouter(project, clientSecret, pd))
 
 		// test routes
 		r.Route("/test", func(r chi.Router) {

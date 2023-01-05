@@ -100,8 +100,8 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 		Email:     profile.Email,
 		AvatarURL: profile.AvatarURL,
 		Bio:       profile.Bio,
-		Skills:    nil, // do this, add to db too
-		Languages: nil, // do this, add to db too
+		Skills:    []string{"drunk driving", "racist (very)"}, // do this, add to db too
+		Languages: nil,                                        // do this, add to db too
 	}
 
 	// send response to frontend

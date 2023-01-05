@@ -107,3 +107,10 @@ func (pd *ProfileData) GetProfileByUsername(username string) (*Profile, error) {
 	err := pd.PDriver.QueryRow(sqlStatement, &p, username)
 	return &p, err
 }
+
+func (pd *ProfileData) GetTokenByUserID(githubUserID int) (string, error) {
+	var token string
+	sqlStatement := "SELECT github_token FROM profiles WHERE github_user_id = $1"
+	err := pd.PDriver.QueryRow(sqlStatement, &token, githubUserID)
+	return token, err
+}

@@ -19,8 +19,8 @@ func NewGitHubUserAPI(gitHubToken oauth2.TokenSource) *GitHubUserAPI {
 /*
  * Get User ID from users github
  */
-func (g *GitHubUserAPI) GetUserID(client *github.Client) (int, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+func (g *GitHubUserAPI) GetUserID() (int, error) {
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return 0, err
 	}
@@ -30,9 +30,9 @@ func (g *GitHubUserAPI) GetUserID(client *github.Client) (int, error) {
 /*
  * Get Github Username from users GitHub
  */
-func (g *GitHubUserAPI) GetGitUserName(client *github.Client) (string, error) {
+func (g *GitHubUserAPI) GetGitUserName() (string, error) {
 
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return "", err
 	}
@@ -43,7 +43,7 @@ func (g *GitHubUserAPI) GetGitUserName(client *github.Client) (string, error) {
  * Get Icon URL from users github
  */
 func (g *GitHubUserAPI) GetUserIconURL(client *github.Client) (string, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,7 @@ func (g *GitHubUserAPI) GetUserIconURL(client *github.Client) (string, error) {
  * Get Bio from users github
  */
 func (g *GitHubUserAPI) GetUserBio(client *github.Client) (string, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +65,7 @@ func (g *GitHubUserAPI) GetUserBio(client *github.Client) (string, error) {
  * Get Account name, not user name from users github
  */
 func (g *GitHubUserAPI) GetAccountName(client *github.Client) (string, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return "", err
 	}
@@ -76,7 +76,7 @@ func (g *GitHubUserAPI) GetAccountName(client *github.Client) (string, error) {
  * Get number of followers from users github
  */
 func (g *GitHubUserAPI) GetNumFollowers(client *github.Client) (int, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return 0, err
 	}
@@ -87,7 +87,7 @@ func (g *GitHubUserAPI) GetNumFollowers(client *github.Client) (int, error) {
  * Get number of accounts being followed from users github
  */
 func (g *GitHubUserAPI) GetNumFollowing(client *github.Client) (int, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return 0, err
 	}
@@ -98,7 +98,7 @@ func (g *GitHubUserAPI) GetNumFollowing(client *github.Client) (int, error) {
  * Get Company from users github
  */
 func (g *GitHubUserAPI) GetCompany(client *github.Client) (string, error) {
-	user, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := g.client.Users.Get(context.Background(), "")
 	if err != nil {
 		return "", err
 	}

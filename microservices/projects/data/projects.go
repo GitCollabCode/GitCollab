@@ -23,6 +23,20 @@ type Project struct {
 	DateCreated        string `json:"date_created"`
 }
 
+// func (pd *ProjectData) GetProjectOwner(, projectName string, projectDescription string) error {
+// 	sqlString :=
+// 		"INSERT INTO projects(project_owner, project_name, project_description)" +
+// 			"VALUES($1, $2, $3)"
+
+// 	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, projectName, projectDescription)
+// 	if err != nil {
+// 		pd.PDriver.Log.Errorf("AddProject database INSERT failed: %s", err.Error())
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
 func (pd *ProjectData) AddProject(ownerID int, projectName string, projectDescription string) error {
 	sqlString :=
 		"INSERT INTO projects(project_owner, project_name, project_description)" +
@@ -70,9 +84,26 @@ func (pd *ProjectData) DeleteProject(projectID int) error {
 	return pd.PDriver.TransactOneRow(sqlStatement, projectID)
 }
 
-func (pd *ProjectData) GetProject(projectID int) (*Project, error) {
-	var p Project
-	sqlStatement := "SELECT * FROM projects WHERE github_user_id = $1"
-	err := pd.PDriver.QueryRow(sqlStatement, &p, projectID)
-	return &p, err
+// Return all project associated witha  project owner
+func (pd *ProjectData) GetProjectsByProjectOwner(projectOwner int) ([]Project, error) {
+	var p []Project
+	sqlStatement := "SELECT * FROM projects WHERE project_owner = $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &p, projectOwner)
+	return p, err
+}
+
+// Return project description by project owner name
+func (pd *ProjectData) GetProjDescByOwner(projectId int) (string, error) {
+	var name string
+	sqlStatement := "SELECT * FROM projects WHERE project_owner = $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &name, projectId)
+	return name, err
+}
+
+// Return project name by project owner name
+func (pd *ProjectData) GetProjNameByOwner(projectId int) (string, error) {
+	var name string
+	sqlStatement := "SELECT * FROM projects WHERE project_owner = $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &name, projectId)
+	return name, err
 }
