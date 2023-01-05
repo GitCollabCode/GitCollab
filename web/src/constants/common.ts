@@ -20,6 +20,16 @@ export type loginResponse = {
   NewUser: boolean
 }
 
+export type profileResponse = {
+  username: string
+  gitID: number
+  email: string
+  avatarUrl: string
+  languages: string[]
+  skills: string[]
+  bio: string
+}
+
 export type GitHubRedirectResponse = {
   RedirectUrl: string
 }
