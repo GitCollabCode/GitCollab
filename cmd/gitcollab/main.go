@@ -1,6 +1,6 @@
 // GitCollab API
 //
-// # GitCollab API Swagger documentation
+// GitCollab API Swagger documentation.
 //
 // Terms Of Service:
 //
@@ -8,9 +8,8 @@
 //
 //	Schemes: https
 //	BasePath: /v1
-//	Version: 0.0.1
+//	Version: 1.0.0
 //	License: MIT http://opensource.org/licenses/MIT
-//	Contact: John Doe<john.doe@example.com> http://john.doe.com
 //	Host: gitcollab.io
 //
 //	Consumes:
