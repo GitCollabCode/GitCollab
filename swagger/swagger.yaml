@@ -1,43 +1,128 @@
+basePath: /api
+consumes:
+    - application/json
+definitions:
+    ErrorMessage:
+        properties:
+            message:
+                description: Error message string
+                example: error message
+                type: string
+                x-go-name: Message
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/internal/models
+    GitHubOauthReq:
+        properties:
+            code:
+                description: temporary code from GitHub to ensure authenticity of user
+                example: gho_16C7e42F292c6912E7710c838347Ae178B4a
+                type: string
+                x-go-name: Code
+        required:
+            - code
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/authentication/models
+    GitHubRedirectResp:
+        properties:
+            RedirectUrl:
+                description: redirect url string.
+                example: https://github.com/login/oauth/authorize?scope=user&client_id=%s&redirect_uri=%s
+                type: string
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/authentication/models
+    LoginResp:
+        properties:
+            NewUser:
+                description: indicates if this is a new users logging in for the first time
+                type: boolean
+            Token:
+                description: users JWT token
+                example: '{Bearer JWT-TOKEN}'
+                type: string
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/authentication/models
+host: gitcollab.tridentshark.com
+info:
+    description: GitCollab API Swagger documentation.
+    license:
+        name: MIT
+        url: http://opensource.org/licenses/MIT
+    termsOfService: There is currently no Terms of Service.
+    title: GitCollab API
+    version: 1.0.0
 paths:
-    /repo-info/:
-        get:
-            description: '# Retrieve basic info about a repo, including name, descriptiom, contributers'
-            operationId: info
+    /auth/logut:
+        post:
+            description: Logs user out and invalidates their currently valid JWT.
+            operationId: logout
+            parameters:
+                - description: users JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
             responses:
                 "200":
-                    $ref: '#/responses/ThingResponse'
-            summary: retrieve information about a given repo
+                    description: Successful logout
+            summary: User logout.
             tags:
-                - Get
-                - repo
-    /repo-issues/:
+                - Auth
+    /auth/redirect-url:
         get:
-            description: Request all repos that a user owns on github. Will require valid access token
-            operationId: user
+            description: Get the redirect url for GitHub that corresponds to the GitCollab app GitHub registration.
+            operationId: getRedirectUrl
+            produces:
+                - application/json
             responses:
                 "200":
-                    $ref: '#/responses/ThingResponse'
-            summary: retrieve list of github repos associated to a given user
+                    $ref: '#/responses/redirectResponse'
+            summary: Get GitCollab redirect url.
             tags:
-                - Get
-                - repos
-                - associated
-                - to
-                - a
-                - github
-    /user-repos/:
-        get:
-            description: Request all repos that a user owns on github. Will require valid access token
-            operationId: user
+                - Auth
+    /auth/signin:
+        post:
+            consumes:
+                - application/json
+            description: Fetch user GitHub access token using users GitHub OAuth code and returns JWT.
+            operationId: githubOAuthRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/GitHubOauthReq'
+            produces:
+                - application/json
             responses:
                 "200":
-                    $ref: '#/responses/ThingResponse'
-            summary: retrieve list of github repos associated to a given user
+                    $ref: '#/responses/loginResponse'
+                "400":
+                    description: Missing GitHub OAuth code
+                "401":
+                    description: Invalid GitHub OAuth code
+            summary: User Login through GitHub.
             tags:
-                - Get
-                - repos
-                - associated
-                - to
-                - a
-                - github
+                - Auth
+produces:
+    - application/json
+responses:
+    errorMessage:
+        description: Error Response
+        schema:
+            $ref: '#/definitions/ErrorMessage'
+    loginResponse:
+        description: GitHub login response
+        schema:
+            $ref: '#/definitions/LoginResp'
+    redirectResponse:
+        description: Redirect URL response
+        schema:
+            $ref: '#/definitions/GitHubRedirectResp'
+schemes:
+    - http
+securityDefinitions:
+    bearer:
+        in: header
+        name: Authorization
+        type: JWT
 swagger: "2.0"

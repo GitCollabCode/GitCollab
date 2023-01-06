@@ -112,11 +112,11 @@ function refresh-env-file() {
 }
 
 function swagger() {
-    docker run --rm -it  --user $(id -u):$(id -g) -e GOCACHE=/tmp -e  GOPATH=$(go env GOPATH):/go -v $HOME:$HOME -w $(pwd) quay.io/goswagger/swagger "$@"
+    docker run --rm -it  --user "$(id -u)":"$(id -g)" -e GOCACHE=/tmp -e  GOPATH="$(go env GOPATH)":/go -v "$HOME":"$HOME" -w "$(pwd)" quay.io/goswagger/swagger "$@"
 }
 
 function generate-swagger() {
-    echo "Generating Swagger yaml documentation inside $(pwd)/cmd/gitcollab/swagger.ymal"
+    echo "Generating Swagger yaml documentation inside $(pwd)/cmd/gitcollab/swagger.yaml"
     docker pull quay.io/goswagger/swagger > /dev/null 2>&1
     #swagger version
     swagger generate spec -o ./swagger/swagger.yaml

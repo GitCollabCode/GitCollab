@@ -17,20 +17,22 @@ import (
 
 type ProfileCtx struct{}
 
+// Interface for profiles handlers.
 type Profiles struct {
 	log      *logrus.Logger
 	validate *validate.Validation
 	Pd       *data.ProfileData
 }
 
+// NewProfiles returns initialized Profiles handler struct.
 func NewProfiles(log *logrus.Logger, pd *data.ProfileData) *Profiles {
 	return &Profiles{log, validate.NewValidation(), pd}
 }
 
-// ErrInvalidProductPath is an error message when the product path is not valid
+// ErrInvalidProductPath is an error message when the product path is not valid.
 var ErrInvalidProfilePath = fmt.Errorf("invalid path, path should be /profile/[username]")
 
-// GetProfile returns profile provided username
+// GetProfile returns profile provided username.
 func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
@@ -81,7 +83,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostProfile creates a profile entry in the database, should not be exposed only for testing
+// PostProfile creates a profile entry in the database, should not be exposed only for testing.
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
 
@@ -118,7 +120,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DeleteProfile deletes a users profile from database
+// DeleteProfile deletes a users profile from database.
 func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
 	username := chi.URLParam(r, "username")
@@ -171,7 +173,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// SearchProfile returns a profiles information based on input search parameters
+// SearchProfile returns a profiles information based on input search parameters.
 func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileSearchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
@@ -197,7 +199,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// PatchSkills insert a set of skills into a profile, does not replace, only appends
+// PatchSkills insert a set of skills into a profile, does not replace, only appends.
 func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)
@@ -219,7 +221,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DeleteSkills deletes selected skills from a profile
+// DeleteSkills deletes selected skills from a profile.
 func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfilePatchReq
 	err := jsonio.FromJSON(&profileReq, r.Body)

@@ -10,6 +10,7 @@ import (
 
 const MAX_GIT_TRANSACTIONS = 5 // per min
 
+// Defines Project service endpoints
 func ProjectRouter(project *handlers.Projects) chi.Router {
 	r := chi.NewRouter()
 

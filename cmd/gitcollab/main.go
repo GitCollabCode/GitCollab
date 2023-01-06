@@ -2,15 +2,15 @@
 //
 // GitCollab API Swagger documentation.
 //
-// Terms Of Service:
+// Terms of Service:
 //
-// there are no TOS at this moment, use at your own risk we take no responsibility
+// There is currently no Terms of Service.
 //
-//	Schemes: https
-//	BasePath: /v1
+//	Schemes: http
+//	BasePath: /api
 //	Version: 1.0.0
 //	License: MIT http://opensource.org/licenses/MIT
-//	Host: gitcollab.io
+//	Host: gitcollab.tridentshark.com
 //
 //	Consumes:
 //	- application/json
@@ -23,7 +23,7 @@
 //
 //	SecurityDefinitions:
 //	bearer:
-//	     type: apiKey
+//	     type: JWT
 //	     name: Authorization
 //	     in: header
 //

@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+// Defines Profiles service endpoints
 func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Router {
 	r := chi.NewRouter()
 	r.Use(middleware.AllowContentEncoding("application/json"))
