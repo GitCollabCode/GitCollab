@@ -48,7 +48,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.log.Error("GetProfile database search failed: %s", err.Error())
+		p.log.Errorf("GetProfile database search failed: %s", err.Error())
 		// NOTE: Repetative code, clean this up
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
@@ -90,7 +90,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 		nProfile.Bio,
 	)
 	if err != nil {
-		p.log.Error("PostProfile database add failed: %s", err.Error())
+		p.log.Errorf("PostProfile database add failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -124,7 +124,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.log.Error("DeleteProfile database search failed: %s", err.Error())
+		p.log.Errorf("DeleteProfile database search failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -135,7 +135,7 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 	err = p.Pd.DeleteProfile(profile.GitHubUserID)
 	if err != nil {
-		p.log.Error("DeleteProfile database delete failed: %s", err.Error())
+		p.log.Errorf("DeleteProfile database delete failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -213,7 +213,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
 	if !ok {
-		p.log.Error("PatchSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -223,7 +223,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if p.Pd.AddProfileSkills(int(userId), profileReq.Skills...) != nil {
-		p.log.Error("PatchSkills failed to append skills to profile: %s", err.Error())
+		p.log.Errorf("PatchSkills failed to append skills to profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -254,7 +254,7 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
 	if !ok {
-		p.log.Error("DeleteSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("DeleteSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -264,7 +264,7 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...) != nil {
-		p.log.Error("DeleteSkills failed to delete skills from profile: %s", err.Error())
+		p.log.Errorf("DeleteSkills failed to delete skills from profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
