@@ -4,11 +4,14 @@ import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { UserLoginProvider } from './context/userLoginContext/userLoginContext'
+import { ModalContextStateProvider } from './context/modalContext/modalContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <UserLoginProvider>
-    <App />
+    <ModalContextStateProvider>
+      <App />
+    </ModalContextStateProvider>
   </UserLoginProvider>
 )
 
