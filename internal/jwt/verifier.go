@@ -67,7 +67,7 @@ func (g *GitCollabJwtConf) VerifyJWT(logger *logrus.Logger) func(http.Handler) h
 			// set context, change this bih to use map or sync map, kinda wack how im
 			// adding both of thees values
 			r = r.WithContext(context.WithValue(r.Context(), ContextKeyUser, username.(string)))
-			r = r.WithContext(context.WithValue(r.Context(), ContextGitId, gitId.(float64)))
+			r = r.WithContext(context.WithValue(r.Context(), ContextGitId, int(gitId.(float64))))
 			next.ServeHTTP(w, r)
 		}
 		return http.HandlerFunc(fn)
