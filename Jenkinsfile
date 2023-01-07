@@ -25,7 +25,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == "main") {
+                    if (env.BRANCH_NAME == "origin/main") {
                         setBuildStatus("Build pending", "PENDING");
                     }
                 }
@@ -90,7 +90,7 @@ pipeline {
 
         stage('Update Live Deployment Server') {
             when {
-                expression { env.BRANCH_NAME == "main" }
+                expression { env.BRANCH_NAME == "origin/main" }
             }
             steps {
                 echo 'Updating live deployment server with new changes...'
@@ -110,14 +110,14 @@ pipeline {
 		}
         success {
             script {
-                if (env.BRANCH_NAME == "main") {
+                if (env.BRANCH_NAME == "origin/main") {
                     setBuildStatus("Build succeeded", "SUCCESS");
                 }
             }
         }
         failure {
             script {
-                if (env.BRANCH_NAME == "main") {
+                if (env.BRANCH_NAME == "origin/main") {
                     setBuildStatus("Build failed", "FAILURE");
                 }
             }

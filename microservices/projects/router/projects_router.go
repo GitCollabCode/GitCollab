@@ -10,9 +10,10 @@ import (
 
 const MAX_GIT_TRANSACTIONS = 5 // per min
 
+// Defines Project service endpoints
 func ProjectRouter(project *handlers.Projects) chi.Router {
 	r := chi.NewRouter()
-	// github related endpoints, should not be called often,
+
 	r.Route("/github", func(r chi.Router) {
 		r.Use(httprate.LimitByIP(MAX_GIT_TRANSACTIONS, 1*time.Minute))
 		r.Get("/user-repos", project.GetUserRepos)

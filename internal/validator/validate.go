@@ -1,4 +1,4 @@
-package data
+package validator
 
 import (
 	"fmt"
@@ -9,6 +9,11 @@ import (
 // ValidationError wraps the validators FieldError so we do not expose this
 type ValidationError struct {
 	validator.FieldError
+}
+
+// ValidationError is a collection of validation error messages
+type ValidationErrorResp struct {
+	Messages []string `json:"messages"`
 }
 
 func (v ValidationError) Error() string {
@@ -36,7 +41,6 @@ type Validation struct {
 	validate *validator.Validate
 }
 
-// NewValidation creates a new Validation type
 func NewValidation() *Validation {
 	validate := validator.New()
 
