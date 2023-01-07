@@ -55,7 +55,7 @@ func AuthRouter(auth *handlers.Auth) chi.Router {
 	//     Parameters:
 	//       + name: Authorization
 	//         in: header
-	//         description: users JWT
+	//         description: User JWT
 	//         required: true
 	//         type: string
 	//

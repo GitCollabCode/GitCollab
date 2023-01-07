@@ -41,6 +41,109 @@ definitions:
                 type: string
         type: object
         x-go-package: github.com/GitCollabCode/GitCollab/microservices/authentication/models
+    Profile:
+        properties:
+            avatarUrl:
+                description: URL to user profile picture on GitHub
+                example: https://avatars.githubusercontent.com/u/45056243?v=4
+                type: string
+                x-go-name: AvatarURL
+            bio:
+                description: GitHub bio of user
+                example: I am programmer
+                type: string
+                x-go-name: Bio
+            email:
+                description: user email
+                example: wagwan@gitcollab.io
+                type: string
+                x-go-name: Email
+            gitID:
+                description: unique GitHub ID of user
+                example: 54350313
+                format: int64
+                type: integer
+                x-go-name: GithubId
+            languages:
+                description: List of the users programming languages
+                example:
+                    - Go
+                    - Javascript
+                    - Python
+                    - Bash
+                items:
+                    type: string
+                type: array
+                x-go-name: Languages
+            skills:
+                description: List of the users skills
+                example:
+                    - testing
+                    - backend
+                    - frontend
+                items:
+                    type: string
+                type: array
+                x-go-name: Skills
+            username:
+                description: GitHub username
+                example: MG4CE
+                type: string
+                x-go-name: Username
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    ProfileSearchReq:
+        properties:
+            username:
+                description: GitHub username
+                example: MG4CE
+                type: string
+                x-go-name: Username
+        required:
+            - username
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    ProfileSkillsReq:
+        properties:
+            skills:
+                description: List of the users skills
+                example:
+                    - testing
+                    - backend
+                    - frontend
+                items:
+                    type: string
+                type: array
+                x-go-name: Skills
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    SearchProfilesResp:
+        properties:
+            avatarUrl:
+                description: URL to user profile picture on GitHub
+                example: https://avatars.githubusercontent.com/u/45056243?v=4
+                type: string
+                x-go-name: AvatarURL
+            email:
+                description: user email
+                example: wagwan@gitcollab.io
+                type: string
+                x-go-name: Email
+            gitID:
+                description: unique GitHub ID of user
+                example: 54350313
+                format: int64
+                type: integer
+                x-go-name: GithubId
+            username:
+                description: GitHub username
+                example: MG4CE
+                type: string
+                x-go-name: Username
+        required:
+            - avatarUrl
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
 host: gitcollab.tridentshark.com
 info:
     description: GitCollab API Swagger documentation.
@@ -56,7 +159,7 @@ paths:
             description: Logs user out and invalidates their currently valid JWT.
             operationId: logout
             parameters:
-                - description: users JWT
+                - description: User JWT
                   in: header
                   name: Authorization
                   required: true
@@ -103,26 +206,167 @@ paths:
             summary: User Login through GitHub.
             tags:
                 - Auth
+    /profiles:
+        post:
+            consumes:
+                - application/json
+            description: Takes in user information to create a new profile, only used for testing.
+            operationId: createProfileRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Profile'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a user profile.
+            tags:
+                - Profiles
+    /profiles/{username}:
+        delete:
+            description: Removes registered GitCollab user from db, only used for testing, should not be exposed.
+            operationId: deleteProfile
+            parameters:
+                - description: Target user
+                  in: path
+                  name: username
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+                "404":
+                    description: Profile not found
+            summary: Delete GitCollab user.
+            tags:
+                - Profiles
+        get:
+            operationId: getProfile
+            parameters:
+                - description: Target user
+                  in: path
+                  name: username
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/getProfileResponse'
+                "404":
+                    description: Profile not found
+            summary: Get GitCollab profile.
+            tags:
+                - Profiles
+    /profiles/search:
+        post:
+            consumes:
+                - application/json
+            description: Get profile information based on input search parameters.
+            operationId: profileSearchRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSearchReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/searchProfilesResponse'
+                "204":
+                    description: No Profiles found
+            summary: Search registered profiles.
+            tags:
+                - Profiles
+    /profiles/skills:
+        patch:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile skills.
+            tags:
+                - Profiles
+        post:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile skills.
+            tags:
+                - Profiles
 produces:
     - application/json
 responses:
-    errorMessage:
+    errorResponse:
         description: Error Response
         schema:
             $ref: '#/definitions/ErrorMessage'
+    getProfileResponse:
+        description: GitCollab get user profile information response
+        schema:
+            $ref: '#/definitions/Profile'
     loginResponse:
         description: GitHub login response
         schema:
             $ref: '#/definitions/LoginResp'
+    messageResponse:
+        description: Message Response
+        schema:
+            $ref: '#/definitions/ErrorMessage'
     redirectResponse:
         description: Redirect URL response
         schema:
             $ref: '#/definitions/GitHubRedirectResp'
+    searchProfilesResponse:
+        description: Profile search response
+        schema:
+            $ref: '#/definitions/SearchProfilesResp'
 schemes:
     - http
 securityDefinitions:
     bearer:
         in: header
         name: Authorization
-        type: JWT
+        type: apiKey
 swagger: "2.0"

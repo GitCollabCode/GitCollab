@@ -23,7 +23,7 @@
 //
 //	SecurityDefinitions:
 //	bearer:
-//	     type: JWT
+//	     type: apiKey
 //	     name: Authorization
 //	     in: header
 //
