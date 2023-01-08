@@ -63,3 +63,10 @@
     height: 100vh;
     position: absolute;
 }
+
+.modalTextUnderline {
+    color: D9D9D9;
+    width: 504px;
+    height: 1px;
+    opacity: 50%;
+}

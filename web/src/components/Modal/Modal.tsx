@@ -5,6 +5,7 @@ import style from '../Modal/Modal.module.css'
 import { ModalContextStateContext } from '../../context/modalContext/modalContext'
 import { ModalType } from '../../constants/common'
 import LoggedOutModal from './ModalTypes/LoggedOutModal'
+import LoginModal from './ModalTypes/LoginModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -24,7 +25,7 @@ const Modal = () => {
         <LoggedOutModal/>
         )
       case ModalType.SkillSelectModal:
-        return <></>
+        return (<LoginModal/> )
     }
   }
 
