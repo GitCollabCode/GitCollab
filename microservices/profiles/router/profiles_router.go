@@ -67,26 +67,32 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//		 404: description:Profile not found
 		r.Get("/", p.GetProfile)
 
-		// swagger:route DELETE /profiles/{username} Profiles deleteProfile
-		//
-		// Delete GitCollab user.
-		//
-		// Removes registered GitCollab user from db, only used for testing, should not be exposed.
-		//
-		//     Parameters:
-		//       + name: username
-		//         in: path
-		//         description: Target user
-		//         required: true
-		//         type: string
-		//
-		//     Produces:
-		//     - application/json
-		//
-		//     Responses:
-		//       200: messageResponse
-		//		 404: description:Profile not found
-		r.Delete("/", p.DeleteProfile)
+		r.Group(func(r chi.Router) {
+			// setup private routes
+			r.Use(jwt.JWTBlackList(p.Pd.PDriver))
+			r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
+
+			// swagger:route DELETE /profiles/{username} Profiles deleteProfile
+			//
+			// Delete GitCollab user.
+			//
+			// Removes registered GitCollab user from db, only used for testing, should not be exposed.
+			//
+			//     Parameters:
+			//       + name: username
+			//         in: path
+			//         description: Target user
+			//         required: true
+			//         type: string
+			//
+			//     Produces:
+			//     - application/json
+			//
+			//     Responses:
+			//       200: messageResponse
+			//		 404: description:Profile not found
+			r.Delete("/", p.DeleteProfile)
+		})
 	})
 
 	r.Route("/skills", func(r chi.Router) {
