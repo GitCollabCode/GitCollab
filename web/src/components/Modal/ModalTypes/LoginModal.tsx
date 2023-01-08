@@ -1,4 +1,5 @@
 import React  from 'react'
+import { UPDATE_SKILLS } from '../../../constants/endpoints'
 
 import style from '../Modal.module.css'
 
@@ -7,7 +8,41 @@ import style from '../Modal.module.css'
 const LoginModal = () => {    
   //const modalContext = useContext(ModalContextStateContext)
   //const [data, setData] = useState({ errorMessage: '', isLoading: false })
+
+let addedSkills:string[] = [] 
+
   
+const handleAddClick = (id:string, skillType: string) => {
+    const el = document.getElementById(id)
+    if(el?.classList.contains(style.active)){
+        el?.classList.remove(style.active)
+        addedSkills.splice(addedSkills.indexOf(skillType), 1)
+    }else{
+        el?.classList.add(style.active)
+        addedSkills.push(skillType)
+    }
+}
+
+const submitSkills = () =>{
+    const responseBody = {skills:addedSkills}
+    fetch(process.env.REACT_APP_API_URI + UPDATE_SKILLS , {
+        method: 'PATCH',
+        body:JSON.stringify(responseBody)
+      })
+        .then((response) => {
+            if(response.status === 200){
+                console.log("It worked")
+        }
+        else{
+            console.log("Failed")
+        }
+    }
+        )
+        .then((data: any) => {
+          console.log(data)
+        })
+}
+
   return (
     <>
         <div className={style.modalText}>
@@ -19,7 +54,7 @@ const LoginModal = () => {
             Select a few topics that interest you
         </p>
         <div className={style.skillButtonContainer}>
-            <button className={[style.modalText, style.skillButton].join(" ")}>
+            <button id="1" className={[style.modalText, style.skillButton].join(" ")} onClick={()=>handleAddClick("1", "continue")}>
                 Contin
             </button>
             <button className={[style.modalText, style.skillButton].join(" ")}>
@@ -33,7 +68,7 @@ const LoginModal = () => {
             </button>
         </div>
     
-        <button className={style.modalButton}>
+        <button className={style.modalButton} onClick={()=>submitSkills()}>
               Continue
           </button>
       </div>
