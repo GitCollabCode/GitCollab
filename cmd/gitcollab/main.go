@@ -109,8 +109,8 @@ func main() {
 	// create oauth config for github
 	var GitOauthConfig = &oauth2.Config{
 		ClientID:     clientID,
-		ClientSecret: clientSecret,                        // maybe store?
-		Scopes:       []string{"user:email", "user:name"}, // verify what we need
+		ClientSecret: clientSecret,
+		Scopes:       []string{"user:email", "user:name"},
 		Endpoint:     githuboauth.Endpoint,
 	}
 

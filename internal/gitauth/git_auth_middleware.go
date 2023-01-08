@@ -29,7 +29,7 @@ func GitClient(p *data.ProfileData) func(http.Handler) http.Handler {
 		 * context that are supplied by the Verifier middleware.
 		 *
 		 * To use the client, retrieve and cast from context:
-		 *	client := r.Context.Value(gitauth.ContextGitClient).(*github.Client)
+		 *	client := r.Context().Value(gitauth.ContextGitClient).(*github.Client)
 		 */
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			gitID := r.Context().Value(jwt.ContextGitId)
