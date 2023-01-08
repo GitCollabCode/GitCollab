@@ -27,7 +27,13 @@ const submitSkills = () =>{
     const responseBody = {skills:addedSkills}
     fetch(process.env.REACT_APP_API_URI + UPDATE_SKILLS , {
         method: 'PATCH',
-        body:JSON.stringify(responseBody)
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
+          },
+        body:JSON.stringify(responseBody),
+        
       })
         .then((response) => {
             if(response.status === 200){
