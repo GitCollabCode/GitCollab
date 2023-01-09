@@ -43,3 +43,7 @@ export type modalContextState = {
   showModal: () => void
   hideModal: () => void
 }
+
+export type SkillListResponse = {
+  skills: string[]
+}
