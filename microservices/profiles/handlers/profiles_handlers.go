@@ -285,11 +285,11 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 
 	err := jsonio.FromJSON(&LanguagesReq, r.Body)
 	if err != nil {
-		p.log.Errorf("DeleteSLanguages failed to decode JSON request: %s", err.Error())
+		p.log.Errorf("DeleteLanguages failed to decode JSON request: %s", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
 		if err != nil {
-			p.log.Fatalf("DeleteSLanguages failed to send error response: %s", err)
+			p.log.Fatalf("DeleteLanguages failed to send error response: %s", err)
 		}
 	}
 
@@ -299,13 +299,13 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
-			p.log.Fatalf("DeleteSLanguages failed to send error response: %s", err)
+			p.log.Fatalf("DeleteLanguages failed to send error response: %s", err)
 		}
 		return
 	}
 
-	if p.Pd.RemoveProfileSkills(int(userId), LanguagesReq.Languages...) != nil {
-		p.log.Errorf("DeleteSkills failed to delete skills from profile: %s", err.Error())
+	if p.Pd.RemoveProfileLanguages(int(userId), LanguagesReq.Languages...) != nil {
+		p.log.Errorf("DeleteLanguages failed to delete skills from profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -315,9 +315,9 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	err = jsonio.ToJSON(&models.Message{Message: "skills removed"}, w)
+	err = jsonio.ToJSON(&models.Message{Message: "languages removed"}, w)
 	if err != nil {
-		p.log.Fatalf("DeleteSkills failed to send success response: %s", err)
+		p.log.Fatalf("DeleteLanguages failed to send success response: %s", err)
 	}
 
 }

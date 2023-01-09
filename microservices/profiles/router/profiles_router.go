@@ -175,7 +175,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 
 		// swagger:route POST  /profile/languages Profiles profileSkillsRequest
 		//
-		// Delete profile skills.
+		// Delete profile languages.
 		//
 		// Delete provided skills from the callers profile.
 		//
@@ -194,7 +194,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//
 		//     Responses:
 		//       200: messageResponse
-		r.Delete("/", p.DeleteSkills)
+		r.Delete("/", p.DeleteLanguages)
 	})
 
 	return r
