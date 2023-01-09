@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, {useContext} from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
@@ -10,7 +10,6 @@ import NotFound from './components/Misc/NotFound'
 import Modal from './components/Modal/Modal'
 import { ModalContextStateContext } from './context/modalContext/modalContext'
 import { ModalType } from './constants/common'
-
 
 const App = () => {
   useContext(ModalContextStateContext).setModalType(ModalType.SkillSelectModal)

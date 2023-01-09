@@ -47,8 +47,10 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	//		 204: description:No Profiles found
 	r.Post("/search", p.SearchProfile)
 
+	r.Get("/get-skills", p.GetSkillList)
+
 	r.Route("/{username}", func(r chi.Router) {
-		// swagger:route GET /profiles/{username} Profiles getProfile
+		// swagger:route GEzusername} Profiles getProfile
 		//
 		// Get GitCollab profile.
 		//

@@ -211,7 +211,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -278,4 +278,14 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("DeleteSkills failed to send success response: %s", err)
 	}
+}
+
+func (p *Profiles) GetSkillList(w http.ResponseWriter, r *http.Request) {
+	err := jsonio.ToJSON(&profilesModels.GetSkillListResp{Skills: models.Skill[:]}, w)
+	if err != nil {
+		p.log.Fatalf("GetSkillsList failed to send skill list response: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

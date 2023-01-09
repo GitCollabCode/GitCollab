@@ -92,3 +92,9 @@ type SearchProfilesResp struct {
 	// Required: true
 	AvatarURL string `json:"avatarUrl"`
 }
+
+type GetSkillListResp struct {
+	// List of skill
+	// Example: ["cheese", "cream", "apple"]
+	Skills []string `json:"skills"`
+}

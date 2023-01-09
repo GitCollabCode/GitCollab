@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	"github.com/GitCollabCode/GitCollab/internal/models"
 )
 
 type ProfileData struct {
@@ -69,6 +70,16 @@ func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) erro
 	// TODO: Make sure duplicates dont exist
 	// can probably change to one statement instead of iterating
 	for _, skill := range skills {
+		validSkill := false
+		for _, skillName := range models.Skill {
+			if skillName == skill {
+				validSkill = true
+			}
+		}
+		if !validSkill {
+			continue // move on to next skill
+		}
+
 		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
 		if err != nil {

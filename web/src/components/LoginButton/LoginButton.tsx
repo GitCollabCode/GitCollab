@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { GITHUB_REDIRECT, SIGNIN } from '../../constants/endpoints'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
-import { loginResponse } from '../../constants/common'
+import { loginResponse, ModalType } from '../../constants/common'
 import { GitHubRedirectResponse } from '../../constants/common'
 import { ReactComponent as GithubIcon } from '../../assets/github.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/logout.svg'
 import style from './LoginButton.module.css'
+import { ModalContextStateContext } from '../../context/modalContext/modalContext'
 
 const LoginButton = ({
   setIsLoading,
@@ -14,7 +15,7 @@ const LoginButton = ({
 }) => {
   const { logIn, isLoggedIn, logOut } = useContext(UserLoginContext)
   const [data, setData] = useState({ errorMessage: '', isLoading: false })
-
+  const modalContext = useContext(ModalContextStateContext)
 
   useEffect(() => {
     // After requesting Github access, Github redirects back to your app with a code parameter
@@ -41,7 +42,8 @@ const LoginButton = ({
         .then((response) => response.json())
         .then((data: loginResponse) => {
           if (data.NewUser) {
-            //TODO ADD the Modal for getting user stuff
+            modalContext.setModalType(ModalType.SkillSelectModal)
+            modalContext.showModal()
             console.log('New USER ')
           }
 
@@ -57,7 +59,7 @@ const LoginButton = ({
           setIsLoading(false)
         })
     }
-  }, [isLoggedIn, data, logIn, setIsLoading])
+  }, [isLoggedIn, data, modalContext, logIn, setIsLoading])
 
   const redirectToGithub = () => {
     setIsLoading(true)
