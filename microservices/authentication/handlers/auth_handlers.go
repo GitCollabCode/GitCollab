@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
-	githubAPI "github.com/GitCollabCode/GitCollab/internal/github"
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/data"
@@ -63,21 +62,21 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get github access token from git with code
-	gitAccessToken, err := githubAPI.GetGithubAccessToken(githubCodeRes.Code, *a.oauth)
+	token, err := a.oauth.Exchange(context.Background(), githubCodeRes.Code)
 	if err != nil {
-		a.Log.Error(err.Error())
+		a.Log.Errorf("Failed to get authentication token: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	if !gitAccessToken.Valid() {
+	if !token.Valid() {
 		a.Log.Error("Invalid Github Access Token!")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	// create github client to retrieve user info, store in JWT
-	oauthClient := a.oauth.Client(context.Background(), gitAccessToken)
+	oauthClient := a.oauth.Client(context.Background(), token)
 	client := goGithub.NewClient(oauthClient)
 	username, _, err := client.Users.Get(context.Background(), "")
 	if err != nil {
@@ -109,14 +108,14 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo == nil {
 		// did not find the user, create new account
-		err := data.CreateNewUser(int(*username.ID), *username.Login, gitAccessToken.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
+		err := data.CreateNewUser(int(*username.ID), *username.Login, token.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
 		if err != nil {
 			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
 		}
-	} else if userInfo.GitHubToken != gitAccessToken.AccessToken {
+	} else if userInfo.GitHubToken != token.AccessToken {
 		// found user, but check if token doesnt match
-		err := data.UpdateGitAccessToken(userInfo, gitAccessToken.AccessToken, a.PgConn, a.Log)
+		err := data.UpdateGitAccessToken(userInfo, token.AccessToken, a.PgConn, a.Log)
 		if err != nil {
 			a.Log.Panicf("Failed to update users access token: %s", err.Error())
 			return
