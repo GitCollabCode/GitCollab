@@ -211,7 +211,7 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -252,7 +252,7 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userId, ok := r.Context().Value(jwt.ContextGitId).(float64)
+	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("DeleteSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -278,4 +278,46 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.log.Fatalf("DeleteSkills failed to send success response: %s", err)
 	}
+}
+
+func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
+	var LanguagesReq profilesModels.ProfileLanguagesReq
+
+	err := jsonio.FromJSON(&LanguagesReq, r.Body)
+	if err != nil {
+		p.log.Errorf("DeleteSLanguages failed to decode JSON request: %s", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
+		if err != nil {
+			p.log.Fatalf("DeleteSLanguages failed to send error response: %s", err)
+		}
+	}
+
+	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
+	if !ok {
+		p.log.Errorf("DeleteSLanguages failed to fetch GitHub ID from JWT context: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.log.Fatalf("DeleteSLanguages failed to send error response: %s", err)
+		}
+		return
+	}
+
+	if p.Pd.RemoveProfileSkills(int(userId), LanguagesReq.Languages...) != nil {
+		p.log.Errorf("DeleteSkills failed to delete skills from profile: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.log.Fatalf("DeleteSkills failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = jsonio.ToJSON(&models.Message{Message: "skills removed"}, w)
+	if err != nil {
+		p.log.Fatalf("DeleteSkills failed to send success response: %s", err)
+	}
+
 }

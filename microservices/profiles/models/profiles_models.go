@@ -92,3 +92,31 @@ type SearchProfilesResp struct {
 	// Required: true
 	AvatarURL string `json:"avatarUrl"`
 }
+
+// Language list to select from
+// swagger:response GetLanguageListResponse
+type _ struct {
+	// in:body
+	// Required: true
+	Body GetLanguageListResp
+}
+
+type GetLanguageListResp struct {
+	// List of languages to return
+	// Example: ["C++", "C", "Python"]
+	Languages []string `json:"languages"`
+}
+
+// Languages request
+// swagger:parameters ProfileLanguagesRequest
+type _ struct {
+	// in:body
+	// Required: true
+	Body ProfileLanguagesReq
+}
+
+type ProfileLanguagesReq struct {
+	// List of the languages
+	// Example: ["C++", "C", "Python"]
+	Languages []string `json:"languages"`
+}

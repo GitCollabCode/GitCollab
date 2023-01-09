@@ -146,5 +146,56 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		r.Delete("/", p.DeleteSkills)
 	})
 
+	r.Route("/languages", func(r chi.Router) {
+		r.Use(jwt.JWTBlackList(p.Pd.PDriver))
+		r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
+
+		// swagger:route PATCH /profile/languages Profiles profileSkillsRequest
+		//
+		// Patch profile skills.
+		//
+		// Append provided skills to the callers profile.
+		//
+		//     Parameters:
+		//       + name: Authorization
+		//         in: header
+		//         description: User JWT
+		//         required: true
+		//         type: string
+		//
+		//     Consumes:
+		//     - application/json
+		//
+		//     Produces:
+		//     - application/json
+		//
+		//     Responses:
+		//       200: messageResponse
+		r.Patch("/", p.PatchSkills)
+
+		// swagger:route POST  /profile/languages Profiles profileSkillsRequest
+		//
+		// Delete profile skills.
+		//
+		// Delete provided skills from the callers profile.
+		//
+		//     Parameters:
+		//       + name: Authorization
+		//         in: header
+		//         description: User JWT
+		//         required: true
+		//         type: string
+		//
+		//     Consumes:
+		//     - application/json
+		//
+		//     Produces:
+		//     - application/json
+		//
+		//     Responses:
+		//       200: messageResponse
+		r.Delete("/", p.DeleteSkills)
+	})
+
 	return r
 }
