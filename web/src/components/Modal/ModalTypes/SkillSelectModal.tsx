@@ -23,6 +23,7 @@ const LoginModal = () => {
         return response.json()
       })
       .then((data: SkillListResponse) => {
+        skillList = []
         data.skills.forEach((element) => {
           skillList.push(
             <button
