@@ -47,6 +47,17 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	//		 204: description:No Profiles found
 	r.Post("/search", p.SearchProfile)
 
+	// swagger:route Get /profile/get-languages Profiles profileLanguageRequest
+	//
+	// Get available languages.
+	//
+	// Get a list of available languages
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Responses:
+	//       200: messageResponse
 	r.Get("/get-languages", p.GetLanguageList)
 
 	r.Route("/{username}", func(r chi.Router) {
