@@ -2,9 +2,9 @@ package data
 
 import (
 	"context"
+	"errors"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
-	"github.com/GitCollabCode/GitCollab/internal/models"
 )
 
 type ProfileData struct {
@@ -68,24 +68,12 @@ func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
 
 func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) error {
 	// TODO: Make sure duplicates dont exist
-	for _, skill := range skills {
-		validSkill := false
-		for _, skillName := range models.Skill {
-			if skillName == skill {
-				validSkill = true
-			}
-		}
-		if !validSkill {
-			continue // move on to next skill
-		}
-
-		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
-		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
-		if err != nil {
-			return err
-		}
+	validSkills := getValidSkills(skills...)
+	if len(validSkills) == 0 {
+		return errors.New("no skills in list")
 	}
-	return nil
+	sqlStatement := "UPDATE profiles SET skills = array_cat(skills, $1) WHERE github_user_id = $2"
+	return pd.PDriver.TransactOneRow(sqlStatement, validSkills, githubUserID)
 }
 
 func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) error {
@@ -101,24 +89,12 @@ func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) e
 
 func (pd *ProfileData) AddProfileLanguages(githubUserID int, languages ...string) error {
 	// TODO: Make sure duplicates dont exist
-	for _, language := range languages {
-		validLanguage := false
-		for _, languageName := range models.Languages {
-			if languageName == language {
-				validLanguage = true
-			}
-		}
-		if !validLanguage {
-			continue
-		}
-
-		sqlStatement := "UPDATE profiles SET languages = array_append(languages, $1) WHERE github_user_id = $2"
-		err := pd.PDriver.TransactOneRow(sqlStatement, language, githubUserID)
-		if err != nil {
-			return err
-		}
+	validLanguages := getValidLanguages(languages...)
+	if len(validLanguages) == 0 {
+		return errors.New("mo languages in list")
 	}
-	return nil
+	sqlStatement := "UPDATE profiles SET languages = array_cat(languages, $1) WHERE github_user_id = $2"
+	return pd.PDriver.TransactOneRow(sqlStatement, validLanguages, githubUserID)
 }
 
 func (pd *ProfileData) RemoveProfileLanguages(githubUserID int, languages ...string) error {
