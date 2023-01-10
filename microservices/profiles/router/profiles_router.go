@@ -47,6 +47,8 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	//		 204: description:No Profiles found
 	r.Post("/search", p.SearchProfile)
 
+	r.Get("/get-languages", p.GetLanguageList)
+
 	r.Route("/{username}", func(r chi.Router) {
 		// swagger:route GET /profiles/{username} Profiles getProfile
 		//
@@ -152,9 +154,9 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 
 		// swagger:route PATCH /profile/languages Profiles profileSkillsRequest
 		//
-		// Patch profile skills.
+		// Patch profile Languages.
 		//
-		// Append provided skills to the callers profile.
+		// Append provided Languages to the callers profile.
 		//
 		//     Parameters:
 		//       + name: Authorization
@@ -171,7 +173,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//
 		//     Responses:
 		//       200: messageResponse
-		r.Patch("/", p.PatchSkills)
+		r.Patch("/", p.PatchLanguages)
 
 		// swagger:route POST  /profile/languages Profiles profileSkillsRequest
 		//

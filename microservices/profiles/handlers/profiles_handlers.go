@@ -280,6 +280,47 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PatchSkills insert a set of skills into a profile, does not replace, only appends.
+func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
+	var profileReq profilesModels.ProfileLanguagesReq
+
+	err := jsonio.FromJSON(&profileReq, r.Body)
+	if err != nil {
+		p.log.Errorf("PatchLanguages Failed to decode JSON request: %s", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
+		if err != nil {
+			p.log.Fatalf("PatchLanguages failed to send error response: %s", err)
+		}
+	}
+
+	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
+	if !ok {
+		p.log.Errorf("PatchLanguages failed to fetch GitHub ID from JWT context: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.log.Fatalf("PatchLanguages failed to send error response: %s", err)
+		}
+		return
+	}
+
+	if p.Pd.AddProfileLanguages(int(userId), profileReq.Languages...) != nil {
+		p.log.Errorf("PatchLanguages failed to append skills to profile: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.log.Fatalf("PatchLanguages failed to send error response: %s", err)
+		}
+		return
+	}
+
+	err = jsonio.ToJSON(&models.Message{Message: "Languages added"}, w)
+	if err != nil {
+		p.log.Fatalf("PatchLanguages failed to send success response: %s", err)
+	}
+}
+
 func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 	var LanguagesReq profilesModels.ProfileLanguagesReq
 
@@ -320,4 +361,14 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 		p.log.Fatalf("DeleteLanguages failed to send success response: %s", err)
 	}
 
+}
+
+func (p *Profiles) GetLanguageList(w http.ResponseWriter, r *http.Request) {
+	err := jsonio.ToJSON(&profilesModels.GetLanguageListResp{Languages: models.Languages[:]}, w)
+	if err != nil {
+		p.log.Fatalf("GetLanguageList failed to send skill list response: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

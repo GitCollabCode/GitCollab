@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	"github.com/GitCollabCode/GitCollab/internal/models"
 )
 
 type ProfileData struct {
@@ -91,6 +92,16 @@ func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) e
 func (pd *ProfileData) AddProfileLanguages(githubUserID int, languages ...string) error {
 	// TODO: Make sure duplicates dont exist
 	for _, language := range languages {
+		validLanguage := false
+		for _, languageName := range models.Languages {
+			if languageName == language {
+				validLanguage = true
+			}
+		}
+		if !validLanguage {
+			continue
+		}
+
 		sqlStatement := "UPDATE profiles SET languages = array_append(languages, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, language, githubUserID)
 		if err != nil {

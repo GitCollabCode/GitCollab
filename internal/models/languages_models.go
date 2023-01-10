@@ -1,6 +1,6 @@
 package models
 
-var Skill = [...]string{
+var Languages = [...]string{
 	"JavaScript",
 	"Python",
 	"PHP",
