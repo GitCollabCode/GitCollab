@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	"github.com/GitCollabCode/GitCollab/internal/models"
 )
 
 type ProfileData struct {
@@ -67,7 +68,6 @@ func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
 
 func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) error {
 	// TODO: Make sure duplicates dont exist
-	// can probably change to one statement instead of iterating
 	for _, skill := range skills {
 		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
@@ -82,6 +82,39 @@ func (pd *ProfileData) RemoveProfileSkills(githubUserID int, skills ...string) e
 	for _, skill := range skills {
 		sqlStatement := "UPDATE profiles SET skills = array_remove(skills, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pd *ProfileData) AddProfileLanguages(githubUserID int, languages ...string) error {
+	// TODO: Make sure duplicates dont exist
+	for _, language := range languages {
+		validLanguage := false
+		for _, languageName := range models.Languages {
+			if languageName == language {
+				validLanguage = true
+			}
+		}
+		if !validLanguage {
+			continue
+		}
+
+		sqlStatement := "UPDATE profiles SET languages = array_append(languages, $1) WHERE github_user_id = $2"
+		err := pd.PDriver.TransactOneRow(sqlStatement, language, githubUserID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pd *ProfileData) RemoveProfileLanguages(githubUserID int, languages ...string) error {
+	for _, language := range languages {
+		sqlStatement := "UPDATE profiles SET languages = array_remove(languages, $1) WHERE github_user_id = $2"
+		err := pd.PDriver.TransactOneRow(sqlStatement, language, githubUserID)
 		if err != nil {
 			return err
 		}

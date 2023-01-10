@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS profiles (
     avatar_url          VARCHAR             NOT NULL,
     bio                 VARCHAR             ,
     skills              VARCHAR             [], 
+    languages           VARCHAR             [],
     PRIMARY Key (github_user_id)
 );
