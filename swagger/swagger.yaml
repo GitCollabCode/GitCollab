@@ -11,11 +11,25 @@ definitions:
                 x-go-name: Message
         type: object
         x-go-package: github.com/GitCollabCode/GitCollab/internal/models
+    GetLanguageListResp:
+        properties:
+            languages:
+                description: List of languages to return
+                example:
+                    - C++
+                    - C
+                    - Python
+                items:
+                    type: string
+                type: array
+                x-go-name: Languages
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
     GitHubOauthReq:
         properties:
             code:
                 description: temporary code from GitHub to ensure authenticity of user
-                example: gho_16C7e42F292c6912E7710c838347Ae178B4a
+                example: 3584d83530557fdd1f46af8289938c8ef79f9dc5
                 type: string
                 x-go-name: Code
         required:
@@ -41,7 +55,77 @@ definitions:
                 type: string
         type: object
         x-go-package: github.com/GitCollabCode/GitCollab/microservices/authentication/models
-    Profile:
+    ProfileLanguagesReq:
+        properties:
+            languages:
+                description: List of the languages
+                example:
+                    - C++
+                    - C
+                    - Python
+                items:
+                    type: string
+                type: array
+                x-go-name: Languages
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    ProfileReq:
+        properties:
+            avatarUrl:
+                description: URL to user profile picture on GitHub
+                example: https://avatars.githubusercontent.com/u/45056243?v=4
+                type: string
+                x-go-name: AvatarURL
+            bio:
+                description: GitHub bio of user
+                example: I am programmer
+                type: string
+                x-go-name: Bio
+            email:
+                description: User email
+                example: wagwan@gitcollab.io
+                type: string
+                x-go-name: Email
+            gitID:
+                description: Unique GitHub ID of user
+                example: 54350313
+                format: int64
+                type: integer
+                x-go-name: GithubId
+            github_token:
+                description: GitHub OAuth Authorization token
+                example: gho_16C7e42F292c6912E7710c838347Ae178B4a
+                type: string
+                x-go-name: GitHubToken
+            languages:
+                description: List of the users programming languages
+                example:
+                    - Go
+                    - Javascript
+                    - Python
+                    - Bash
+                items:
+                    type: string
+                type: array
+                x-go-name: Languages
+            skills:
+                description: List of the users skills
+                example:
+                    - testing
+                    - backend
+                    - frontend
+                items:
+                    type: string
+                type: array
+                x-go-name: Skills
+            username:
+                description: GitHub username
+                example: MG4CE
+                type: string
+                x-go-name: Username
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    ProfileResp:
         properties:
             avatarUrl:
                 description: URL to user profile picture on GitHub
@@ -206,6 +290,67 @@ paths:
             summary: User Login through GitHub.
             tags:
                 - Auth
+    /profile/get-languages:
+        get:
+            description: Get a list of available languages
+            operationId: profileLanguageRequest
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Get available languages.
+            tags:
+                - Profiles
+    /profile/languages:
+        patch:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile languages.
+            tags:
+                - Profiles
+        post:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile languages.
+            tags:
+                - Profiles
     /profiles:
         post:
             consumes:
@@ -217,7 +362,7 @@ paths:
                   name: Body
                   required: true
                   schema:
-                    $ref: '#/definitions/Profile'
+                    $ref: '#/definitions/ProfileReq'
             produces:
                 - application/json
             responses:
@@ -308,7 +453,7 @@ paths:
             responses:
                 "200":
                     $ref: '#/responses/messageResponse'
-            summary: Delete profile skills.
+            summary: Delete profile languages.
             tags:
                 - Profiles
         post:
@@ -332,12 +477,16 @@ paths:
             responses:
                 "200":
                     $ref: '#/responses/messageResponse'
-            summary: Delete profile skills.
+            summary: Delete profile languages.
             tags:
                 - Profiles
 produces:
     - application/json
 responses:
+    GetLanguageListResponse:
+        description: Language list to select from
+        schema:
+            $ref: '#/definitions/GetLanguageListResp'
     errorResponse:
         description: Error Response
         schema:
@@ -345,7 +494,7 @@ responses:
     getProfileResponse:
         description: GitCollab get user profile information response
         schema:
-            $ref: '#/definitions/Profile'
+            $ref: '#/definitions/ProfileResp'
     loginResponse:
         description: GitHub login response
         schema:
