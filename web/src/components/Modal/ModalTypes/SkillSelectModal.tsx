@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { SkillListResponse } from '../../../constants/common'
+import React, { useEffect, useState, useCallback, useContext } from 'react'
+import { ModalType, SkillListResponse } from '../../../constants/common'
 import { UPDATE_SKILLS, GET_SKILLS } from '../../../constants/endpoints'
 
 import style from '../Modal.module.css'
 
-//import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
+import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
+import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner'
 
 const LoginModal = () => {
-  //const modalContext = useContext(ModalContextStateContext)
+  const modalContext = useContext(ModalContextStateContext)
+  const [isLoading, setIsLoading] = useState(false)
 
   const initialArray: string[] = []
   const [skillList, setSkillList] = useState();
@@ -28,6 +30,7 @@ const LoginModal = () => {
 
   /*react-hooks/exhaustive-deps*/
   useEffect(() => {
+    setIsLoading(true)
     fetch(process.env.REACT_APP_API_URI + GET_SKILLS, {
       method: 'GET',
     })
@@ -51,12 +54,14 @@ const LoginModal = () => {
             </button>
           )
           setSkillList(skills)
+          setIsLoading(false)
         })
       })
   },[handleAddClick])
 
 
   const submitSkills = () => {
+    setIsLoading(true)
     const responseBody = { skills: addedSkills }
     fetch(process.env.REACT_APP_API_URI + UPDATE_SKILLS, {
       method: 'PATCH',
@@ -69,7 +74,8 @@ const LoginModal = () => {
     })
       .then((response) => {
         if (response.status === 200) {
-          console.log('It worked')
+          modalContext.setModalType(ModalType.LanguagesSelectModal)
+          setIsLoading(false)
         } else {
           console.log('Failed')
         }
@@ -81,6 +87,7 @@ const LoginModal = () => {
 
   return (
     <>
+    {isLoading && <LoadingSpinner isLoading={isLoading} />}
       <div className={style.modalText}>
         <p className={style.modalTextTitle}>Tell us more about yourself</p>
         <div className={style.modalTextUnderline}/>

@@ -6,6 +6,7 @@ import { ModalContextStateContext } from '../../context/modalContext/modalContex
 import { ModalType } from '../../constants/common'
 import LoggedOutModal from './ModalTypes/LoggedOutModal'
 import LoginModal from './ModalTypes/SkillSelectModal'
+import LanguagesSelectModal from './ModalTypes/LanguagesSelectModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -26,6 +27,8 @@ const Modal = () => {
         )
       case ModalType.SkillSelectModal:
         return (<LoginModal/> )
+      case ModalType.LanguagesSelectModal:
+        return (<LanguagesSelectModal/> )
     }
   }
 
