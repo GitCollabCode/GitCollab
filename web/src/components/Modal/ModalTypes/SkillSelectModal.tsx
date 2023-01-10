@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { SkillListResponse } from '../../../constants/common'
 import { UPDATE_SKILLS, GET_SKILLS } from '../../../constants/endpoints'
-import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
 
 import style from '../Modal.module.css'
 
@@ -9,13 +8,25 @@ import style from '../Modal.module.css'
 
 const LoginModal = () => {
   //const modalContext = useContext(ModalContextStateContext)
-  //const [data, setData] = useState({ errorMessage: '', isLoading: false })
 
   const initialArray: string[] = []
   const [skillList, setSkillList] = useState();
   const [addedSkills, setAddedSkills] = useState(initialArray);
   
-  
+  const handleAddClick = useCallback((id: string, skillType: string) => {
+    const el = document.getElementById(id)
+    if (el?.classList.contains(style.active)) {
+      el?.classList.remove(style.active)
+      addedSkills.splice(addedSkills.indexOf(skillType), 1)
+    } else {
+      el?.classList.add(style.active)
+      addedSkills.push(skillType)
+    }
+    setAddedSkills(addedSkills)
+  },[addedSkills])
+
+
+  /*react-hooks/exhaustive-deps*/
   useEffect(() => {
     fetch(process.env.REACT_APP_API_URI + GET_SKILLS, {
       method: 'GET',
@@ -42,26 +53,11 @@ const LoginModal = () => {
           setSkillList(skills)
         })
       })
-  }, [])
+  },[handleAddClick])
 
-  
-
-  const handleAddClick = (id: string, skillType: string) => {
-    console.log(addedSkills)
-    const el = document.getElementById(id)
-    if (el?.classList.contains(style.active)) {
-      el?.classList.remove(style.active)
-      addedSkills.splice(addedSkills.indexOf(skillType), 1)
-    } else {
-      el?.classList.add(style.active)
-      addedSkills.push(skillType)
-    }
-    setAddedSkills(addedSkills)
-  }
 
   const submitSkills = () => {
     const responseBody = { skills: addedSkills }
-    console.log(responseBody)
     fetch(process.env.REACT_APP_API_URI + UPDATE_SKILLS, {
       method: 'PATCH',
       headers: {
