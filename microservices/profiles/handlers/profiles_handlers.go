@@ -284,7 +284,6 @@ func (p *Profiles) GetSkillList(w http.ResponseWriter, r *http.Request) {
 	err := jsonio.ToJSON(&profilesModels.GetSkillListResp{Skills: models.Skill[:]}, w)
 	if err != nil {
 		p.log.Fatalf("GetSkillsList failed to send skill list response: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
