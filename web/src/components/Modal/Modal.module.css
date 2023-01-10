@@ -69,10 +69,11 @@
 
 .modalTextUnderline {
     background-color: #D9D9D9;
-    width: 504px;
+    width: 75%;
     height: 0.1rem;
     opacity: 30%;
     margin-top: 0.7rem;
+    transform: translate(17%);
 }
 
 .skillButtonContainer {

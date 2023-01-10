@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
@@ -8,12 +8,9 @@ import Navbar from './components/Navbar/Navbar'
 import Profile from './components/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
 import Modal from './components/Modal/Modal'
-import { ModalContextStateContext } from './context/modalContext/modalContext'
-import { ModalType } from './constants/common'
+
 
 const App = () => {
-  useContext(ModalContextStateContext).setModalType(ModalType.SkillSelectModal)
-  useContext(ModalContextStateContext).showModal()
   return (
     
     <Router>
