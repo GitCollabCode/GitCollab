@@ -280,6 +280,15 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (p *Profiles) GetSkillList(w http.ResponseWriter, r *http.Request) {
+	err := jsonio.ToJSON(&profilesModels.GetSkillListResp{Skills: models.Skill[:]}, w)
+	if err != nil {
+		p.log.Fatalf("GetSkillsList failed to send skill list response: %s", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 // PatchSkills insert a set of skills into a profile, does not replace, only appends.
 func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileLanguagesReq

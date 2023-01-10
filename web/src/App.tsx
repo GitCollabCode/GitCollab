@@ -12,6 +12,7 @@ import Modal from './components/Modal/Modal'
 
 const App = () => {
   return (
+    
     <Router>
       <div>
         <Modal></Modal>

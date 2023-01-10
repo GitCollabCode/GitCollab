@@ -93,6 +93,12 @@ type SearchProfilesResp struct {
 	AvatarURL string `json:"avatarUrl"`
 }
 
+type GetSkillListResp struct {
+	// List of skill
+	// Example: ["cheese", "cream", "apple"]
+	Skills []string `json:"skills"`
+}
+
 // Language list to select from
 // swagger:response GetLanguageListResponse
 type _ struct {

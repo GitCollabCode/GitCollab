@@ -69,6 +69,16 @@ func (pd *ProfileData) UpdateProfileBio(githubUserID int, bio string) error {
 func (pd *ProfileData) AddProfileSkills(githubUserID int, skills ...string) error {
 	// TODO: Make sure duplicates dont exist
 	for _, skill := range skills {
+		validSkill := false
+		for _, skillName := range models.Skill {
+			if skillName == skill {
+				validSkill = true
+			}
+		}
+		if !validSkill {
+			continue // move on to next skill
+		}
+
 		sqlStatement := "UPDATE profiles SET skills = array_append(skills, $1) WHERE github_user_id = $2"
 		err := pd.PDriver.TransactOneRow(sqlStatement, skill, githubUserID)
 		if err != nil {
