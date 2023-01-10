@@ -61,7 +61,7 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	res := profilesModels.Profile{
+	res := profilesModels.ProfileResp{
 		Username:  profile.Username,
 		GithubId:  profile.GitHubUserID,
 		Email:     profile.Email,
@@ -79,15 +79,21 @@ func (p *Profiles) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 // PostProfile creates a profile entry in the database, should not be exposed only for testing.
 func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
-	nProfile := r.Context().Value(ProfileCtx{}).(*data.Profile)
+	var profileReq profilesModels.ProfileReq
 
-	err := p.Pd.AddProfile(
-		nProfile.GitHubUserID,
-		nProfile.GitHubToken,
-		nProfile.Username,
-		nProfile.AvatarURL,
-		nProfile.Email,
-		nProfile.Bio,
+	err := p.validate.GetJSON(&profileReq, w, r, p.log)
+	if err != nil {
+		p.log.Errorf("SearchProfile failed to decode and validate JSON")
+		return
+	}
+
+	err = p.Pd.AddProfile(
+		profileReq.GithubId,
+		profileReq.GitHubToken,
+		profileReq.Username,
+		profileReq.AvatarURL,
+		profileReq.Email,
+		profileReq.Bio,
 	)
 	if err != nil {
 		p.log.Errorf("PostProfile database add failed: %s", err.Error())
@@ -157,14 +163,10 @@ func (p *Profiles) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileSearchReq
 
-	err := jsonio.FromJSON(&profileReq, r.Body)
+	err := p.validate.GetJSON(&profileReq, w, r, p.log)
 	if err != nil {
-		p.log.Errorf("SearchProfile Failed to decode json request: %s", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
-		if err != nil {
-			p.log.Fatalf("SearchProfile failed to send error response: %s", err)
-		}
+		p.log.Errorf("SearchProfile failed to decode and validate JSON")
+		return
 	}
 
 	profile, err := p.Pd.GetProfileByUsername(profileReq.Username)
@@ -175,6 +177,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			p.log.Fatalf("SearchProfile failed to send error response: %s", err)
 		}
+		return
 	}
 
 	if profile == nil {
@@ -183,6 +186,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			p.log.Fatalf("SearchProfile failed to send success response: %s", err)
 		}
+		return
 	}
 
 	res := profilesModels.SearchProfilesResp{
@@ -191,6 +195,7 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		Email:     profile.Email,
 		AvatarURL: profile.AvatarURL,
 	}
+
 	err = jsonio.ToJSON(&res, w)
 	if err != nil {
 		p.log.Errorf("SearchProfile failed to send response: %s", err)
@@ -201,19 +206,15 @@ func (p *Profiles) SearchProfile(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileSkillsReq
 
-	err := jsonio.FromJSON(&profileReq, r.Body)
+	err := p.validate.GetJSON(&profileReq, w, r, p.log)
 	if err != nil {
-		p.log.Errorf("PatchSkills Failed to decode JSON request: %s", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
-		if err != nil {
-			p.log.Fatalf("PatchSkills failed to send error response: %s", err)
-		}
+		p.log.Errorf("PatchSkills failed to decode and validate JSON")
+		return
 	}
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
-		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -222,7 +223,8 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Pd.AddProfileSkills(int(userId), profileReq.Skills...) != nil {
+	err = p.Pd.AddProfileSkills(int(userId), profileReq.Skills...)
+	if err != nil {
 		p.log.Errorf("PatchSkills failed to append skills to profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
@@ -242,19 +244,15 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileSkillsReq
 
-	err := jsonio.FromJSON(&profileReq, r.Body)
+	err := p.validate.GetJSON(&profileReq, w, r, p.log)
 	if err != nil {
-		p.log.Errorf("DeleteSkills failed to decode JSON request: %s", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
-		if err != nil {
-			p.log.Fatalf("DeleteSkills failed to send error response: %s", err)
-		}
+		p.log.Errorf("DeleteSkills failed to decode and validate JSON")
+		return
 	}
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
-		p.log.Errorf("DeleteSkills failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("DeleteSkills failed to fetch GitHub ID from JWT context")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -263,7 +261,8 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...) != nil {
+	err = p.Pd.RemoveProfileSkills(int(userId), profileReq.Skills...)
+	if err != nil {
 		p.log.Errorf("DeleteSkills failed to delete skills from profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
@@ -284,19 +283,15 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
 	var profileReq profilesModels.ProfileLanguagesReq
 
-	err := jsonio.FromJSON(&profileReq, r.Body)
+	err := p.validate.GetJSON(&profileReq, w, r, p.log)
 	if err != nil {
-		p.log.Errorf("PatchLanguages Failed to decode JSON request: %s", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
-		if err != nil {
-			p.log.Fatalf("PatchLanguages failed to send error response: %s", err)
-		}
+		p.log.Errorf("PatchLanguages failed to decode and validate JSON")
+		return
 	}
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
-		p.log.Errorf("PatchLanguages failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("PatchLanguages failed to fetch GitHub ID from JWT context")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -305,7 +300,8 @@ func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Pd.AddProfileLanguages(int(userId), profileReq.Languages...) != nil {
+	err = p.Pd.AddProfileLanguages(int(userId), profileReq.Languages...)
+	if err != nil {
 		p.log.Errorf("PatchLanguages failed to append skills to profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
@@ -322,21 +318,17 @@ func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
-	var LanguagesReq profilesModels.ProfileLanguagesReq
+	var languagesReq profilesModels.ProfileLanguagesReq
 
-	err := jsonio.FromJSON(&LanguagesReq, r.Body)
+	err := p.validate.GetJSON(&languagesReq, w, r, p.log)
 	if err != nil {
-		p.log.Errorf("DeleteLanguages failed to decode JSON request: %s", err.Error())
-		w.WriteHeader(http.StatusBadRequest)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "bad request"}, w)
-		if err != nil {
-			p.log.Fatalf("DeleteLanguages failed to send error response: %s", err)
-		}
+		p.log.Errorf("DeleteLanguages failed to decode and validate JSON")
+		return
 	}
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
-		p.log.Errorf("DeleteSLanguages failed to fetch GitHub ID from JWT context: %s", err.Error())
+		p.log.Errorf("DeleteSLanguages failed to fetch GitHub ID from JWT context")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -345,7 +337,8 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Pd.RemoveProfileLanguages(int(userId), LanguagesReq.Languages...) != nil {
+	err = p.Pd.RemoveProfileLanguages(int(userId), languagesReq.Languages...)
+	if err != nil {
 		p.log.Errorf("DeleteLanguages failed to delete skills from profile: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)

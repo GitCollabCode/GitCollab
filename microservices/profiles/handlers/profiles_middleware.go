@@ -10,6 +10,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 )
 
+// Deprecated
 // Validates incoming request json body for profiles struct
 func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
