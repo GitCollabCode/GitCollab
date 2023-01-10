@@ -41,8 +41,11 @@
     font-weight: 400;
     font-size: 44px;
     line-height: 52px;
+    height:100%;
     text-align: center;
     color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
 }
 
 .modalTextContent {
@@ -82,6 +85,7 @@
 }
 
 .skillButtonContainer {
+    margin:auto 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -122,5 +126,6 @@
 }
 
 .skillContinueButton {
-    margin: 1rem;
+    margin:1rem;
+    width:calc(100% - 2rem);
 }
