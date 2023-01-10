@@ -49,6 +49,19 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 
 	r.Get("/get-skills", p.GetSkillList)
 
+	// swagger:route Get /profile/get-languages Profiles profileLanguageRequest
+	//
+	// Get available languages.
+	//
+	// Get a list of available languages
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Responses:
+	//       200: messageResponse
+	r.Get("/get-languages", p.GetLanguageList)
+
 	r.Route("/{username}", func(r chi.Router) {
 		// swagger:route GEzusername} Profiles getProfile
 		//
@@ -146,6 +159,57 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//     Responses:
 		//       200: messageResponse
 		r.Delete("/", p.DeleteSkills)
+	})
+
+	r.Route("/languages", func(r chi.Router) {
+		r.Use(jwt.JWTBlackList(p.Pd.PDriver))
+		r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
+
+		// swagger:route PATCH /profile/languages Profiles profileSkillsRequest
+		//
+		// Patch profile Languages.
+		//
+		// Append provided Languages to the callers profile.
+		//
+		//     Parameters:
+		//       + name: Authorization
+		//         in: header
+		//         description: User JWT
+		//         required: true
+		//         type: string
+		//
+		//     Consumes:
+		//     - application/json
+		//
+		//     Produces:
+		//     - application/json
+		//
+		//     Responses:
+		//       200: messageResponse
+		r.Patch("/", p.PatchLanguages)
+
+		// swagger:route POST  /profile/languages Profiles profileSkillsRequest
+		//
+		// Delete profile languages.
+		//
+		// Delete provided skills from the callers profile.
+		//
+		//     Parameters:
+		//       + name: Authorization
+		//         in: header
+		//         description: User JWT
+		//         required: true
+		//         type: string
+		//
+		//     Consumes:
+		//     - application/json
+		//
+		//     Produces:
+		//     - application/json
+		//
+		//     Responses:
+		//       200: messageResponse
+		r.Delete("/", p.DeleteLanguages)
 	})
 
 	return r
