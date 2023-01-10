@@ -7,7 +7,7 @@ var Skill = [...]string{
 	"DevOps",
 	"Tools",
 	"Scripting",
-	"UI Desing",
+	"UI Design",
 	"Cloud",
 	"Data Analysis",
 	"Networking",
