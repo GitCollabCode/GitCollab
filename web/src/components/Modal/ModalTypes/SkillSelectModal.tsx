@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SkillListResponse } from '../../../constants/common'
 import { UPDATE_SKILLS, GET_SKILLS } from '../../../constants/endpoints'
 
@@ -10,8 +10,8 @@ const LoginModal = () => {
   //const modalContext = useContext(ModalContextStateContext)
   //const [data, setData] = useState({ errorMessage: '', isLoading: false })
 
-  let idCounter = 0
-  let skillList
+  const [skillList, setSkillList] = useState();
+  
   useEffect(() => {
     fetch(process.env.REACT_APP_API_URI + GET_SKILLS, {
       method: 'GET',
@@ -23,21 +23,22 @@ const LoginModal = () => {
         return response.json()
       })
       .then((data: SkillListResponse) => {
-        skillList = []
-        data.skills.forEach((element) => {
-          skillList.push(
+        let skills: any = []
+        data.skills.forEach((element, index) => {
+          skills.push(
             <button
-              id={idCounter + ''}
+              id={index + ''}
               className={[style.modalText, style.skillButton].join(' ')}
-              onClick={() => handleAddClick(idCounter + '', element)}
+              onClick={() => handleAddClick(index + '', element)}
+              key={index}
             >
               {element}
             </button>
           )
-          idCounter++
+          setSkillList(skills)
         })
       })
-  })
+  }, [])
 
   let addedSkills: string[] = []
 
@@ -78,8 +79,8 @@ const LoginModal = () => {
   return (
     <>
       <div className={style.modalText}>
-        <p className={style.modalTextContent}>Tell us more about yourself</p>
-        <div className={style.modalTextUnderline} />
+        <p className={style.modalTextTitle}>Tell us more about yourself</p>
+        <div className={style.modalTextUnderline}/>
         <p className={style.modalTextContent}>
           Select a few topics that interest you
         </p>
@@ -87,7 +88,7 @@ const LoginModal = () => {
           <>{skillList}</>
         </div>
 
-        <button className={style.modalButton} onClick={() => submitSkills()}>
+        <button className={[style.modalButton, style.skillContinueButton].join(" ")} onClick={() => submitSkills()}>
           Continue
         </button>
       </div>

@@ -36,14 +36,17 @@
     font-weight: 400;
     font-size: 44px;
     line-height: 52px;
-   
+    text-align: center;
     color: #FFFFFF;
 }
 
 .modalTextContent {
-    padding-top: 50px;
     margin: 40px;
-    text-align: center;
+    margin-top: 2rem;
+}
+
+.modalTextTitle{
+    padding-top: 1rem;    
 }
 
 .modalButton {
@@ -65,17 +68,30 @@
 }
 
 .modalTextUnderline {
-    color: D9D9D9;
+    background-color: #D9D9D9;
     width: 504px;
-    height: 1px;
-    opacity: 50%;
+    height: 0.1rem;
+    opacity: 30%;
+    margin-top: 0.7rem;
 }
 
 .skillButtonContainer {
-    display: flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     max-width: max-content;
+    max-height: 400px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
     padding-left: 30px;
     padding-right: 30px;
+}
+
+.skillButtonContainer::-webkit-scrollbar { 
+    display: none;
 }
 
 .skillButton {
@@ -97,4 +113,8 @@
 
 .active {
     background-color: #2DA572;
+}
+
+.skillContinueButton {
+    margin: 1rem;
 }
