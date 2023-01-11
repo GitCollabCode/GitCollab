@@ -20,7 +20,7 @@ var Languages = map[string]bool{
 func Keys(m map[string]bool) []string {
 	keys := make([]string, len(m))
 	idx := 0
-	for k, _ := range m {
+	for k := range m {
 		keys[idx] = k
 		idx++
 	}
