@@ -33,6 +33,7 @@ pipeline {
                 sh 'go version'
                 sh 'go mod vendor'
                 sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
+                sh 'echo $env.BRANCH_NAME'
             }
         }
 
