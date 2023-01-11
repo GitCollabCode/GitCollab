@@ -25,7 +25,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == "origin/main") {
+                    if (ghprbTargetBranch == "main") {
                         setBuildStatus("Build pending", "PENDING");
                     }
                 }
@@ -33,6 +33,7 @@ pipeline {
                 sh 'go version'
                 sh 'go mod vendor'
                 sh 'curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $WORKSPACE v1.49.0'
+                sh 'printenv'
             }
         }
 
@@ -90,7 +91,7 @@ pipeline {
 
         stage('Update Live Deployment Server') {
             when {
-                expression { env.BRANCH_NAME == "origin/main" }
+                expression { ghprbTargetBranch == "main" }
             }
             steps {
                 echo 'Updating live deployment server with new changes...'
@@ -110,14 +111,14 @@ pipeline {
 		}
         success {
             script {
-                if (env.BRANCH_NAME == "origin/main") {
+                if (ghprbTargetBranch == "main") {
                     setBuildStatus("Build succeeded", "SUCCESS");
                 }
             }
         }
         failure {
             script {
-                if (env.BRANCH_NAME == "origin/main") {
+                if (ghprbTargetBranch == "main") {
                     setBuildStatus("Build failed", "FAILURE");
                 }
             }
