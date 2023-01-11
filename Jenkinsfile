@@ -26,7 +26,7 @@ pipeline {
             steps {
                 sh 'printenv'
                 script {
-                    if (env.ghprbTargetBranch == "main") {
+                    if (env.GIT_BRANCH == "origin/main") {
                         setBuildStatus("Build pending", "PENDING");
                     }
                 }
@@ -91,7 +91,7 @@ pipeline {
 
         stage('Update Live Deployment Server') {
             when {
-                expression { env.ghprbTargetBranch == "main" }
+                expression { env.GIT_BRANCH == "origin/main" }
             }
             steps {
                 echo 'Updating live deployment server with new changes...'
@@ -111,14 +111,14 @@ pipeline {
 		}
         success {
             script {
-                if (env.ghprbTargetBranch == "main") {
+                if (env.GIT_BRANCH == "origin/main") {
                     setBuildStatus("Build succeeded", "SUCCESS");
                 }
             }
         }
         failure {
             script {
-                if (env.ghprbTargetBranch == "main") {
+                if (env.GIT_BRANCH == "origin/main") {
                     setBuildStatus("Build failed", "FAILURE");
                 }
             }
