@@ -14,7 +14,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	r.Use(middleware.AllowContentEncoding("application/json"))
 	r.Use(genericMiddleware.SetContentType("application/json"))
 
-	// swagger:route POST /profiles Profiles createProfileRequest
+	// swagger:route POST /profile Profiles createProfileRequest
 	//
 	// Create a user profile.
 	//
@@ -30,7 +30,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	//       200: messageResponse
 	r.Post("/", p.PostProfile)
 
-	// swagger:route POST /profiles/search Profiles profileSearchRequest
+	// swagger:route POST /profile/search Profiles profileSearchRequest
 	//
 	// Search registered profiles.
 	//
@@ -75,7 +75,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	r.Get("/get-languages", p.GetLanguageList)
 
 	r.Route("/{username}", func(r chi.Router) {
-		// swagger:route GEzusername} Profiles getProfile
+		// swagger:route GET /profile/{username} Profiles getProfile
 		//
 		// Get GitCollab profile.
 		//
@@ -99,7 +99,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 			r.Use(jwt.JWTBlackList(p.Pd.PDriver))
 			r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
 
-			// swagger:route DELETE /profiles/{username} Profiles deleteProfile
+			// swagger:route DELETE /profile/{username} Profiles deleteProfile
 			//
 			// Delete GitCollab user.
 			//
@@ -126,7 +126,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		r.Use(jwt.JWTBlackList(p.Pd.PDriver))
 		r.Use(jwtConf.VerifyJWT(p.Pd.PDriver.Log))
 
-		// swagger:route PATCH /profiles/skills Profiles profileSkillsRequest
+		// swagger:route PATCH /profile/skills Profiles profileSkillsRequest
 		//
 		// Patch profile skills.
 		//
@@ -149,7 +149,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//       200: messageResponse
 		r.Patch("/", p.PatchSkills)
 
-		// swagger:route POST /profiles/skills Profiles profileSkillsRequest
+		// swagger:route POST /profile/skills Profiles profileSkillsRequest
 		//
 		// Delete profile skills.
 		//
