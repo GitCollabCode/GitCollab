@@ -281,7 +281,7 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) GetSkillList(w http.ResponseWriter, r *http.Request) {
-	err := jsonio.ToJSON(&profilesModels.GetSkillListResp{Skills: models.Skill[:]}, w)
+	err := jsonio.ToJSON(&profilesModels.GetSkillListResp{Skills: models.Keys(models.Skill)}, w)
 	if err != nil {
 		p.log.Fatalf("GetSkillsList failed to send skill list response: %s", err)
 		return
@@ -373,7 +373,7 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Profiles) GetLanguageList(w http.ResponseWriter, r *http.Request) {
-	err := jsonio.ToJSON(&profilesModels.GetLanguageListResp{Languages: models.Languages[:]}, w)
+	err := jsonio.ToJSON(&profilesModels.GetLanguageListResp{Languages: models.Keys(models.Languages)}, w)
 	if err != nil {
 		p.log.Fatalf("GetLanguageList failed to send skill list response: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
