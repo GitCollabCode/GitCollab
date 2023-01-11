@@ -2,6 +2,7 @@
 export enum ModalType {
   LoggedOutModal,
   SkillSelectModal,
+  LanguagesSelectModal,
 }
 
 export type userValue = {
@@ -46,4 +47,8 @@ export type modalContextState = {
 
 export type SkillListResponse = {
   skills: string[]
+}
+
+export type LanguageListResponse = {
+  languages: string[]
 }

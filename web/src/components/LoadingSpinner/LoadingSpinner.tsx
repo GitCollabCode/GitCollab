@@ -14,7 +14,6 @@ const LoadingSpinner = ({ isLoading }: { isLoading: boolean }) => {
 
   return (
     <div className={style.overlay}>
-      heelllo
       <RingLoader
         loading={isLoading}
         color={'#ffffff'}
