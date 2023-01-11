@@ -21,7 +21,7 @@ pipeline {
         stage('Integration Test') {
             steps {
                 echo 'Running Integration Tests...'
-                sh 'source $WORKSPACE/gitcollab_pyenv/bin/activate && pytest ${env.WORKSPACE}/integration_tests'
+                sh 'source gitcollab_pyenv/bin/activate && pytest ./integration_tests'
             }
         }
     } 
