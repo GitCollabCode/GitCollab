@@ -10,9 +10,9 @@ type _ struct {
 
 type GitHubOauthReq struct {
 	// temporary code from GitHub to ensure authenticity of user
-	// Example: gho_16C7e42F292c6912E7710c838347Ae178B4a
+	// Example: 3584d83530557fdd1f46af8289938c8ef79f9dc5
 	// Required: true
-	Code string `json:"code"`
+	Code string `json:"code" validate:"required"`
 }
 
 // GitHub login response

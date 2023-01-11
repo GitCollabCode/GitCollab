@@ -12,15 +12,7 @@ type ProfileSearchReq struct {
 	// GitHub username
 	// Example: MG4CE
 	// Required: true
-	Username string `json:"username"`
-}
-
-// GitCollab create profile request
-// swagger:parameters createProfileRequest
-type _ struct {
-	// in:body
-	// Required: true
-	Body Profile
+	Username string `json:"username" validate:"required"`
 }
 
 // GitCollab get user profile information response
@@ -28,10 +20,10 @@ type _ struct {
 type _ struct {
 	// in:body
 	// Required: true
-	Body Profile
+	Body ProfileResp
 }
 
-type Profile struct {
+type ProfileResp struct {
 	// GitHub username
 	// Example: MG4CE
 	Username string `json:"username"`
@@ -55,6 +47,41 @@ type Profile struct {
 	Languages []string `json:"languages"`
 }
 
+// GitCollab create profile request
+// swagger:parameters createProfileRequest
+type _ struct {
+	// in:body
+	// Required: true
+	Body ProfileReq
+}
+
+type ProfileReq struct {
+	// GitHub username
+	// Example: MG4CE
+	Username string `json:"username" validate:"required"`
+	// Unique GitHub ID of user
+	// Example: 54350313
+	GithubId int `json:"gitID" validate:"required"`
+	// GitHub OAuth Authorization token
+	// Example: gho_16C7e42F292c6912E7710c838347Ae178B4a
+	GitHubToken string `json:"github_token" validate:"required"`
+	// User email
+	// Example: wagwan@gitcollab.io
+	Email string `json:"email" validate:"required,email"`
+	// URL to user profile picture on GitHub
+	// Example: https://avatars.githubusercontent.com/u/45056243?v=4
+	AvatarURL string `json:"avatarUrl" validate:"required,url"`
+	// GitHub bio of user
+	// Example: I am programmer
+	Bio string `json:"bio" validate:"required"`
+	// List of the users skills
+	// Example: ["testing", "backend", "frontend"]
+	Skills []string `json:"skills"`
+	// List of the users programming languages
+	// Example: ["Go", "Javascript", "Python", "Bash"]
+	Languages []string `json:"languages"`
+}
+
 // Skills request
 // swagger:parameters profileSkillsRequest
 type _ struct {
@@ -66,7 +93,7 @@ type _ struct {
 type ProfileSkillsReq struct {
 	// List of the users skills
 	// Example: ["testing", "backend", "frontend"]
-	Skills []string `json:"skills"`
+	Skills []string `json:"skills" validate:"required"`
 }
 
 // Profile search response
@@ -124,5 +151,5 @@ type _ struct {
 type ProfileLanguagesReq struct {
 	// List of the languages
 	// Example: ["C++", "C", "Python"]
-	Languages []string `json:"languages"`
+	Languages []string `json:"languages" validate:"required"`
 }

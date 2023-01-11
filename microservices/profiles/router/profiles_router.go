@@ -28,7 +28,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 	//
 	//     Responses:
 	//       200: messageResponse
-	r.With(p.MiddleWareValidateProfile).Post("/", p.PostProfile)
+	r.Post("/", p.PostProfile)
 
 	// swagger:route POST /profiles/search Profiles profileSearchRequest
 	//

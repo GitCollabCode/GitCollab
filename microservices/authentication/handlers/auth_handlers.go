@@ -8,6 +8,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
+	"github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/authentication/data"
 	authModels "github.com/GitCollabCode/GitCollab/microservices/authentication/models"
 	goGithub "github.com/google/go-github/github"
@@ -20,6 +21,7 @@ type Auth struct {
 	PgConn          *db.PostgresDriver
 	Log             *logrus.Logger
 	oauth           *oauth2.Config
+	validate        *validator.Validation
 	gitRedirectUrl  string
 	gitCollabSecret string
 }
@@ -30,7 +32,7 @@ const (
 
 // NewAuth returns initialized Auth handler struct
 func NewAuth(pg *db.PostgresDriver, log *logrus.Logger, oConf *oauth2.Config, redirectUrl string, gitCollabSecret string) *Auth {
-	return &Auth{pg, log, oConf, redirectUrl, gitCollabSecret}
+	return &Auth{pg, log, oConf, validator.NewValidation(), redirectUrl, gitCollabSecret}
 }
 
 // NOTE: improve the error return for user for these handlers by using ErrorMessage struct.
@@ -54,10 +56,10 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: If user does not exist in DB, should create jwt and bring to new user flow.
 	a.Log.Info("Serving login request")
 	var githubCodeRes authModels.GitHubOauthReq
-	err := jsonio.FromJSON(&githubCodeRes, r.Body)
+
+	err := a.validate.GetJSON(&githubCodeRes, w, r, a.Log)
 	if err != nil {
-		a.Log.Errorf("Request missing code: %s", err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		a.Log.Errorf("LoginHandler failed to decode and validate JSON")
 		return
 	}
 
