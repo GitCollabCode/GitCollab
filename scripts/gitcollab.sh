@@ -103,7 +103,7 @@ function restart() {
 
 function stop() {
     echo "Stopping active GitCollab docker containers..."
-    docker compose stop
+    docker compose stop $selected_container
 }
 
 function clean() {
