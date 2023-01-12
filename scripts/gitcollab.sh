@@ -22,6 +22,8 @@ fi
 # Enable errtrace or the error trap handler will not work as expected
 set -o errtrace         # Ensure the error trap handler is inherited
 
+selected_container=""
+
 function script_usage() {
     cat << EOF
 GitCollab deployment script, used to control the docker functions of the project
@@ -54,9 +56,23 @@ function test-integration() {
     source gitcollab_pyenv/bin/activate && pytest ./integration_tests/
 }
 
+function fetch_valid_containers() {
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        if grep "container_name:" "$(pwd)/docker-compose.yaml" | grep -q "$param"; then
+            if [ -z "$selected_container" ]; then
+                selected_container="$param"
+            else
+                selected_container="$selected_container $param"
+            fi
+        fi
+        done
+}
+
 function build() {
     echo "Building GitCollab docker images..."
-    docker compose -f "$(pwd)/docker-compose-convert.yaml" build
+    docker compose -f "$(pwd)/docker-compose-convert.yaml" build $selected_container
 
     # delete dangling images
     # dangling_images=$(docker images -f "dangling=true" -q)
@@ -72,17 +88,17 @@ function build() {
 function start() {
     if [ "$is_verbose" = "true" ]; then
         echo "Starting GitCollab docker containers [verbose]..."
-        docker compose -f "$(pwd)/docker-compose-convert.yaml" up
+        docker compose -f "$(pwd)/docker-compose-convert.yaml" up $selected_container
     else
         echo "Starting GitCollab docker containers..."
-        docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d 
+        docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d $selected_container
     fi
 }
 
 function restart() {
     echo "Restarting GitCollab docker containers..."
     docker compose down
-    docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d 
+    docker compose -f "$(pwd)/docker-compose-convert.yaml" up -d $selected_container
 }
 
 function stop() {
@@ -101,8 +117,7 @@ function clean() {
 function clean-db() {
     echo "Removing saved postgres db volume and container..."
     docker compose down
-    docker volume rm gitcollab_db
-    #docker container rm gitcollab-db-1
+    docker volume rm postgres
 }
 
 function refresh-env-file() {
@@ -177,8 +192,10 @@ function parse_params() {
                 generate-swagger
                 ;;
             *)
-                echo "Invalid parameter was provided: $param"
-                exit 1
+                if ! echo "$selected_container" | grep -q "$param"; then
+                    echo "Invalid parameter was provided: $param"
+                    exit 1
+                fi
                 ;;
         esac
     done
@@ -194,6 +211,8 @@ function main() {
     fi
 
     is_verbose=false
+
+    fetch_valid_containers "$@"
 
     parse_params "$@"
 }
