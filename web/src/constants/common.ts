@@ -3,6 +3,7 @@ export enum ModalType {
   LoggedOutModal,
   SkillSelectModal,
   LanguagesSelectModal,
+  PageNotFoundModal,
 }
 
 export type userValue = {

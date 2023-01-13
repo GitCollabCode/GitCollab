@@ -7,6 +7,7 @@ import { ModalType } from '../../constants/common'
 import LoggedOutModal from './ModalTypes/LoggedOutModal'
 import LoginModal from './ModalTypes/SkillSelectModal'
 import LanguagesSelectModal from './ModalTypes/LanguagesSelectModal'
+import PageNotFoundModal from './ModalTypes/PageNotFoundModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -29,6 +30,8 @@ const Modal = () => {
         return (<LoginModal/> )
       case ModalType.LanguagesSelectModal:
         return (<LanguagesSelectModal/> )
+      case ModalType.PageNotFoundModal:
+        return (<PageNotFoundModal/>)
     }
   }
 
