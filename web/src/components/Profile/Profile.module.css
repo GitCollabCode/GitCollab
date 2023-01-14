@@ -17,7 +17,7 @@
 
 .username {
   font-family: 'Roboto Flex';
-  font-size: 3.1875rem;
+  font-size: 2.1875rem;
   font-weight: 400;
   line-height: 3.75rem;
   text-align: left;
@@ -27,7 +27,7 @@
 
 .bioText {
   font-family: 'Roboto Flex';
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: 400;
   line-height: 2.625rem;
   text-align: center;
@@ -35,6 +35,7 @@
 }
 
 .tables {
+  margin-left: 1.5rem;
   margin-top: 3rem;
   width: 75%;
   display: flex;
@@ -74,16 +75,23 @@
   border-radius: 1.25rem;
   width: 100%;
   padding-left: 0.1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  max-height: 387px;
 }
 
 .line {
-  background-color: #eaeff5;
+  background-color: rgba(217, 217, 217, 0.25);
   height: 0.1rem;
   margin-right: 0.33rem;
-  background-color: #eaeff5;
+  margin-left: 1.5rem;
+  width:calc(100% - 2.5rem);
+  padding-top: 0.1rem;
 }
 
 ul{
+  margin-top: 1rem;
   margin-left: 2rem;
 }
 
@@ -93,6 +101,18 @@ font-style: normal;
 font-weight: 400;
 font-size: 40px;
 line-height: 47px;
+
+color: #FFFFFF;
+}
+
+.header{
+margin-top: 1rem;
+margin-left: 2rem;
+font-family: 'Roboto Flex';
+font-style: normal;
+font-weight: 400;
+font-size: 60px;
+line-height: 70px;
 
 color: #FFFFFF;
 }
