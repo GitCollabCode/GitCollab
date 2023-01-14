@@ -23,6 +23,7 @@ type Profile struct {
 	AvatarURL    string   `db:"avatar_url"`
 	Bio          string   `db:"bio"`
 	Skills       []string `db:"skills"`
+	Languages    []string `db:"languages"`
 }
 
 type Profiles []*Profile
@@ -91,7 +92,7 @@ func (pd *ProfileData) AddProfileLanguages(githubUserID int, languages ...string
 	// TODO: Make sure duplicates dont exist
 	validLanguages := getValidLanguages(languages...)
 	if len(validLanguages) == 0 {
-		return errors.New("mo languages in list")
+		return errors.New("no languages in list")
 	}
 	sqlStatement := "UPDATE profiles SET languages = array_cat(languages, $1) WHERE github_user_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, validLanguages, githubUserID)
