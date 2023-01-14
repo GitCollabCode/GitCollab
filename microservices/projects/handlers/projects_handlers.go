@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
+	githubAPI "github.com/GitCollabCode/GitCollab/internal/github"
+	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
+	projectModels "github.com/GitCollabCode/GitCollab/microservices/projects/models"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +24,25 @@ func NewProjects(pg *db.PostgresDriver, logger *logrus.Logger) *Projects {
 // retrieve list of github repos associated to a given user
 // Request all repos that a user owns on github. Will require valid access token
 func (p *Projects) GetUserRepos(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	client := githubAPI.GetGitClientFromContext(r)
+	if client == nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	repos, err := githubAPI.GetUserOwnedRepos(client)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
+	var repoNames []string
+	for _, repo := range repos {
+		repoNames = append(repoNames, *repo.Name)
+	}
+
+	resp := projectModels.ProjectGetResp{Projects: repoNames}
+	err = jsonio.ToJSON(resp, w)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
 // retrieve information about a given repo
