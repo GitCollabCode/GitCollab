@@ -33,6 +33,25 @@ const Profile = () => {
       })
   }, [])
 
+
+  const getLanguages = ()=>{
+    let languagList:JSX.Element[] = [<></>]
+    profile.languages.forEach(element => {
+      languagList.push(<li className={styles.profileLi}>{element}</li>)
+    })
+
+    return languagList
+  }
+
+  const getSkills = ()=>{
+    let skills:JSX.Element[] = [<></>]
+    profile.skills.forEach(element => {
+      skills.push(<li className={styles.profileLi}>{element}</li>)
+    })
+
+    return skills
+  }
+
   const intitalDataRows: rowType[] = [
     {id : "1", date : "2014-04-18", total : 121.0, status : "Shipped", name : "A", points: 5, percent : 50},
     {id : "2", date : "2014-04-21", total : 121.0, status : "Not Shipped", name : "B", points: 10, percent: 60},
@@ -62,9 +81,7 @@ const Profile = () => {
               <div className={styles.line}></div>
               <div>Card 1 Body</div>
               <ul>
-                <li className={styles.profileLi}>Fraud</li>
-                <li className={styles.profileLi}>Avoiding the CRA</li>
-                <li className={styles.profileLi}>Autoerrotic Asphyxiation</li>
+                {getSkills()}
               </ul>
             </div>
             <div className={styles.card}>
@@ -72,9 +89,7 @@ const Profile = () => {
               <div className={styles.line}></div>
               <div>Card 2 Body</div>
               <ul>
-                <li className={styles.profileLi}>C++</li>
-                <li className={styles.profileLi}>Python</li>
-                <li className={styles.profileLi}>r</li>
+                {getLanguages()}
               </ul>
             </div>
           </div>
