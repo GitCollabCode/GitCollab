@@ -1,6 +1,0 @@
-pytest
-pytest-postgresql
-requests
-psycopg2-binary
-SQLAlchemy
-factory-boy
