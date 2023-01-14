@@ -23,6 +23,7 @@ type Profile struct {
 	AvatarURL    string   `db:"avatar_url"`
 	Bio          string   `db:"bio"`
 	Skills       []string `db:"skills"`
+	Languages    []string `db:"languages"`
 }
 
 type Profiles []*Profile
