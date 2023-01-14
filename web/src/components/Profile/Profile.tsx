@@ -61,11 +61,21 @@ const Profile = () => {
               <div>Card 1</div>
               <div className={styles.line}></div>
               <div>Card 1 Body</div>
+              <ul>
+                <li className={styles.profileLi}>Fraud</li>
+                <li className={styles.profileLi}>Avoiding the CRA</li>
+                <li className={styles.profileLi}>Autoerrotic Asphyxiation</li>
+              </ul>
             </div>
             <div className={styles.card}>
               <div>Card 2</div>
               <div className={styles.line}></div>
               <div>Card 2 Body</div>
+              <ul>
+                <li className={styles.profileLi}>C++</li>
+                <li className={styles.profileLi}>Python</li>
+                <li className={styles.profileLi}>r</li>
+              </ul>
             </div>
           </div>
           <div className={styles.row}>

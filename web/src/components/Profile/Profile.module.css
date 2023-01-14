@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300&display=swap');
+
 .container {
   display: flex;
   flex-direction: row;
@@ -81,4 +81,18 @@
   height: 0.1rem;
   margin-right: 0.33rem;
   background-color: #eaeff5;
+}
+
+ul{
+  margin-left: 2rem;
+}
+
+.profileLi {
+font-family: 'Roboto Flex';
+font-style: normal;
+font-weight: 400;
+font-size: 40px;
+line-height: 47px;
+
+color: #FFFFFF;
 }
