@@ -117,7 +117,7 @@ function clean() {
 function clean-db() {
     echo "Removing saved postgres db volume and container..."
     docker compose down
-    docker volume rm postgres
+    docker volume rm gitcollab_db
 }
 
 function refresh-env-file() {

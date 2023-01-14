@@ -1,14 +1,10 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import styles from './NotFound.module.css'
+import React, { useContext } from 'react'
+import { ModalType } from '../../constants/common';
+import { ModalContextStateContext } from '../../context/modalContext/modalContext';
 const NotFound = () => {
-  return (
-    <div className={styles.container}>
-      <h1>404 Error</h1>
-      <h2>Page not found...</h2>
-      <Link to="/">take this link back home</Link>
-    </div>
-  )
+  useContext(ModalContextStateContext).setModalType(ModalType.PageNotFoundModal);
+  useContext(ModalContextStateContext).showModal();
+  return(<>.</>)
 }
 
 export default NotFound
