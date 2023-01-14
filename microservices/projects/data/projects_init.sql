@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS projects (
     project_name          VARCHAR         NOT NULL,
     project_description   VARCHAR         NOT NULL,
     project_skills        VARCHAR         [], 
-    date_created          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    date_created          TIMESTAMPTZ     NULL DEFAULT NOW(),
     PRIMARY Key (project_id)
 );

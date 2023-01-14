@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 )
@@ -24,6 +25,10 @@ type Project struct {
 }
 
 func (pd *ProjectData) AddProject(ownerID int, projectName string, projectDescription string) error {
+	fmt.Println(ownerID)
+	fmt.Println(projectName)
+	fmt.Println(projectDescription)
+
 	sqlString :=
 		"INSERT INTO projects(project_owner, project_name, project_description)" +
 			"VALUES($1, $2, $3)"
