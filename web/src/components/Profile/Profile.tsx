@@ -3,6 +3,7 @@ import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
 import { profileResponse } from '../../constants/common'
+import Table, { rowType } from '../Table/Tables'
 
 const Profile = () => {
   let initialProfile: profileResponse = {
@@ -32,6 +33,35 @@ const Profile = () => {
       })
   }, [])
 
+
+  const getLanguages = ()=>{
+    //eslint-disable-next-line
+    let languagList:JSX.Element[] = [<></>]
+    profile.languages.forEach(element => {
+      languagList.push(<li className={styles.profileLi}>{element}</li>)
+    })
+
+    return languagList
+  }
+
+  const getSkills = ()=>{
+    //eslint-disable-next-line
+    let skills:JSX.Element[] = [<></>]
+    profile.skills.forEach(element => {
+      skills.push(<li className={styles.profileLi}>{element}</li>)
+    })
+
+    return skills
+  }
+
+  const intitalDataRows: rowType[] = [
+    {id : "1", date : "2014-04-18", total : 121.0, status : "Shipped", name : "A", points: 5, percent : 50},
+    {id : "2", date : "2014-04-21", total : 121.0, status : "Not Shipped", name : "B", points: 10, percent: 60},
+    {id : "3", date : "2014-08-09", total : 121.0, status : "Not Shipped", name : "C", points: 15, percent: 70},
+    {id : "4", date : "2014-04-24", total : 121.0, status : "Shipped", name : "D", points: 20, percent : 80},
+    {id : "5", date : "2014-04-26", total : 121.0, status : "Shipped", name : "E", points: 25, percent : 90},
+]
+
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
@@ -49,24 +79,35 @@ const Profile = () => {
         <div className={styles.tables}>
           <div className={styles.row}>
             <div className={styles.card}>
-              <div>Card 1</div>
+              <div className={styles.header}>Skills</div>
               <div className={styles.line}></div>
-              <div>Card 1 Body</div>
+              <ul>
+                {getSkills()}
+              </ul>
             </div>
             <div className={styles.card}>
-              <div>Card 2</div>
+              <div className={styles.header}>Languages</div>
               <div className={styles.line}></div>
-              <div>Card 2 Body</div>
+              <ul>
+                {getLanguages()}
+              </ul>
             </div>
           </div>
           <div className={styles.row}>
             <div className={styles.card}>
-              <div>Card 2</div>
+            <div className={styles.header}>Projects</div>
               <div className={styles.line}></div>
-              <div>Card 2 Body</div>
+              <div>
+              <Table rows={intitalDataRows} isExpandable={false} />
+              </div>
+              
             </div>
           </div>
+          
         </div>
+      
+          
+        
       </Media>
       <Media query={{ maxWidth: 1023 }}>
         <div className={styles.tables}>
