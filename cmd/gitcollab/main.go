@@ -154,7 +154,6 @@ func main() {
 
 		projectD := projectData.NewProjectData(dbDriver)
 		p := project.NewProjects(dbDriver, projectD, jwtConf, logger)
-		projectD.AddProject(1234, "test123", "asdqrtqf qerw12 123 asd")
 		r.Mount("/project", projectsRouter.ProjectRouter(p, pd))
 
 		// test routes

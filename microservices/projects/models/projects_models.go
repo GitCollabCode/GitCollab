@@ -74,3 +74,31 @@ type RepoIssueResp struct {
 	// Example: ["chicken1", "chicken2"]
 	Issues []RepoIssue `json:"issues"`
 }
+
+// Get Req User Projects
+// swagger:parameters UserProjectsReq
+type _ struct {
+	// in:body
+	// Required: true
+	Body UserProjectsReq
+}
+
+type UserProjectsReq struct {
+	// Github repositories
+	// Example: ["chicken1", "chicken2"]
+	Username string `json:"username"`
+}
+
+// Get user projects
+// swagger:parameters UserProjectsResp
+type _ struct {
+	// in:body
+	// Required: true
+	Body UserProjectsResp
+}
+
+type UserProjectsResp struct {
+	// Github repositories
+	// Example: ["chicken1", "chicken2"]
+	Projects []string `json:"projects"`
+}

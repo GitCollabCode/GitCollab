@@ -159,35 +159,62 @@ func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+
 	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	if err != nil {
+	username, ok := r.Context().Value(jwt.ContextKeyUser).(string)
+	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = p.ProjectData.AddProject(userId, *repo.Name, *repo.Description)
+
+	err = p.ProjectData.AddProject(userId, username, *repo.Name, *repo.URL)
 	if err != nil {
 		p.Log.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
-func (p *Projects) PatchProjectDescription(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 // retrieve list of github repos associated to a given user
 // Request all repos that a user owns on github. Will require valid access token
 func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	var req projectModels.UserProjectsReq
+	err := jsonio.FromJSON(&req, r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var resp projectModels.UserProjectsResp
+	projects, err := p.ProjectData.GetUserProjects(req.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// create response containing list of projects
+	for _, project := range projects {
+		resp.Projects = append(resp.Projects, project.ProjectName)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	err = jsonio.ToJSON(&resp, w)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 // retrieve list of github repos associated to a given user

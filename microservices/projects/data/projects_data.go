@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 )
@@ -16,24 +15,21 @@ func NewProjectData(dbDriver *db.PostgresDriver) *ProjectData {
 }
 
 type Project struct {
-	ProjectID          int    `json:"project_id"`
-	ProjectOwner       string `json:"project_owner"`
-	ProjectName        string `json:"project_name"`
-	ProjectDescription string `json:"project_description"`
-	ProjectSkills      string `json:"project_skills"`
-	DateCreated        string `json:"date_created"`
+	ProjectID            int    `json:"project_id"`
+	ProjectOwnerId       string `json:"project_owner_id"`
+	ProjectOwnerUsername string `json:"project_owner_username"`
+	ProjectName          string `json:"project_name"`
+	ProjectURL           string `json:"project_url"`
+	//ProjectSkills        string `json:"project_skills"`
+	//DateCreated string `json:"date_created"`
 }
 
-func (pd *ProjectData) AddProject(ownerID int, projectName string, projectDescription string) error {
-	fmt.Println(ownerID)
-	fmt.Println(projectName)
-	fmt.Println(projectDescription)
-
+func (pd *ProjectData) AddProject(ownerID int, ownerUsername string, projectName string, projectURL string) error {
 	sqlString :=
-		"INSERT INTO projects(project_owner, project_name, project_description)" +
-			"VALUES($1, $2, $3)"
+		"INSERT INTO projects(project_owner_id, project_owner_username, project_name, project_url)" +
+			"VALUES($1, $2, $3, $4)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, projectName, projectDescription)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, ownerUsername, projectName, projectURL)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddProject database INSERT failed: %s", err.Error())
 		return err
@@ -46,6 +42,8 @@ func (pd *ProjectData) UpdateProjectName(projectID int, projectName string) erro
 	sqlStatement := "UPDATE projects SET project_name = $1 WHERE project_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, projectName, projectID)
 }
+
+// our endpoints
 
 func (pd *ProjectData) UpdateProjectDescription(projectID int, description string) error {
 	sqlStatement := "UPDATE projects SET project_description = $1 WHERE project_id = $2"
@@ -71,13 +69,20 @@ func (pd *ProjectData) UpdateProjectDescription(projectID int, description strin
 //}
 
 func (pd *ProjectData) DeleteProject(projectID int) error {
-	sqlStatement := "DELETE FROM projects WHERE projectID = $1"
+	sqlStatement := "DELETE FROM projects WHERE project_id = $1"
 	return pd.PDriver.TransactOneRow(sqlStatement, projectID)
 }
 
 func (pd *ProjectData) GetProject(projectID int) (*Project, error) {
 	var p Project
-	sqlStatement := "SELECT * FROM projects WHERE github_user_id = $1"
+	sqlStatement := "SELECT * FROM projects WHERE project_id = $1"
 	err := pd.PDriver.QueryRow(sqlStatement, &p, projectID)
 	return &p, err
+}
+
+func (pd *ProjectData) GetUserProjects(username string) ([]Project, error) {
+	var p []Project
+	sqlStatement := "SELECT * FROM projects WHERE project_owner_username = $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &p, username)
+	return p, err
 }

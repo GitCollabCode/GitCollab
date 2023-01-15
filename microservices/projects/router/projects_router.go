@@ -29,11 +29,10 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 			r.Get("/repo-issues", project.GetRepoIssues)
 		})
 
-		// our endpoints
 		r.Post("/create-project", project.CreateProject)
-		r.Patch("/project-description", project.PatchProjectDescription)
-		r.Get("/user-projects", project.GetUserProjects)
-		r.Get("/projects-issues", project.GetProjectIssues)
 	})
+	r.Get("/user-projects", project.GetUserProjects)
+	r.Get("/projects-issues", project.GetProjectIssues)
+
 	return r
 }
