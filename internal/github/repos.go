@@ -15,13 +15,22 @@ func GetUserOwnedRepos(client *github.Client) ([]*github.Repository, error) {
 	if repoService == nil {
 		return nil, errors.New("could not get repo service")
 	}
-
 	opts := github.RepositoryListOptions{
 		Type: "owner",
 	}
 
 	repos, _, err := repoService.List(context.Background(), "", &opts)
 	return repos, err
+}
+
+func GetRepoByName(client *github.Client, repoName string) (*github.Repository, error) {
+	repoService := client.Repositories
+	owner, _, err := client.Users.Get(context.Background(), "")
+	if err != nil {
+		return nil, err
+	}
+	repo, _, err := repoService.Get(context.Background(), *owner.Login, repoName)
+	return repo, err
 }
 
 /*
