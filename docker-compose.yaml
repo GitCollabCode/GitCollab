@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   db:
+    container_name: postgres
     image: postgres:14.5-alpine
     restart: always
     command: ["postgres", "-c", "log_statement=all"]
@@ -23,6 +24,7 @@ services:
       retries: 5
 
   backend:
+    container_name: backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -46,6 +48,7 @@ services:
         condition: service_healthy
 
   frontend:
+    container_name: frontend
     build:
       context: ./web
       dockerfile: Dockerfile
@@ -64,8 +67,8 @@ services:
         condition: service_healthy
 
   swagger-ui:
+    container_name: swagger-ui
     image: swaggerapi/swagger-ui
-    container_name: swagger
     ports:
         - "3001:8080"
     volumes:
