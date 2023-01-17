@@ -2,57 +2,62 @@ import React, { useState } from 'react'
 import styles from './Table.module.css'
 
 export type rowType = {
-    id:string,
-    name:string,
-    date:string,
-    total:number,
-    points:number,
-    percent:number,
-    status:string
+  id: string
+  name: string
+  date: string
+  total: number
+  points: number
+  percent: number
+  status: string
 }
 
-const Table = ({rows, isExpandable, expandableRows}:{rows:any[], isExpandable: boolean, expandableRows?: string[]}) => {
+const Table = ({
+  rows,
+  isExpandable,
+  expandableRows,
+}: {
+  rows: any[]
+  isExpandable: boolean
+  expandableRows?: string[]
+}) => {
+  const initialData = {
+    data: rows,
+    expandedRows: ['0'],
+  }
 
-    const initialData = {
-        data : rows,
-        expandedRows: ["0"]
-    };
+  const [tableData, setTableData] = useState(initialData)
 
-    const [tableData, setTableData]=useState(initialData);
-   
+  const handleRowClick = (rowId: string) => {
+    const currentExpandedRows = tableData.expandedRows
+    const isRowCurrentlyExpanded = currentExpandedRows.includes(rowId)
 
-    const handleRowClick = (rowId:string)=> {
-        const currentExpandedRows = tableData.expandedRows;
-        const isRowCurrentlyExpanded = currentExpandedRows.includes(rowId);
-        
-        const newExpandedRows = isRowCurrentlyExpanded ? 
-			currentExpandedRows.filter((id:string) => id !== rowId) : 
-			currentExpandedRows.concat(rowId);
-        
-        setTableData({data:tableData.data, expandedRows:newExpandedRows})
-    }
-    
+    const newExpandedRows = isRowCurrentlyExpanded
+      ? currentExpandedRows.filter((id: string) => id !== rowId)
+      : currentExpandedRows.concat(rowId)
+
+    setTableData({ data: tableData.data, expandedRows: newExpandedRows })
+  }
+
+  //eslint-disable-next-line
+  const buildTableRow = (item: any, id: string): JSX.Element => {
+    const result = Object.keys(item)
+    const clickCallback = () => handleRowClick(id)
     //eslint-disable-next-line
-    const buildTableRow = (item:any, id:string) : JSX.Element=>{
-        const result = Object.keys(item);
-        const clickCallback = () => handleRowClick(id);
-        //eslint-disable-next-line
-        let tds:JSX.Element[] = []
-        result.forEach(element => {
-            tds.push(<td className={styles.row}>{item[element]}</td>)
-        });
-        return (<tr onClick={()=>isExpandable && clickCallback} key={"row-data-" + id}>
-            {tds}
-        </tr>);
-    }
+    let tds: JSX.Element[] = []
+    result.forEach((element) => {
+      tds.push(<td className={styles.row}>{item[element]}</td>)
+    })
+    return (
+      <tr onClick={() => isExpandable && clickCallback} key={'row-data-' + id}>
+        {tds}
+      </tr>
+    )
+  }
 
-//eslint-disable-next-line
-    const renderItem =(item:rowType, id:string):JSX.Element[]=> {
-        
-        const itemRows = [
-			buildTableRow(item, id)
-        ];
-        /*
+  //eslint-disable-next-line
+  const renderItem = (item: rowType, id: string): JSX.Element[] => {
+    const itemRows = [buildTableRow(item, id)]
+    /*
         if(isExpandable && tableData.expandedRows.includes(id)) {
             itemRows.push(
                 <tr key={"row-expanded-" + id}>
@@ -63,30 +68,29 @@ const Table = ({rows, isExpandable, expandableRows}:{rows:any[], isExpandable: b
             );
         }
         */
-        return itemRows;    
-    }
+    return itemRows
+  }
 
-    let allItemRows:any = [];
-    //eslint-disable-next-line
-    let header:JSX.Element[] = []
-    Object.keys(tableData.data[0]).forEach(element => {
-            header.push(<th>{element}</th>)
-        });
-    
-    allItemRows = allItemRows.concat(<tr>{header}</tr>);
-    tableData.data.forEach((item, index) => {
-        const perItemRows = renderItem(item, ""+index);
-        allItemRows = allItemRows.concat(perItemRows);
-    });
+  let allItemRows: any = []
+  //eslint-disable-next-line
+  let header: JSX.Element[] = []
+  Object.keys(tableData.data[0]).forEach((element) => {
+    header.push(<th>{element}</th>)
+  })
 
-   
+  allItemRows = allItemRows.concat(<tr>{header}</tr>)
+  tableData.data.forEach((item, index) => {
+    const perItemRows = renderItem(item, '' + index)
+    allItemRows = allItemRows.concat(perItemRows)
+  })
 
-
-return(
-     <>
-            <table>{allItemRows}</table>
+  return (
+    <>
+      <div className={styles.tableBackground}>
+        <table>{allItemRows}</table>
+      </div>
     </>
-)
+  )
 }
 
-export default Table;
+export default Table

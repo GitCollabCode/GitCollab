@@ -1,0 +1,51 @@
+.line {
+  background-color: rgba(217, 217, 217, 0.25);
+  height: 0.1rem;
+  width: 100%;
+  padding-top: 0.1rem;
+}
+
+.filterBox {
+  display: flex;
+  flex-direction: column;
+  height: 15rem;
+}
+
+.checkboxBox {
+  margin-left: 40px;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 45px;
+  /* identical to box height */
+
+  color: #ffffff;
+}
+input[type='checkbox'] {
+  margin-right: 20px;
+}
+
+.filterTitle {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 45px;
+  /* identical to box height */
+
+  color: #ffffff;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+}
+
+.options::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
