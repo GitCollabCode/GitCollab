@@ -1,0 +1,13 @@
+# Some of these vars might need to be changed on deployment or be defaulted to empty and filled in on deployment!
+REACT_APP_REDIRECT_URI=http://localhost:3000/
+REACT_APP_API_URI="http://localhost:8080/api/"
+
+POSTGRES_NAME="postgres"
+POSTGRES_URL="postgres://postgres:postgres@db:5432/postgres"
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+GITHUB_CLIENTID="7951668d40646606f4ac"
+GITHUB_SECRET="51010ce3310c4a6a0e15d10438e53f9e64770118"
+
+GITCOLLAB_SECRET="CUENGTARD12asdasdssdasdsdasd3"
