@@ -8,7 +8,7 @@ const NewProject = () => {
   const intialRepos: ReposResponse = {
     repos: [''],
   }
-  const [step, setStep] = useState(0)
+  // const [step, setStep] = useState(0)
   const [repos, setRepos] = useState(intialRepos)
 
   useEffect(() => {
