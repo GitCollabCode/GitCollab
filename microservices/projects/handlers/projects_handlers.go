@@ -42,7 +42,7 @@ func (p *Projects) GetUserRepos(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.Log.Errorf("GetUserRepos client fetch from context failed", err.Error())
+		p.Log.Errorf("GetUserRepos client fetch from context failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -91,7 +91,7 @@ func (p *Projects) GetRepoInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.Log.Errorf("GetRepoInfo client fetch from context failed", err.Error())
+		p.Log.Errorf("GetRepoInfo client fetch from context failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -162,7 +162,7 @@ func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.Log.Errorf("GetRepoIssues client fetch from context failed", err.Error())
+		p.Log.Errorf("GetRepoIssues client fetch from context failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
@@ -231,7 +231,7 @@ func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		p.Log.Errorf("CreateProject client fetch from context failed", err.Error())
+		p.Log.Errorf("CreateProject client fetch from context failed: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
 		if err != nil {
