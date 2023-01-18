@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	githubAPI "github.com/GitCollabCode/GitCollab/internal/github"
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
 	"github.com/GitCollabCode/GitCollab/internal/jwt"
+	"github.com/GitCollabCode/GitCollab/internal/models"
+	"github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/projects/data"
 	projectModels "github.com/GitCollabCode/GitCollab/microservices/projects/models"
 	"github.com/sirupsen/logrus"
@@ -17,73 +18,117 @@ import (
 type Projects struct {
 	PgConn      *db.PostgresDriver
 	ProjectData *data.ProjectData
+	validate    validator.Validation
 	Log         *logrus.Logger
-	JwtConf     *jwt.GitCollabJwtConf
 }
 
 // NewProjects returns initialized Projects handler struct
-func NewProjects(db *db.PostgresDriver, p *data.ProjectData, jwtConf *jwt.GitCollabJwtConf, logger *logrus.Logger) *Projects {
-	return &Projects{db, p, logger, jwtConf}
+func NewProjects(db *db.PostgresDriver, p *data.ProjectData, logger *logrus.Logger) *Projects {
+	return &Projects{db, p, *validator.NewValidation(), logger}
 }
 
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
+// GetUserRepos retrieve list of github repos associated to a select user
 func (p *Projects) GetUserRepos(w http.ResponseWriter, r *http.Request) {
+	// TODO: repetitive code use helper
 	client, err := githubAPI.GetGitClientFromContext(r)
 	if client == nil {
-		w.WriteHeader(http.StatusNotFound)
+		p.Log.Warning("GetUserRepos client fetch from context returned nothing!")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetUserRepos failed to send error response: %s", err)
+		}
+		return
 	}
 
 	if err != nil {
-		p.Log.Error(err)
+		p.Log.Errorf("GetUserRepos client fetch from context failed", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetUserRepos failed to send error response: %s", err)
+		}
+		return
 	}
 
 	repos, err := githubAPI.GetUserOwnedRepos(client)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch users repos from github"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetUserRepos failed to send error response: %s", err)
+		}
+		return
 	}
 
 	var repoNames []string
 	for _, repo := range repos {
 		repoNames = append(repoNames, *repo.Name)
-		fmt.Println(*repo.Name)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+
 	resp := projectModels.ReposGetResp{Repos: repoNames}
-	err = jsonio.ToJSON(resp, w)
+
+	err = jsonio.ToJSON(&resp, w)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		p.Log.Fatalf("GetUserRepos failed to send response: %s", err)
 	}
 }
 
-// retrieve information about a given repo
-// Retrieve basic info about a repo, including name, descriptiom, contributers
+// GetRepoInfo retrieve information about a given repo such as name, description, contributers
 func (p *Projects) GetRepoInfo(w http.ResponseWriter, r *http.Request) {
 	client, err := githubAPI.GetGitClientFromContext(r)
 	if client == nil {
-		w.WriteHeader(http.StatusNotFound)
+		p.Log.Warning("GetRepoInfo client fetch from context returned nothing!")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoInfo failed to send error response: %s", err)
+		}
+		return
 	}
 
 	if err != nil {
-		p.Log.Error(err)
+		p.Log.Errorf("GetRepoInfo client fetch from context failed", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoInfo failed to send error response: %s", err)
+		}
+		return
 	}
+
 	var repoReq projectModels.RepoInfoReq
-	err = jsonio.FromJSON(&repoReq, r.Body)
+
+	err = p.validate.GetJSON(&repoReq, w, r, p.Log)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Errorf("GetRepoInfo failed to decode and validate JSON")
+		return
 	}
 
 	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch repo info from github"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoInfo failed to send error response: %s", err)
+		}
+		return
 	}
 
 	contributors, err := githubAPI.GetRepoContributers(client, repo)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Error("GetRepoInfo unable to fetch repo contributers")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoInfo failed to send error response: %s", err)
+		}
+		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -92,41 +137,69 @@ func (p *Projects) GetRepoInfo(w http.ResponseWriter, r *http.Request) {
 		c := projectModels.Contributor{Username: user, GitID: userID}
 		contribList = append(contribList, c)
 	}
-	//TODO ADD LANGUAGES
+
+	//TODO: ADD LANGUAGES
 
 	resp := projectModels.RepoInfoResp{Contributors: contribList}
+
 	err = jsonio.ToJSON(&resp, w)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Fatalf("GetRepoInfo failed to send response: %s", err)
 	}
 }
 
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
+// GetRepoIssues retrieve list of issues inside of a repo
 func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
 	client, err := githubAPI.GetGitClientFromContext(r)
 	if client == nil {
-		w.WriteHeader(http.StatusNotFound)
+		p.Log.Warning("GetRepoIssues client fetch from context returned nothing!")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
 	}
 
 	if err != nil {
-		p.Log.Error(err)
+		p.Log.Errorf("GetRepoIssues client fetch from context failed", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
 	}
+
 	var repoReq projectModels.RepoInfoReq
-	err = jsonio.FromJSON(&repoReq, r.Body)
+
+	err = p.validate.GetJSON(&repoReq, w, r, p.Log)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Errorf("GetRepoIssues failed to decode and validate JSON")
+		return
 	}
 
 	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch repo info from github"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
 	}
 
 	issues, err := githubAPI.GetRepoIssues(client, repo)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Error("GetRepoIssues unable to fetch repo issues")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
@@ -137,70 +210,115 @@ func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := projectModels.RepoIssueResp{Issues: issueList}
+
 	err = jsonio.ToJSON(&resp, w)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Fatalf("GetRepoIssues failed to send response: %s", err)
 	}
 }
 
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
+// CreateProject create project based on a select repo
 func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 	client, err := githubAPI.GetGitClientFromContext(r)
 	if client == nil {
-		w.WriteHeader(http.StatusNotFound)
+		p.Log.Warning("CreateProject client fetch from context returned nothing!")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
+		return
 	}
 
 	if err != nil {
-		p.Log.Error(err)
+		p.Log.Errorf("CreateProject client fetch from context failed", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
+		return
 	}
+
 	var repoReq projectModels.RepoInfoReq
-	err = jsonio.FromJSON(&repoReq, r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
 
-	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
+	err = p.validate.GetJSON(&repoReq, w, r, p.Log)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Errorf("CreateProject failed to decode and validate JSON")
 		return
 	}
 
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
+		p.Log.Errorf("CreateProject failed to fetch GitHub ID from JWT context")
 		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid GitHub ID"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
 		return
 	}
+
 	username, ok := r.Context().Value(jwt.ContextKeyUser).(string)
 	if !ok {
+		p.Log.Errorf("CreateProject failed to fetch username from JWT context")
 		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid username"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
+		return
+	}
+
+	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch repo info from github"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
 		return
 	}
 
 	err = p.ProjectData.AddProject(userId, username, *repo.Name, *repo.URL)
 	if err != nil {
-		p.Log.Error(err)
+		p.Log.Errorf("CreateProject failed add project: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+
+	err = jsonio.ToJSON(&models.Message{Message: "project created"}, w)
+	if err != nil {
+		p.Log.Fatalf("CreateProject failed to send success response: %s", err)
+	}
 }
 
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
+// GetUserProjects retrieve list of github repos associated to a given user
 func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
 	var req projectModels.UserProjectsReq
-	err := jsonio.FromJSON(&req, r.Body)
+
+	err := p.validate.GetJSON(&req, w, r, p.Log)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Errorf("GetUserProjects failed to decode and validate JSON")
 		return
 	}
 
 	var resp projectModels.UserProjectsResp
+
 	projects, err := p.ProjectData.GetUserProjects(req.Username)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch user projects"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+		}
 		return
 	}
 
@@ -211,14 +329,9 @@ func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+
 	err = jsonio.ToJSON(&resp, w)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		p.Log.Fatalf("GetUserProjects failed to send success response: %s", err)
 	}
-}
-
-// retrieve list of github repos associated to a given user
-// Request all repos that a user owns on github. Will require valid access token
-func (p *Projects) GetProjectIssues(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
 }

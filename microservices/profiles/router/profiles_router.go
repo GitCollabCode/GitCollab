@@ -200,7 +200,7 @@ func ProfileRouter(p *handlers.Profiles, jwtConf *jwt.GitCollabJwtConf) chi.Rout
 		//       200: messageResponse
 		r.Patch("/", p.PatchLanguages)
 
-		// swagger:route POST  /profile/languages Profiles profileSkillsRequest
+		// swagger:route POST /profile/languages Profiles profileSkillsRequest
 		//
 		// Delete profile languages.
 		//
