@@ -16,22 +16,23 @@ func NewProfileData(dbDriver *db.PostgresDriver) *ProfileData {
 }
 
 type Profile struct {
-	GitHubUserID int      `db:"github_user_id"`
-	GitHubToken  string   `db:"github_token"`
-	Username     string   `db:"username"`
-	Email        string   `db:"email"`
-	AvatarURL    string   `db:"avatar_url"`
-	Bio          string   `db:"bio"`
-	Skills       []string `db:"skills"`
-	Languages    []string `db:"languages"`
+	GitHubUserID  int      `db:"github_user_id"`
+	GitHubUserUrl string   `db:"github_user_url"`
+	GitHubToken   string   `db:"github_token"`
+	Username      string   `db:"username"`
+	Email         string   `db:"email"`
+	AvatarURL     string   `db:"avatar_url"`
+	Bio           string   `db:"bio"`
+	Skills        []string `db:"skills"`
+	Languages     []string `db:"languages"`
 }
 
 type Profiles []*Profile
 
-func (pd *ProfileData) AddProfile(githubUserID int, githubToken string, username string, avatarURL string, email string, bio string) error {
+func (pd *ProfileData) AddProfile(githubUserID int, gitUrl string, githubToken string, username string, avatarURL string, email string, bio string) error {
 	sqlString :=
-		"INSERT INTO profiles(github_user_id, github_token, username, avatar_url, email, bio)" +
-			"VALUES($1, $2, $3, $4, $5, $6)"
+		"INSERT INTO profiles(github_user_id, github_user_url, github_token, username, avatar_url, email, bio)" +
+			"VALUES($1, $2, $3, $4, $5, $6, $7)"
 
 	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email, bio)
 	if err != nil {
@@ -50,6 +51,11 @@ func (pd *ProfileData) UpdateProfileToken(githubUserID int, githubToken string) 
 func (pd *ProfileData) UpdateProfileUsername(githubUserID int, username string) error {
 	sqlStatement := "UPDATE profiles SET username = $1 WHERE github_user_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, username, githubUserID)
+}
+
+func (pd *ProfileData) UpdateProfileUrl(githubUserID int, profileURL string) error {
+	sqlStatement := "Update profiles SET github_user_url = $1 WHERE github_user_id = $2"
+	return pd.PDriver.TransactOneRow(sqlStatement, profileURL, githubUserID)
 }
 
 func (pd *ProfileData) UpdateProfileAvatarURL(githubUserID int, avatarURL string) error {

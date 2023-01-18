@@ -25,8 +25,8 @@ func UpdateGitAccessToken(user *data.Profile, token string, pg *db.PostgresDrive
 	return pDb.UpdateProfileToken(user.GitHubUserID, token)
 }
 
-func CreateNewUser(gitId int, gitUser string, gitToken string,
+func CreateNewUser(gitId int, gitUser string, gitUrl string, gitToken string,
 	gitEmail string, gitAvatarUrl string, gitBio string, log *logrus.Logger, pg *db.PostgresDriver) error {
 	pDb := data.NewProfileData(pg)
-	return pDb.AddProfile(gitId, gitToken, gitUser, gitAvatarUrl, gitEmail, gitBio)
+	return pDb.AddProfile(gitId, gitUrl, gitToken, gitUser, gitAvatarUrl, gitEmail, gitBio)
 }

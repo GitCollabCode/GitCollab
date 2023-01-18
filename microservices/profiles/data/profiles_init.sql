@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS profiles (
     github_user_id      INTEGER             UNIQUE NOT NULL,
+    github_user_url     VARCHAR             UNIQUE NOT NULL,
     github_token        VARCHAR             NOT NULL, /* candidate for hashing */
     username            VARCHAR             NOT NULL,
     email               VARCHAR             NOT NULL,

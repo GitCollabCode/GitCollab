@@ -89,6 +89,7 @@ func (p *Profiles) PostProfile(w http.ResponseWriter, r *http.Request) {
 
 	err = p.Pd.AddProfile(
 		profileReq.GithubId,
+		profileReq.GithubURL,
 		profileReq.GitHubToken,
 		profileReq.Username,
 		profileReq.AvatarURL,

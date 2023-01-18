@@ -62,6 +62,9 @@ type ProfileReq struct {
 	// Unique GitHub ID of user
 	// Example: 54350313
 	GithubId int `json:"gitID" validate:"required"`
+	// Unique GitHub Profile URL of user
+	// Example: www.github.com/.../magedcinge.com
+	GithubURL string `json:"gitUrl" validate:"required"`
 	// GitHub OAuth Authorization token
 	// Example: gho_16C7e42F292c6912E7710c838347Ae178B4a
 	GitHubToken string `json:"github_token" validate:"required"`

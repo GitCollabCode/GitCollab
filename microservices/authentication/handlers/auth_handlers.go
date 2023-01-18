@@ -110,7 +110,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo == nil {
 		// did not find the user, create new account
-		err := data.CreateNewUser(int(*username.ID), *username.Login, token.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
+		err := data.CreateNewUser(int(*username.ID), *username.Login, *username.URL, token.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
 		if err != nil {
 			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
