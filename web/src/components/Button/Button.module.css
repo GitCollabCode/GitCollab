@@ -1,0 +1,22 @@
+.greenButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 33px;
+  margin-right: 70px;
+  background: #2da573;
+  border-radius: 15px;
+  width: 185px;
+  height: 53px;
+}
+
+.buttonText {
+  padding-left: 0.5rem;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 49px;
+
+  color: #ffffff;
+}

@@ -1,0 +1,56 @@
+.projects {
+  display: flex;
+  flex-direction: row;
+  margin-left: 22px;
+  margin-top: 34px;
+}
+
+.filterPanel {
+  width: 22%;
+}
+
+.projectsDisplay {
+  width: 75%;
+}
+
+.projectsBox {
+  background: #1e1f26;
+  border-radius: 48px;
+  padding-left: 3rem;
+  margin-left: 1rem;
+  height: calc(100% - 3rem);
+}
+
+.line {
+  background-color: rgba(217, 217, 217, 0.25);
+  height: 0.1rem;
+  margin-right: 0.33rem;
+  width: calc(100% - 2.5rem);
+  padding-top: 0.1rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 70px;
+  padding-top: 35px;
+
+  color: #ffffff;
+}
+
+.titleBox {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.noLink {
+  color: #2da573;
+}
+
+.noLink:hover {
+  color: #4b072c;
+}
