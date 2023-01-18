@@ -1,0 +1,27 @@
+.searchBox {
+  width: 100%;
+  height: 39px;
+
+  background: #ffffff;
+  border-radius: 48px;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 30px;
+  /* identical to box height */
+
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+input::placeholder {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 30px;
+  /* identical to box height */
+
+  color: #000000;
+}
