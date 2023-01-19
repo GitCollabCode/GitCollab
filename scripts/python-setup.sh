@@ -18,9 +18,10 @@ if [ $? -eq 0 ]; then
 fi
 
 # install venv, and postgres requirements
-apt install python3.8-venv -y
+apt-get install -y python3-venv
 #apt install libpq-dev postgresql
 
+# Create virtual env. if folder doesn't already exists
 if [ ! -d "$PYTHON_VENV_DIR" ]; then
     echo "Creating virtual env"
     python3 -m venv "$PYTHON_VENV_DIR"
