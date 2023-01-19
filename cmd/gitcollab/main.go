@@ -153,8 +153,8 @@ func main() {
 		r.Mount("/profile", profilesRouter.ProfileRouter(profiles, jwtConf))
 
 		projectD := projectData.NewProjectData(dbDriver)
-		p := project.NewProjects(dbDriver, projectD, jwtConf, logger)
-		r.Mount("/project", projectsRouter.ProjectRouter(p, pd))
+		p := project.NewProjects(dbDriver, projectD, logger)
+		r.Mount("/project", projectsRouter.ProjectRouter(p, pd, jwtConf))
 
 		// test routes
 		r.Route("/test", func(r chi.Router) {

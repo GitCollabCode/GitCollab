@@ -216,8 +216,8 @@ func (p *Profiles) PatchSkills(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("PatchSkills failed to fetch GitHub ID from JWT context")
-		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid GitHub ID"}, w)
 		if err != nil {
 			p.log.Fatalf("PatchSkills failed to send error response: %s", err)
 		}
@@ -254,8 +254,8 @@ func (p *Profiles) DeleteSkills(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("DeleteSkills failed to fetch GitHub ID from JWT context")
-		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid GitHub ID"}, w)
 		if err != nil {
 			p.log.Fatalf("DeleteSkills failed to send error response: %s", err)
 		}
@@ -302,8 +302,8 @@ func (p *Profiles) PatchLanguages(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("PatchLanguages failed to fetch GitHub ID from JWT context")
-		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid GitHub ID"}, w)
 		if err != nil {
 			p.log.Fatalf("PatchLanguages failed to send error response: %s", err)
 		}
@@ -339,8 +339,8 @@ func (p *Profiles) DeleteLanguages(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(jwt.ContextGitId).(int)
 	if !ok {
 		p.log.Errorf("DeleteSLanguages failed to fetch GitHub ID from JWT context")
-		w.WriteHeader(http.StatusInternalServerError)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid GitHub ID"}, w)
 		if err != nil {
 			p.log.Fatalf("DeleteLanguages failed to send error response: %s", err)
 		}
