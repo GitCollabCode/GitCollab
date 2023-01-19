@@ -34,7 +34,7 @@ func (pd *ProfileData) AddProfile(githubUserID int, gitUrl string, githubToken s
 		"INSERT INTO profiles(github_user_id, github_user_url, github_token, username, avatar_url, email, bio)" +
 			"VALUES($1, $2, $3, $4, $5, $6, $7)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, githubToken, username, avatarURL, email, bio)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, githubUserID, gitUrl, githubToken, username, avatarURL, email, bio)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddProfile database INSERT failed: %s", err.Error())
 		return err
