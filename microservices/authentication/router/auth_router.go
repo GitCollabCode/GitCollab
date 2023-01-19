@@ -46,7 +46,7 @@ func AuthRouter(auth *handlers.Auth) chi.Router {
 	//       401: description:Invalid GitHub OAuth code
 	r.Post("/signin", auth.LoginHandler)
 
-	// swagger:route POST /auth/logut Auth logout
+	// swagger:route POST /auth/logout Auth logout
 	//
 	// User logout.
 	//

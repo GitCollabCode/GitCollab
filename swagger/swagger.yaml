@@ -2,6 +2,21 @@ basePath: /api
 consumes:
     - application/json
 definitions:
+    Contributor:
+        properties:
+            git_id:
+                description: Github ID
+                example: 12312312
+                format: int64
+                type: integer
+                x-go-name: GitID
+            username:
+                description: Github username
+                example: '"robotevan"'
+                type: string
+                x-go-name: Username
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
     ErrorMessage:
         properties:
             message:
@@ -201,6 +216,74 @@ definitions:
                 x-go-name: Skills
         type: object
         x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    RepoInfoReq:
+        properties:
+            repo_name:
+                description: Github repository name
+                example: '"sysc4995"'
+                type: string
+                x-go-name: RepoName
+        required:
+            - repo_name
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
+    RepoInfoResp:
+        properties:
+            contributors:
+                description: |-
+                    List of contributors
+                    Example [{"username": "wagwan", "git_id": 1234567}]
+                items:
+                    $ref: '#/definitions/Contributor'
+                type: array
+                x-go-name: Contributors
+            languages:
+                description: Github repositories
+                example:
+                    - chicken1
+                    - chicken2
+                items:
+                    type: string
+                type: array
+                x-go-name: Languages
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
+    RepoIssue:
+        properties:
+            state:
+                type: string
+                x-go-name: State
+            title:
+                type: string
+                x-go-name: Title
+            url:
+                type: string
+                x-go-name: Url
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
+    RepoIssueResp:
+        properties:
+            issues:
+                description: Github repositories
+                items:
+                    $ref: '#/definitions/RepoIssue'
+                type: array
+                x-go-name: Issues
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
+    ReposGetResp:
+        properties:
+            repos:
+                description: List of GitHub repository names
+                example:
+                    - chicken1
+                    - chicken2
+                items:
+                    type: string
+                type: array
+                x-go-name: Repos
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
     SearchProfilesResp:
         properties:
             avatarUrl:
@@ -228,6 +311,28 @@ definitions:
             - avatarUrl
         type: object
         x-go-package: github.com/GitCollabCode/GitCollab/microservices/profiles/models
+    UserProjectsReq:
+        properties:
+            username:
+                description: Profile username
+                example: wagwan
+                type: string
+                x-go-name: Username
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
+    UserProjectsResp:
+        properties:
+            projects:
+                description: GitCollab projects
+                example:
+                    - chicken1
+                    - chicken2
+                items:
+                    type: string
+                type: array
+                x-go-name: Projects
+        type: object
+        x-go-package: github.com/GitCollabCode/GitCollab/microservices/projects/models
 host: gitcollab.tridentshark.com
 info:
     description: GitCollab API Swagger documentation.
@@ -238,7 +343,7 @@ info:
     title: GitCollab API
     version: 1.0.0
 paths:
-    /auth/logut:
+    /auth/logout:
         post:
             description: Logs user out and invalidates their currently valid JWT.
             operationId: logout
@@ -290,6 +395,64 @@ paths:
             summary: User Login through GitHub.
             tags:
                 - Auth
+    /profile:
+        post:
+            consumes:
+                - application/json
+            description: Takes in user information to create a new profile, only used for testing.
+            operationId: createProfileRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a user profile.
+            tags:
+                - Profiles
+    /profile/{username}:
+        delete:
+            description: Removes registered GitCollab user from db, only used for testing, should not be exposed.
+            operationId: deleteProfile
+            parameters:
+                - description: Target user
+                  in: path
+                  name: username
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+                "404":
+                    description: Profile not found
+            summary: Delete GitCollab user.
+            tags:
+                - Profiles
+        get:
+            operationId: getProfile
+            parameters:
+                - description: Target user
+                  in: path
+                  name: username
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/getProfileResponse'
+                "404":
+                    description: Profile not found
+            summary: Get GitCollab profile.
+            tags:
+                - Profiles
     /profile/get-languages:
         get:
             description: Get a list of available languages
@@ -351,24 +514,75 @@ paths:
             summary: Delete profile languages.
             tags:
                 - Profiles
-    /profiles:
+    /profile/search:
         post:
             consumes:
                 - application/json
-            description: Takes in user information to create a new profile, only used for testing.
-            operationId: createProfileRequest
+            description: Get profile information based on input search parameters.
+            operationId: profileSearchRequest
             parameters:
                 - in: body
                   name: Body
                   required: true
                   schema:
-                    $ref: '#/definitions/ProfileReq'
+                    $ref: '#/definitions/ProfileSearchReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/searchProfilesResponse'
+                "204":
+                    description: No Profiles found
+            summary: Search registered profiles.
+            tags:
+                - Profiles
+    /profile/skills:
+        patch:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
             produces:
                 - application/json
             responses:
                 "200":
                     $ref: '#/responses/messageResponse'
-            summary: Create a user profile.
+            summary: Delete profile languages.
+            tags:
+                - Profiles
+        post:
+            consumes:
+                - application/json
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile languages.
             tags:
                 - Profiles
     /profiles/{username}:
@@ -409,26 +623,29 @@ paths:
             summary: Get GitCollab profile.
             tags:
                 - Profiles
-    /profiles/search:
-        post:
+    /profiles/get-skills:
+        get:
             consumes:
                 - application/json
-            description: Get profile information based on input search parameters.
-            operationId: profileSearchRequest
+            description: Delete provided skills from the callers profile.
+            operationId: profileSkillsRequest
             parameters:
                 - in: body
                   name: Body
                   required: true
                   schema:
-                    $ref: '#/definitions/ProfileSearchReq'
+                    $ref: '#/definitions/ProfileSkillsReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
             produces:
                 - application/json
             responses:
                 "200":
-                    $ref: '#/responses/searchProfilesResponse'
-                "204":
-                    description: No Profiles found
-            summary: Search registered profiles.
+                    $ref: '#/responses/messageResponse'
+            summary: Delete profile languages.
             tags:
                 - Profiles
     /profiles/skills:
@@ -480,6 +697,174 @@ paths:
             summary: Delete profile languages.
             tags:
                 - Profiles
+    /project/{project-name}/tasks/:
+        get:
+            description: Get a list of available languages
+            operationId: profileLanguageRequest
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Get available languages.
+            tags:
+                - Profiles
+    /projects/{project-name}/tasks:
+        post:
+            consumes:
+                - application/json
+            description: Get profile information based on input search parameters.
+            operationId: profileSearchRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileSearchReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/searchProfilesResponse'
+                "204":
+                    description: No Profiles found
+            summary: Search registered profiles.
+            tags:
+                - Profiles
+    /projects/{project-name}/tasks/new:
+        post:
+            consumes:
+                - application/json
+            description: Takes in user information to create a new profile, only used for testing.
+            operationId: createProfileRequest
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/ProfileReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a user profile.
+            tags:
+                - Profiles
+    /projects/create-project:
+        post:
+            consumes:
+                - application/json
+            description: Create a GitCollab project based on a select repo.
+            operationId: repoInfoReq
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/RepoInfoReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a GitCollab project.
+            tags:
+                - Projects
+    /projects/github/repo-info:
+        get:
+            consumes:
+                - application/json
+            description: Create a GitCollab project based on a select repo.
+            operationId: repoInfoReq
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/RepoInfoReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a GitCollab project.
+            tags:
+                - Projects
+    /projects/github/repo-issues:
+        get:
+            consumes:
+                - application/json
+            description: Create a GitCollab project based on a select repo.
+            operationId: repoInfoReq
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/RepoInfoReq'
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Create a GitCollab project.
+            tags:
+                - Projects
+    /projects/github/user-repos:
+        get:
+            description: Retrieve a list of GitHub repos owned by a user.
+            operationId: githubGetUserRepos
+            parameters:
+                - description: User JWT
+                  in: header
+                  name: Authorization
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/reposGetResp'
+            summary: Get GitHub repos owned by user.
+            tags:
+                - Projects
+                - GitHub
+    /projects/user-projects:
+        post:
+            consumes:
+                - application/json
+            description: Retrieve list of GitCollab projects associated to a given user.
+            operationId: userProjectsReq
+            parameters:
+                - in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UserProjectsReq'
+            produces:
+                - application/json
+            responses:
+                "200":
+                    $ref: '#/responses/messageResponse'
+            summary: Get GitCollab projects owned by a user.
+            tags:
+                - Projects
 produces:
     - application/json
 responses:
@@ -507,10 +892,26 @@ responses:
         description: Redirect URL response
         schema:
             $ref: '#/definitions/GitHubRedirectResp'
+    repoInfoResp:
+        description: Repo info response
+        schema:
+            $ref: '#/definitions/RepoInfoResp'
+    repoIssueResp:
+        description: List of repo issues response
+        schema:
+            $ref: '#/definitions/RepoIssueResp'
+    reposGetResp:
+        description: List GitHub repositories response
+        schema:
+            $ref: '#/definitions/ReposGetResp'
     searchProfilesResponse:
         description: Profile search response
         schema:
             $ref: '#/definitions/SearchProfilesResp'
+    userProjectsResp:
+        description: User projects response
+        schema:
+            $ref: '#/definitions/UserProjectsResp'
 schemes:
     - http
 securityDefinitions:
