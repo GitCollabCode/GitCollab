@@ -109,7 +109,10 @@ const NewProjectModal = () => {
   const createProject = () => {
     const requestData = {
       repo_name: selectedRepo,
+      skills: addedSkills,
+      description: description,
     }
+
     console.log('posting' + requestData)
     fetch(process.env.REACT_APP_API_URI + CREATE_PROJECT, {
       method: 'POST',
