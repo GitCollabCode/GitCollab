@@ -27,6 +27,7 @@ const NewProjectModal = () => {
   const [step, setCurrentStep] = useState(0)
   const [selectedRepo, setSelectedRepo] = useState('')
   const [description, setDescription] = useState('')
+  const [error, setError] = useState(false)
 
   console.log(selectedRepo, description)
 
@@ -61,10 +62,16 @@ const NewProjectModal = () => {
         Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status >= 400){
+          throw new Error("API failed")
+        } else {
+          return response.json()}})
       .then((data: ReposResponse) => {
         setRepos(data)
         setIsLoading(false)
+      }).catch((err) =>{
+        setError(true)
       })
   }, [])
 
@@ -122,8 +129,13 @@ const NewProjectModal = () => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
       },
-    }).then(() => {
+    }).then((response) => {
+      if (response.status >= 400){
+        throw new Error()
+      }
       hideModal()
+    }).catch((err)=>{
+      setError(true)
     })
   }
 
@@ -139,6 +151,30 @@ const NewProjectModal = () => {
   //Gets the current step for the submitting a New Project
   //eslint-disable-next-line
   const getCurrentStepsHtml = (step: number): JSX.Element => {
+    if(error){
+      return <>
+      <div className={styles.modalText}>
+        <p className={styles.modalTextTitle}>
+          There was an error in the request
+        </p>
+        <div className={styles.modalTextUnderline} />
+        <p className={styles.modalTextContent}>
+          Please Try Again Later
+        </p>
+
+        <div className={styles.spaceBox}></div>
+        <button
+          className={[
+            styles.modalButton,
+            styles.skillContinueButton,
+          ].join(' ')}
+          onClick={() => hideModal()}
+        >
+          Close
+        </button>
+      </div>
+    </>
+    }
     switch (step) {
       case 2:
         return (
@@ -242,7 +278,7 @@ const NewProjectModal = () => {
           </>
         )
       default:
-        return <>error</>
+        return <></>
     }
   }
 
