@@ -36,25 +36,25 @@
 }
 
 .modalText {
-    font-family: 'Roboto Flex';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 44px;
-    line-height: 52px;
-    height:100%;
-    text-align: center;
-    color: #FFFFFF;
-    display: flex;
-    flex-direction: column;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 52px;
+  height: 100%;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .modalTextContent {
-    margin: 40px;
-    margin-top: 2rem;
+  margin: 40px;
+  margin-top: 2rem;
 }
 
-.modalTextTitle{
-    padding-top: 1rem;    
+.modalTextTitle {
+  padding-top: 1rem;
 }
 
 .modalButton {
@@ -70,62 +70,88 @@
 }
 
 .bg {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
 }
 
 .modalTextUnderline {
-    background-color: #D9D9D9;
-    width: 75%;
-    height: 0.1rem;
-    opacity: 30%;
-    margin-top: 0.7rem;
-    transform: translate(17%);
+  background-color: #d9d9d9;
+  width: 75%;
+  height: 0.1rem;
+  opacity: 30%;
+  margin-top: 0.7rem;
+  transform: translate(17%);
 }
 
 .skillButtonContainer {
-    margin:auto 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    max-width: max-content;
-    max-height: 400px;
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  margin: auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: max-content;
+  max-height: 400px;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
-    padding-left: 30px;
-    padding-right: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
-.skillButtonContainer::-webkit-scrollbar { 
-    display: none;
+.skillButtonContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .skillButton {
-    background-color: #9A196A;
-    text-align: center;
-    padding-left: 20px;
-    padding-right: 20px;
-    height: auto;
-    width: auto;
-    border-radius: 20px;
-    border: 0;
-    margin-right: 20px;
-    margin-top: 10px;
+  background-color: #9a196a;
+  text-align: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  height: auto;
+  width: auto;
+  border-radius: 20px;
+  border: 0;
+  margin-right: 20px;
+  margin-top: 10px;
 }
 
 .skillButtonHovered {
-    box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 7px 7px 0px rgba(0, 0, 0, 0.25);
 }
 
 .active {
-    background-color: #2DA572;
+  background-color: #2da572;
 }
 
 .skillContinueButton {
-    margin:1rem;
-    width:calc(100% - 2rem);
+  margin: 1rem;
+  width: calc(100% - 2rem);
+}
+
+.newProjectContainer {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 40px;
+  height: 100%;
+  align-items: center;
+  color: #ffffff;
+}
+
+.spaceBox {
+  margin: auto 0;
+  display: flex;
+}
+
+.selectBox {
+  padding-top: 30px;
+  width: 75%;
+  line-height: 20px;
+  height: 100%;
+  color: #ffffff;
 }
