@@ -15,21 +15,23 @@ func NewProjectData(dbDriver *db.PostgresDriver) *ProjectData {
 }
 
 type Project struct {
-	ProjectID            int    `json:"project_id"`
-	ProjectOwnerId       string `json:"project_owner_id"`
-	ProjectOwnerUsername string `json:"project_owner_username"`
-	ProjectName          string `json:"project_name"`
-	ProjectURL           string `json:"project_url"`
+	ProjectID            int    `db:"project_id"`
+	ProjectOwnerId       string `db:"project_owner_id"`
+	ProjectOwnerUsername string `db:"project_owner_username"`
+	ProjectName          string `db:"project_name"`
+	ProjectURL           string `db:"project_url"`
 	//ProjectSkills        string `json:"project_skills"`
 	//DateCreated string `json:"date_created"`
 }
 
-func (pd *ProjectData) AddProject(ownerID int, ownerUsername string, projectName string, projectURL string) error {
-	sqlString :=
-		"INSERT INTO projects(project_owner_id, project_owner_username, project_name, project_url)" +
-			"VALUES($1, $2, $3, $4)"
+func (pd *ProjectData) AddProject(ownerID int, ownerUsername string, projectName string, projectURL string,
+	description string, skills []string) error {
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, ownerUsername, projectName, projectURL)
+	sqlString :=
+		"INSERT INTO projects(project_owner_id, project_owner_username, project_name, project_url, project_skills, project_description)" +
+			"VALUES($1, $2, $3, $4, $5, $6)"
+
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, ownerUsername, projectName, projectURL, skills, description)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddProject database INSERT failed: %s", err.Error())
 		return err
@@ -43,8 +45,6 @@ func (pd *ProjectData) UpdateProjectName(projectID int, projectName string) erro
 	return pd.PDriver.TransactOneRow(sqlStatement, projectName, projectID)
 }
 
-// our endpoints
-
 func (pd *ProjectData) UpdateProjectDescription(projectID int, description string) error {
 	sqlStatement := "UPDATE projects SET project_description = $1 WHERE project_id = $2"
 	return pd.PDriver.TransactOneRow(sqlStatement, description, projectID)
@@ -53,6 +53,7 @@ func (pd *ProjectData) UpdateProjectDescription(projectID int, description strin
 /*
  * TODO, i dont know how to add custom types to list yet....
  */
+
 //func (pd *ProjectData) AddProjectskills(projectID int, skill string) error {
 //	sqlStatement := "UPDATE projects SET avatar_url = $1 WHERE github_user_id = $2"
 //	return pd.projectsTransactOneRow(sqlStatement, avatarURL, githubUserID)

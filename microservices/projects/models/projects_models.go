@@ -1,7 +1,6 @@
 package projectsModels
 
-// Project get request
-// swagger:parameters ReposGetResp
+// swagger:response reposGetResp
 type _ struct {
 	// in:body
 	// Required: true
@@ -9,14 +8,28 @@ type _ struct {
 }
 
 type ReposGetResp struct {
-	// Github repositories
+	// List of GitHub repository names
 	// Example: ["chicken1", "chicken2"]
-	// Required: true
 	Repos []string `json:"repos"`
 }
 
-// Request Repo Info
-// swagger:parameters RepoInfoReq
+// swagger:RequestCreateRepo
+type _ struct {
+	// in:body
+	// Required: true
+	Body CreateRepoReq
+}
+
+type CreateRepoReq struct {
+	// List of GitHub repository names
+	// Example: ["chicken1", "chicken2"]
+	RepoName    string   `json:"repo_name"`
+	Skills      []string `json:"skills"`
+	Description string   `json:"description"`
+}
+
+// Repo info request
+// swagger:parameters repoInfoReq
 type _ struct {
 	// in:body
 	// Required: true
@@ -30,17 +43,8 @@ type RepoInfoReq struct {
 	RepoName string `json:"repo_name" validate:"required"`
 }
 
-type Contributor struct {
-	// Github username
-	// Example: "robotevan"
-	Username string `json:"username"`
-	// Github ID
-	// Example: 12312312
-	GitID int `json:"git_id"`
-}
-
-// Get Repo Info
-// swagger:parameters RepoInfoResp
+// Repo info response
+// swagger:response repoInfoResp
 type _ struct {
 	// in:body
 	// Required: true
@@ -50,8 +54,32 @@ type _ struct {
 type RepoInfoResp struct {
 	// Github repositories
 	// Example: ["chicken1", "chicken2"]
-	Languages    []string      `json:"languages"`
+	Languages []string `json:"languages"`
+	// List of contributors
+	// Example [{"username": "wagwan", "git_id": 1234567}]
 	Contributors []Contributor `json:"contributors"`
+}
+
+type Contributor struct {
+	// Github username
+	// Example: "robotevan"
+	Username string `json:"username"`
+	// Github ID
+	// Example: 12312312
+	GitID int `json:"git_id"`
+}
+
+// List of repo issues response
+// swagger:response repoIssueResp
+type _ struct {
+	// in:body
+	// Required: true
+	Body RepoIssueResp
+}
+
+type RepoIssueResp struct {
+	// Github repositories
+	Issues []RepoIssue `json:"issues"`
 }
 
 type RepoIssue struct {
@@ -61,22 +89,8 @@ type RepoIssue struct {
 	// TODO add more info here
 }
 
-// Get Repo Issues
-// swagger:parameters RepoIssueResp
-type _ struct {
-	// in:body
-	// Required: true
-	Body RepoIssueResp
-}
-
-type RepoIssueResp struct {
-	// Github repositories
-	// Example: ["chicken1", "chicken2"]
-	Issues []RepoIssue `json:"issues"`
-}
-
-// Get Req User Projects
-// swagger:parameters UserProjectsReq
+// User projects request
+// swagger:parameters userProjectsReq
 type _ struct {
 	// in:body
 	// Required: true
@@ -84,13 +98,13 @@ type _ struct {
 }
 
 type UserProjectsReq struct {
-	// Github repositories
-	// Example: ["chicken1", "chicken2"]
-	Username string `json:"username"`
+	// Profile username
+	// Example: wagwan
+	Username string `json:"username" validate:"required"`
 }
 
-// Get user projects
-// swagger:parameters UserProjectsResp
+// User projects response
+// swagger:response userProjectsResp
 type _ struct {
 	// in:body
 	// Required: true
@@ -98,7 +112,7 @@ type _ struct {
 }
 
 type UserProjectsResp struct {
-	// Github repositories
+	// GitCollab projects
 	// Example: ["chicken1", "chicken2"]
 	Projects []string `json:"projects"`
 }
