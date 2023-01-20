@@ -110,6 +110,11 @@ const NewProjectModal = () => {
     fetch(process.env.REACT_APP_API_URI + CREATE_PROJECT, {
       method: 'POST',
       body: JSON.stringify(requestData),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
+      },
     })
   }
 
