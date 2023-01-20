@@ -57,8 +57,8 @@ const NewProjectModal = () => {
       .then((response) => response.json())
       .then((data: ReposResponse) => {
         setRepos(data)
+        setIsLoading(false)
       })
-    setIsLoading(false)
   }, [])
 
   //UseEffect to query each piece of data for each step in the form
@@ -75,6 +75,7 @@ const NewProjectModal = () => {
           return response.json()
         })
         .then((data: SkillListResponse) => {
+          setIsLoading(false)
           let skills: any = []
           data.skills.forEach((element, index) => {
             skills.push(
@@ -90,7 +91,6 @@ const NewProjectModal = () => {
             setSkillList(skills)
           })
         })
-      setIsLoading(false)
     }
   }, [handleAddClick, step])
 
