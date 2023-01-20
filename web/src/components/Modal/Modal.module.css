@@ -69,6 +69,12 @@
   margin-top: 140px;
 }
 
+.modalButton:disabled{
+  opacity: 0.65; 
+  cursor: not-allowed;
+  background: #d9d9d9;
+}
+
 .bg {
   width: 100vw;
   height: 100vh;

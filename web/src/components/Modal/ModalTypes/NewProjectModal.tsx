@@ -19,23 +19,25 @@ import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner'
 
 const NewProjectModal = () => {
   const { hideModal } = useContext(ModalContextStateContext)
+  
   const intialRepos: ReposResponse = {
-    repos: [''],
+    repos: [],
   }
-
-  const [repos, setRepos] = useState(intialRepos)
-  const [step, setCurrentStep] = useState(0)
-  const [selectedRepo, setSelectedRepo] = useState('')
-  const [description, setDescription] = useState('')
-  const [error, setError] = useState(false)
-
-  console.log(selectedRepo, description)
-
   const initialArray: string[] = []
-  const [skillList, setSkillList] = useState()
-  const [addedSkills, setAddedSkills] = useState(initialArray)
-  const [isLoading, setIsLoading] = useState(false)
 
+  const [step, setCurrentStep] = useState(0)
+
+  const [repos, setRepos] = useState(intialRepos)      //List of repos from user-repos 
+  const [selectedRepo, setSelectedRepo] = useState('') //The selected repo
+  const [description, setDescription] = useState('')   //The description of the project
+  const [error, setError] = useState(false)           //For when an API failed
+
+
+  const [skillList, setSkillList] = useState()        //The total list of skills
+  const [addedSkills, setAddedSkills] = useState(initialArray)  //Skills that the user selected
+  const [isLoading, setIsLoading] = useState(false)       //For when api is loading
+
+  //This is for when adding a skill to the array when clicked
   const handleAddClick = useCallback(
     (id: string, skillType: string) => {
       const el = document.getElementById(id)
@@ -106,13 +108,14 @@ const NewProjectModal = () => {
     }
   }, [handleAddClick, step])
 
-  //Handle React Select change
+  //Handle Selecting a repo when using react select repos
   const handleRepoChange = (value: string | undefined) => {
     if (value) {
       setSelectedRepo(value)
     }
   }
 
+  //Function to create a new project
   const createProject = () => {
     const requestData = {
       repo_name: selectedRepo,
@@ -148,7 +151,7 @@ const NewProjectModal = () => {
     return values
   }
 
-  //Gets the current step for the submitting a New Project
+  //Renders the correct html for which step the user is on
   //eslint-disable-next-line
   const getCurrentStepsHtml = (step: number): JSX.Element => {
     if(error){
@@ -176,65 +179,7 @@ const NewProjectModal = () => {
     </>
     }
     switch (step) {
-      case 2:
-        return (
-          <>
-            <div className={styles.modalText}>
-              <p className={styles.modalTextTitle}>
-                Tell us more about your project
-              </p>
-              <div className={styles.modalTextUnderline} />
-              <p className={styles.modalTextContent}>
-                Please provide a description of your project
-              </p>
-
-              <textarea
-                className={styles.textArea}
-                rows={10}
-                onChange={(e) => setDescription(e.target.value)}
-              ></textarea>
-              <div className={styles.spaceBox}></div>
-              <button
-                className={[
-                  styles.modalButton,
-                  styles.skillContinueButton,
-                ].join(' ')}
-                onClick={() => createProject()}
-              >
-                Create Project
-              </button>
-            </div>
-          </>
-        )
-
-      case 1:
-        return (
-          <>
-            <div className={styles.modalText}>
-              <p className={styles.modalTextTitle}>
-                Tell us more about your project
-              </p>
-              <div className={styles.modalTextUnderline} />
-              <p className={styles.modalTextContent}>
-                Select a few topics that you want in your project
-              </p>
-              <div className={styles.skillButtonContainer}>
-                <>{skillList}</>
-              </div>
-              <button
-                className={[
-                  styles.modalButton,
-                  styles.skillContinueButton,
-                ].join(' ')}
-                onClick={() => setCurrentStep(2)}
-              >
-                Continue
-              </button>
-            </div>
-          </>
-        )
-
-      case 0:
+      case 0: // Selecting a repo
         return (
           <>
             {isLoading ? (
@@ -263,6 +208,7 @@ const NewProjectModal = () => {
                 )}
                 <div className={styles.spaceBox}></div>
                 <button
+                disabled={selectedRepo==""? true:false}
                   className={[
                     styles.modalButton,
                     styles.skillContinueButton,
@@ -275,6 +221,62 @@ const NewProjectModal = () => {
                 </button>
               </div>
             )}
+          </>
+        )
+        case 1: //Adding skills list to project
+        return (
+          <>
+            <div className={styles.modalText}>
+              <p className={styles.modalTextTitle}>
+                Tell us more about your project
+              </p>
+              <div className={styles.modalTextUnderline} />
+              <p className={styles.modalTextContent}>
+                Select a few topics that you want in your project
+              </p>
+              <div className={styles.skillButtonContainer}>
+                <>{skillList}</>
+              </div>
+              <button
+                className={[
+                  styles.modalButton,
+                  styles.skillContinueButton,
+                ].join(' ')}
+                onClick={() => setCurrentStep(2)}
+              >
+                Continue
+              </button>
+            </div>
+          </>
+        )
+      case 2: // Adding a description to a project
+        return (
+          <>
+            <div className={styles.modalText}>
+              <p className={styles.modalTextTitle}>
+                Tell us more about your project
+              </p>
+              <div className={styles.modalTextUnderline} />
+              <p className={styles.modalTextContent}>
+                Please provide a description of your project
+              </p>
+
+              <textarea
+                className={styles.textArea}
+                rows={10}
+                onChange={(e) => setDescription(e.target.value)}
+              ></textarea>
+              <div className={styles.spaceBox}></div>
+              <button
+                className={[
+                  styles.modalButton,
+                  styles.skillContinueButton,
+                ].join(' ')}
+                onClick={() => createProject()}
+              >
+                Create Project
+              </button>
+            </div>
           </>
         )
       default:
