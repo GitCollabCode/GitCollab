@@ -63,7 +63,7 @@ const NewProjectModal = () => {
 
   //UseEffect to query each piece of data for each step in the form
   useEffect(() => {
-    if (step === 2) {
+    if (step === 1) {
       setIsLoading(true)
       fetch(process.env.REACT_APP_API_URI + GET_SKILLS, {
         method: 'GET',
