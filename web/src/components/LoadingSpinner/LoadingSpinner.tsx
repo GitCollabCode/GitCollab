@@ -2,7 +2,13 @@ import React, { CSSProperties } from 'react'
 import RingLoader from 'react-spinners/RingLoader'
 import style from './LoadingSpinner.module.css'
 
-const LoadingSpinner = ({ isLoading }: { isLoading: boolean }) => {
+const LoadingSpinner = ({
+  isLoading,
+  type,
+}: {
+  isLoading: boolean
+  type?: 'fixed'
+}) => {
   const override: CSSProperties = {
     position: 'fixed',
     margin: '0 auto',
@@ -13,7 +19,7 @@ const LoadingSpinner = ({ isLoading }: { isLoading: boolean }) => {
   }
 
   return (
-    <div className={style.overlay}>
+    <div className={type !== 'fixed' ? style.overlay : style.dynamicOverlay}>
       <RingLoader
         loading={isLoading}
         color={'#ffffff'}

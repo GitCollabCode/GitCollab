@@ -23,7 +23,7 @@ test('renders', () => {
   })
 
   waitFor(() => {
-    expect(screen.getByText('discover')).toBeInTheDocument()
+    expect(screen.getByText('projects')).toBeInTheDocument()
   })
 
   const links = document.getElementsByClassName('link')
