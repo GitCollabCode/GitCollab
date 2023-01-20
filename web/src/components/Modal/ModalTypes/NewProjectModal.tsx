@@ -106,15 +106,10 @@ const NewProjectModal = () => {
     const requestData = {
       repo_name: selectedRepo,
     }
-
+    console.log('posting' + requestData)
     fetch(process.env.REACT_APP_API_URI + CREATE_PROJECT, {
       method: 'POST',
       body: JSON.stringify(requestData),
-    }).then((response) => {
-      if (response.status !== 200) {
-        console.log('fail')
-      }
-      return response.json()
     })
   }
 
