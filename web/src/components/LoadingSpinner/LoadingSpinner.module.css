@@ -20,12 +20,12 @@
 
 .dynamicOverlay {
   /* Height & width depends on how you want to reveal the overlay (see JS below) */
-  height: 100vh;
-  width: 100vw;
-  z-index: 1; /* Sit on top */
+  height: 100%;
+
+  overflow: hidden;
   position: relative;
-  background: black;
-  background: rgba(0, 0, 0, 0.99);
+  z-index: 1; /* Sit on top */
+  backdrop-filter: blur(12px);
 
   filter: blur(4px);
   -o-filter: blur(4px);

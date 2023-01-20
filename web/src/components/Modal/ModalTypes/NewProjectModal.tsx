@@ -15,6 +15,7 @@ import octocat from '../../../assets/octocat.png'
 
 import Select from 'react-select'
 import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
+import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner'
 
 const NewProjectModal = () => {
   const { hideModal } = useContext(ModalContextStateContext)
@@ -32,6 +33,7 @@ const NewProjectModal = () => {
   const initialArray: string[] = []
   const [skillList, setSkillList] = useState()
   const [addedSkills, setAddedSkills] = useState(initialArray)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleAddClick = useCallback(
     (id: string, skillType: string) => {
@@ -50,6 +52,7 @@ const NewProjectModal = () => {
 
   //Fetch a users public repos
   useEffect(() => {
+    setIsLoading(true)
     fetch(process.env.REACT_APP_API_URI + GET_USER_REPOS, {
       method: 'GET',
       headers: {
@@ -61,6 +64,7 @@ const NewProjectModal = () => {
       .then((response) => response.json())
       .then((data: ReposResponse) => {
         setRepos(data)
+        setIsLoading(false)
       })
   }, [])
 
@@ -115,6 +119,8 @@ const NewProjectModal = () => {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
       },
+    }).then(() => {
+      hideModal()
     })
   }
 
@@ -192,6 +198,7 @@ const NewProjectModal = () => {
       case 0:
         return (
           <>
+            {isLoading && <LoadingSpinner isLoading={isLoading} type="fixed" />}
             <div className={styles.newProjectContainer}>
               <img
                 className={styles.modalLogo}
