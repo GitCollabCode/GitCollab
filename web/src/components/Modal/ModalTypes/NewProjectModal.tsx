@@ -4,14 +4,17 @@ import {
   SelectType,
   SkillListResponse,
 } from '../../../constants/common'
-import { GET_SKILLS, GET_USER_REPOS } from '../../../constants/endpoints'
+import {
+  CREATE_PROJECT,
+  GET_SKILLS,
+  GET_USER_REPOS,
+} from '../../../constants/endpoints'
 import styles from '../Modal.module.css'
 
 import octocat from '../../../assets/octocat.png'
 
 import Select from 'react-select'
 import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
-import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner'
 
 const NewProjectModal = () => {
   const { hideModal } = useContext(ModalContextStateContext)
@@ -19,10 +22,12 @@ const NewProjectModal = () => {
     repos: [''],
   }
 
-  const [isLoading, setIsLoading] = useState(false)
   const [repos, setRepos] = useState(intialRepos)
   const [step, setCurrentStep] = useState(0)
   const [selectedRepo, setSelectedRepo] = useState('')
+  const [description, setDescription] = useState('')
+
+  console.log(selectedRepo, description)
 
   const initialArray: string[] = []
   const [skillList, setSkillList] = useState()
@@ -45,7 +50,6 @@ const NewProjectModal = () => {
 
   //Fetch a users public repos
   useEffect(() => {
-    setIsLoading(true)
     fetch(process.env.REACT_APP_API_URI + GET_USER_REPOS, {
       method: 'GET',
       headers: {
@@ -57,14 +61,12 @@ const NewProjectModal = () => {
       .then((response) => response.json())
       .then((data: ReposResponse) => {
         setRepos(data)
-        setIsLoading(false)
       })
   }, [])
 
   //UseEffect to query each piece of data for each step in the form
   useEffect(() => {
     if (step === 1) {
-      setIsLoading(true)
       fetch(process.env.REACT_APP_API_URI + GET_SKILLS, {
         method: 'GET',
       })
@@ -75,7 +77,6 @@ const NewProjectModal = () => {
           return response.json()
         })
         .then((data: SkillListResponse) => {
-          setIsLoading(false)
           let skills: any = []
           data.skills.forEach((element, index) => {
             skills.push(
@@ -100,6 +101,23 @@ const NewProjectModal = () => {
       setSelectedRepo(value)
     }
   }
+
+  const createProject = () => {
+    const requestData = {
+      repo_name: selectedRepo,
+    }
+
+    fetch(process.env.REACT_APP_API_URI + CREATE_PROJECT, {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+    }).then((response) => {
+      if (response.status !== 200) {
+        console.log('fail')
+      }
+      return response.json()
+    })
+  }
+
   //Formats the Repos into usable data
   const getReposSelect = () => {
     let values: SelectType[] = []
@@ -114,12 +132,39 @@ const NewProjectModal = () => {
   const getCurrentStepsHtml = (step: number): JSX.Element => {
     switch (step) {
       case 2:
-        return <>hi{console.log(selectedRepo)}</>
+        return (
+          <>
+            <div className={styles.modalText}>
+              <p className={styles.modalTextTitle}>
+                Tell us more about your project
+              </p>
+              <div className={styles.modalTextUnderline} />
+              <p className={styles.modalTextContent}>
+                Please provide a description of your project
+              </p>
+
+              <textarea
+                className={styles.textArea}
+                rows={10}
+                onChange={(e) => setDescription(e.target.value)}
+              ></textarea>
+              <div className={styles.spaceBox}></div>
+              <button
+                className={[
+                  styles.modalButton,
+                  styles.skillContinueButton,
+                ].join(' ')}
+                onClick={() => createProject()}
+              >
+                Create Project
+              </button>
+            </div>
+          </>
+        )
 
       case 1:
         return (
           <>
-            {isLoading && <LoadingSpinner isLoading={isLoading} />}
             <div className={styles.modalText}>
               <p className={styles.modalTextTitle}>
                 Tell us more about your project
@@ -131,7 +176,6 @@ const NewProjectModal = () => {
               <div className={styles.skillButtonContainer}>
                 <>{skillList}</>
               </div>
-
               <button
                 className={[
                   styles.modalButton,
@@ -148,7 +192,6 @@ const NewProjectModal = () => {
       case 0:
         return (
           <>
-            {isLoading && <LoadingSpinner isLoading={isLoading} />}
             <div className={styles.newProjectContainer}>
               <img
                 className={styles.modalLogo}
