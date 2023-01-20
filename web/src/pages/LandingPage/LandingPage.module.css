@@ -9,6 +9,7 @@
   font-size: 164px;
   line-height: 192px;
   color: white;
+  margin-left: 2rem;
 }
 
 .textContainer {
@@ -16,6 +17,7 @@
   height: 418px;
 }
 .animatedText {
+  margin-left: 4rem;
   width: 800px;
   height: 216px;
   overflow: hidden;

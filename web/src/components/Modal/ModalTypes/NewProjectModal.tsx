@@ -208,7 +208,7 @@ const NewProjectModal = () => {
                 )}
                 <div className={styles.spaceBox}></div>
                 <button
-                disabled={selectedRepo==""? true:false}
+                disabled={selectedRepo===""? true:false}
                   className={[
                     styles.modalButton,
                     styles.skillContinueButton,
