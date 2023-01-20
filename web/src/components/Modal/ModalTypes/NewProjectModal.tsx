@@ -198,41 +198,44 @@ const NewProjectModal = () => {
       case 0:
         return (
           <>
-            {isLoading && <LoadingSpinner isLoading={isLoading} type="fixed" />}
-            <div className={styles.newProjectContainer}>
-              <img
-                className={styles.modalLogo}
-                src={octocat}
-                alt="Github Cat"
-              />
-              <p className={styles.modalTextContent}>
-                {repos.repos.length > 0
-                  ? 'Please select the project you would like to register from Github'
-                  : 'To create a GitCollab Project, please create a GitHub project first'}
-              </p>
-              {repos.repos.length !== 0 ? (
-                <div className={styles.selectBox}>
-                  <Select
-                    options={getReposSelect()}
-                    onChange={(e) => handleRepoChange(e?.value)}
-                  />
-                </div>
-              ) : (
-                <></>
-              )}
-              <div className={styles.spaceBox}></div>
-              <button
-                className={[
-                  styles.modalButton,
-                  styles.skillContinueButton,
-                ].join(' ')}
-                onClick={() => {
-                  repos.repos.length > 0 ? setCurrentStep(1) : hideModal()
-                }}
-              >
-                {repos.repos.length > 0 ? 'Continue' : 'Close'}
-              </button>
-            </div>
+            {isLoading ? (
+              <LoadingSpinner isLoading={isLoading} type="fixed" />
+            ) : (
+              <div className={styles.newProjectContainer}>
+                <img
+                  className={styles.modalLogo}
+                  src={octocat}
+                  alt="Github Cat"
+                />
+                <p className={styles.modalTextContent}>
+                  {repos.repos.length > 0
+                    ? 'Please select the project you would like to register from Github'
+                    : 'To create a GitCollab Project, please create a GitHub project first'}
+                </p>
+                {repos.repos.length !== 0 ? (
+                  <div className={styles.selectBox}>
+                    <Select
+                      options={getReposSelect()}
+                      onChange={(e) => handleRepoChange(e?.value)}
+                    />
+                  </div>
+                ) : (
+                  <></>
+                )}
+                <div className={styles.spaceBox}></div>
+                <button
+                  className={[
+                    styles.modalButton,
+                    styles.skillContinueButton,
+                  ].join(' ')}
+                  onClick={() => {
+                    repos.repos.length > 0 ? setCurrentStep(1) : hideModal()
+                  }}
+                >
+                  {repos.repos.length > 0 ? 'Continue' : 'Close'}
+                </button>
+              </div>
+            )}
           </>
         )
       default:
