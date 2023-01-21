@@ -8,6 +8,7 @@ import LoggedOutModal from './ModalTypes/LoggedOutModal'
 import LoginModal from './ModalTypes/SkillSelectModal'
 import LanguagesSelectModal from './ModalTypes/LanguagesSelectModal'
 import PageNotFoundModal from './ModalTypes/PageNotFoundModal'
+import NewProjectModal from './ModalTypes/NewProjectModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -23,15 +24,15 @@ const Modal = () => {
   const renderModalType = (modalType: any) => {
     switch (modalType) {
       case ModalType.LoggedOutModal:
-        return (
-        <LoggedOutModal/>
-        )
+        return <LoggedOutModal />
       case ModalType.SkillSelectModal:
-        return (<LoginModal/> )
+        return <LoginModal />
       case ModalType.LanguagesSelectModal:
-        return (<LanguagesSelectModal/> )
+        return <LanguagesSelectModal />
       case ModalType.PageNotFoundModal:
-        return (<PageNotFoundModal/>)
+        return <PageNotFoundModal />
+      case ModalType.NewProjectModal:
+        return <NewProjectModal />
     }
   }
 

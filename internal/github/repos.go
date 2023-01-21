@@ -16,7 +16,8 @@ func GetUserOwnedRepos(client *github.Client) ([]*github.Repository, error) {
 		return nil, errors.New("could not get repo service")
 	}
 	opts := github.RepositoryListOptions{
-		Type: "owner",
+		Affiliation: "owner",
+		Visibility:  "public",
 	}
 
 	repos, _, err := repoService.List(context.Background(), "", &opts)

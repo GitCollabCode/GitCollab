@@ -4,6 +4,7 @@ export enum ModalType {
   SkillSelectModal,
   LanguagesSelectModal,
   PageNotFoundModal,
+  NewProjectModal,
 }
 
 export type userValue = {
@@ -52,4 +53,13 @@ export type SkillListResponse = {
 
 export type LanguageListResponse = {
   languages: string[]
+}
+
+export type ReposResponse = {
+  repos: string[]
+}
+
+export type SelectType = {
+  value: string
+  label: string
 }

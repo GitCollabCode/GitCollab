@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import CheckboxFilter from '../../components/CheckboxFilter/CheckboxFilter'
 import SearchBox from '../../components/SearchBox/SearchBox'
 import Table, { rowType } from '../../components/Table/Tables'
 import styles from './Projects.module.css'
-import { Link } from 'react-router-dom'
+
 import Button from '../../components/Button/Button'
+import { ModalContextStateContext } from '../../context/modalContext/modalContext'
+import { ModalType } from '../../constants/common'
 
 const Projects = () => {
+  const { showModal, setModalType } = useContext(ModalContextStateContext)
   const [topicsFilter, setTopicsFilter] = useState([''])
   const [skillsFilter, setSkillsFilter] = useState([''])
   const [languagesFilter, setLanguagesFilter] = useState([''])
@@ -116,9 +119,15 @@ const Projects = () => {
           <div className={styles.projectTitle}>
             <div className={styles.titleBox}>
               <p className={styles.title}>Projects</p>
-              <Link to={'/new-project'} className={styles.noLink}>
-                <Button type="new" text="New Project" />
-              </Link>
+
+              <Button
+                type="new"
+                text="New Project"
+                onClick={() => {
+                  setModalType(ModalType.NewProjectModal)
+                  showModal()
+                }}
+              />
             </div>
             <div className={styles.line} />
           </div>

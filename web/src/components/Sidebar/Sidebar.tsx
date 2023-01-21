@@ -8,8 +8,8 @@ const Sidebar = () => {
     <Menu>
       <div className={style.sidebar}>
         <div>
-          <a href="/" className={style.link}>
-            discover
+          <a href="/projects" className={style.link}>
+            projects
           </a>
         </div>
 

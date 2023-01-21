@@ -24,12 +24,14 @@ type Project struct {
 	//DateCreated string `json:"date_created"`
 }
 
-func (pd *ProjectData) AddProject(ownerID int, ownerUsername string, projectName string, projectURL string) error {
-	sqlString :=
-		"INSERT INTO projects(project_owner_id, project_owner_username, project_name, project_url)" +
-			"VALUES($1, $2, $3, $4)"
+func (pd *ProjectData) AddProject(ownerID int, ownerUsername string, projectName string, projectURL string,
+	description string, skills []string) error {
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, ownerUsername, projectName, projectURL)
+	sqlString :=
+		"INSERT INTO projects(project_owner_id, project_owner_username, project_name, project_url, project_skills, project_description)" +
+			"VALUES($1, $2, $3, $4, $5, $6)"
+
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, ownerID, ownerUsername, projectName, projectURL, skills, description)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddProject database INSERT failed: %s", err.Error())
 		return err
