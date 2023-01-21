@@ -116,19 +116,26 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 		r.Post("/create-project", p.CreateProject)
 	})
 
-	r.Route("/tasks", func(r chi.Router) {
-		r.Get("/", p.GetTasks)
+	r.Route("/{project-name}", func(r chi.Router) {
 
-		r.Route("/{project-name}", func(r chi.Router) {
-			r.Use(jwt.JWTBlackList(p.PgConn))
-			r.Use(jwtConf.VerifyJWT(p.Log))
-
-			r.Post("/new", p.CreateTask)
+		r.Route("/tasks", func(r chi.Router) {
+			r.Get("/", p.GetTasks)
 
 			r.Route("/{task-id}", func(r chi.Router) {
 				r.Get("/", p.GetTask)
-				r.Delete("/", p.DeleteTask)
-				r.Patch("/", p.EditTask)
+
+				r.Group(func(r chi.Router) {
+					r.Use(jwt.JWTBlackList(p.PgConn))
+					r.Use(jwtConf.VerifyJWT(p.Log))
+					r.Delete("/", p.DeleteTask)
+					r.Patch("/", p.EditTask)
+				})
+			})
+
+			r.Group(func(r chi.Router) {
+				r.Use(jwt.JWTBlackList(p.PgConn))
+				r.Use(jwtConf.VerifyJWT(p.Log))
+				r.Post("/new", p.CreateTask)
 			})
 		})
 	})
