@@ -143,6 +143,8 @@ func main() {
 
 	// register all sub routers under /api
 	r.Route("/api", func(r chi.Router) {
+		r.Use(middleware.AllowContentEncoding("application/json"))
+
 		// authentication subrouter
 		auth := authHandlers.NewAuth(dbDriver, logger, GitOauthConfig, gitRedirect, gitCollabSecret)
 		r.Mount("/auth", authRouter.AuthRouter(auth))

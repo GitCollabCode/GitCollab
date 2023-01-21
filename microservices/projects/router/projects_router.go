@@ -13,13 +13,13 @@ import (
 
 const MAX_GIT_TRANSACTIONS = 5 // per min
 
-// ProjectRouter defines Project service endpoints
-func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData, jwtConf *jwt.GitCollabJwtConf) chi.Router {
+// ProjectRouter serve projects api endpoints
+func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtConf *jwt.GitCollabJwtConf) chi.Router {
 	r := chi.NewRouter()
 
 	r.Group(func(r chi.Router) {
-		r.Use(jwt.JWTBlackList(project.PgConn))
-		r.Use(jwtConf.VerifyJWT(project.Log))
+		r.Use(jwt.JWTBlackList(p.PgConn))
+		r.Use(jwtConf.VerifyJWT(p.Log))
 		r.Use(gitauth.GitClient(profiles))
 
 		r.Route("/github", func(r chi.Router) {
@@ -43,7 +43,7 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 			//
 			//     Responses:
 			//       200: reposGetResp
-			r.Get("/user-repos", project.GetUserRepos)
+			r.Get("/user-repos", p.GetUserRepos)
 
 			// swagger:route GET /projects/github/repo-info Projects GitHub repoInfoReq
 			//
@@ -66,7 +66,7 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 			//
 			//     Responses:
 			//       200: repoInfoResp
-			r.Get("/repo-info", project.GetRepoInfo)
+			r.Get("/repo-info", p.GetRepoInfo)
 
 			// swagger:route GET /projects/github/repo-issues Projects GitHub repoInfoReq
 			//
@@ -89,7 +89,7 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 			//
 			//     Responses:
 			//       200: repoIssueResp
-			r.Get("/repo-issues", project.GetRepoIssues)
+			r.Get("/repo-issues", p.GetRepoIssues)
 		})
 
 		// swagger:route POST /projects/create-project Projects repoInfoReq
@@ -113,7 +113,24 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 		//
 		//     Responses:
 		//       200: messageResponse
-		r.Post("/create-project", project.CreateProject)
+		r.Post("/create-project", p.CreateProject)
+	})
+
+	r.Route("/tasks", func(r chi.Router) {
+		r.Get("/", p.GetTasks)
+
+		r.Route("/{project-name}", func(r chi.Router) {
+			r.Use(jwt.JWTBlackList(p.PgConn))
+			r.Use(jwtConf.VerifyJWT(p.Log))
+
+			r.Post("/new", p.CreateTask)
+
+			r.Route("/{task-id}", func(r chi.Router) {
+				r.Get("/", p.GetTask)
+				r.Delete("/", p.DeleteTask)
+				r.Patch("/", p.EditTask)
+			})
+		})
 	})
 
 	// swagger:route POST /projects/user-projects Projects userProjectsReq
@@ -130,7 +147,7 @@ func ProjectRouter(project *handlers.Projects, profiles *profileData.ProfileData
 	//
 	//     Responses:
 	//       200: messageResponse
-	r.Get("/user-projects", project.GetUserProjects)
+	r.Get("/user-projects", p.GetUserProjects)
 
 	return r
 }

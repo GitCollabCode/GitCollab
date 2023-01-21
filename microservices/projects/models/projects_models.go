@@ -1,4 +1,4 @@
-package projectsModels
+package models
 
 // List GitHub repositories response
 // swagger:response reposGetResp
@@ -53,19 +53,6 @@ type Contributor struct {
 	// Github ID
 	// Example: 12312312
 	GitID int `json:"git_id"`
-}
-
-// List of repo issues response
-// swagger:response repoIssueResp
-type _ struct {
-	// in:body
-	// Required: true
-	Body RepoIssueResp
-}
-
-type RepoIssueResp struct {
-	// Github repositories
-	Issues []RepoIssue `json:"issues"`
 }
 
 type RepoIssue struct {

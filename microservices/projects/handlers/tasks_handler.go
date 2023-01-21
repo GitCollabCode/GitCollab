@@ -1,152 +1,285 @@
 package handlers
 
-// import (
-// 	"net/http"
+import (
+	"net/http"
+	"strconv"
+	"time"
 
-// 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
-// 	"github.com/GitCollabCode/GitCollab/internal/models"
-// 	validate "github.com/GitCollabCode/GitCollab/internal/validator"
-// 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
-// 	profilesModels "github.com/GitCollabCode/GitCollab/microservices/profiles/models"
-// 	"github.com/go-chi/chi/v5"
-// 	"github.com/jackc/pgx/v5"
-// 	"github.com/sirupsen/logrus"
-// )
+	githubAPI "github.com/GitCollabCode/GitCollab/internal/github"
+	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
+	"github.com/GitCollabCode/GitCollab/internal/models"
+	projectModels "github.com/GitCollabCode/GitCollab/microservices/projects/models"
+	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
+)
 
-// // Interface for profiles handlers.
-// type Tasks struct {
-// 	log      *logrus.Logger
-// 	validate *validate.Validation
-// 	Pd       *data.ProfileData
-// }
+// GetTasks sends all Tasks under a Project.
+func (p *Projects) GetTasks(w http.ResponseWriter, r *http.Request) {
+	projectName := chi.URLParam(r, "project-name")
 
-// // NewProfiles returns initialized Profiles handler struct.
-// func NewTasks(log *logrus.Logger, pd *data.ProfileData) *Tasks {
-// 	return &Tasks{log, validate.NewValidation(), pd}
-// }
+	tasks, err := p.ProjectData.GetTasks(projectName)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "project has no task"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetTasks failed to send error response: %s", err)
+		}
+		return
+	}
 
-// // GetTasks sends all Tasks under a Project.
-// func (p *Tasks) GetTasks(w http.ResponseWriter, r *http.Request) {
-// 	username := chi.URLParam(r, "username")
+	if err != nil {
+		p.Log.Errorf("GetTasks database search failed: %s", err.Error())
+		// NOTE: Repetative code, clean this up
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetTasks failed to send error response: %s", err)
+		}
+		return
+	}
 
-// 	profile, err := p.Pd.GetProfileByUsername(username)
-// 	if err == pgx.ErrNoRows {
-// 		w.WriteHeader(http.StatusNotFound)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "profile does not exist"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("GetTasks failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-// 	if err != nil {
-// 		p.log.Errorf("GetTasks database search failed: %s", err.Error())
-// 		// NOTE: Repetative code, clean this up
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("GetTasks failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	var res []projectModels.TaskResp
+	for _, task := range tasks {
+		res = append(res, projectModels.TaskResp{
+			TaskID:          task.TaskID,
+			ProjectID:       task.ProjectID,
+			ProjectName:     task.ProjectName,
+			CompletedByID:   task.CompletedByID,
+			CreatedDate:     task.CreatedDate,
+			CompletedDate:   task.CompletedDate,
+			TaskTitle:       task.TaskTitle,
+			TaskDescription: task.TaskDescription,
+			Diffictly:       task.Diffictly,
+			Priority:        task.Priority,
+			Skills:          task.Skills,
+		})
+	}
 
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Header().Set("Content-Type", "application/json")
+	err = jsonio.ToJSON(res, w)
+	if err != nil {
+		p.Log.Fatalf("GetTasks failed to send response: %s", err)
+	}
+}
 
-// 	res := profilesModels.ProfileResp{
-// 		Username:  profile.Username,
-// 		GithubId:  profile.GitHubUserID,
-// 		Email:     profile.Email,
-// 		AvatarURL: profile.AvatarURL,
-// 		Bio:       profile.Bio,
-// 		Skills:    nil, // do this, add to db too
-// 		Languages: nil, // do this, add to db too
-// 	}
+// GetTask return a select task.
+func (p *Projects) GetTask(w http.ResponseWriter, r *http.Request) {
+	projectName := chi.URLParam(r, "project-name")
+	taskIDStr := chi.URLParam(r, "task-id")
 
-// 	err = jsonio.ToJSON(res, w)
-// 	if err != nil {
-// 		p.log.Fatalf("GetProfile failed to send response: %s", err)
-// 	}
-// }
+	taskID, err := strconv.Atoi(taskIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid task ID"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetTask failed to send error response: %s", err)
+		}
+		return
+	}
 
-// // PostProfile creates a profile entry in the database, should not be exposed only for testing.
-// func (p *Tasks) CreateTask(w http.ResponseWriter, r *http.Request) {
-// 	var profileReq profilesModels.ProfileReq
+	task, err := p.ProjectData.GetTask(projectName, taskID)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "project has no tasks"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetTask failed to send error response: %s", err)
+		}
+		return
+	}
 
-// 	err := p.validate.GetJSON(&profileReq, w, r, p.log)
-// 	if err != nil {
-// 		p.log.Errorf("SearchProfile failed to decode and validate JSON")
-// 		return
-// 	}
+	if err != nil {
+		p.Log.Errorf("GetTask database search failed: %s", err.Error())
+		// NOTE: Repetative code, clean this up
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetTask failed to send error response: %s", err)
+		}
+		return
+	}
 
-// 	err = p.Pd.AddProfile(
-// 		profileReq.GithubId,
-// 		profileReq.GitHubToken,
-// 		profileReq.Username,
-// 		profileReq.AvatarURL,
-// 		profileReq.Email,
-// 		profileReq.Bio,
-// 	)
-// 	if err != nil {
-// 		p.log.Errorf("PostProfile database add failed: %s", err.Error())
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("PostProfile failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Header().Set("Content-Type", "application/json")
+	res := projectModels.TaskResp{
+		TaskID:          task.TaskID,
+		ProjectID:       task.ProjectID,
+		ProjectName:     task.ProjectName,
+		CompletedByID:   task.CompletedByID,
+		CreatedDate:     task.CreatedDate,
+		CompletedDate:   task.CompletedDate,
+		TaskTitle:       task.TaskTitle,
+		TaskDescription: task.TaskDescription,
+		Diffictly:       task.Diffictly,
+		Priority:        task.Priority,
+		Skills:          task.Skills,
+	}
 
-// 	err = jsonio.ToJSON(&models.Message{Message: "profile created"}, w)
-// 	if err != nil {
-// 		p.log.Fatalf("PostProfile failed to send success response: %s", err)
-// 	}
-// }
+	err = jsonio.ToJSON(res, w)
+	if err != nil {
+		p.Log.Fatalf("GetTask failed to send response: %s", err)
+	}
+}
 
-// // DeleteProfile deletes a users profile from database.
-// func (p *Tasks) DeleteTask(w http.ResponseWriter, r *http.Request) {
-// 	// TODO: add a regex check to make sure username follows allowed username format (as middleware maybe?)
-// 	username := chi.URLParam(r, "username")
+// CreateTask creates a task entry in the database.
+func (p *Projects) CreateTask(w http.ResponseWriter, r *http.Request) {
+	projectName := chi.URLParam(r, "project-name")
 
-// 	profile, err := p.Pd.GetProfileByUsername(username)
-// 	if err == pgx.ErrNoRows {
-// 		w.WriteHeader(http.StatusNotFound)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "profile does not exist"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("DeleteProfile failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	var req projectModels.CreateTaskReq
+	err := p.validate.GetJSON(&req, w, r, p.Log)
+	if err != nil {
+		p.Log.Errorf("CreateTask failed to decode and validate JSON")
+		return
+	}
 
-// 	if err != nil {
-// 		p.log.Errorf("DeleteProfile database search failed: %s", err.Error())
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("DeleteProfile failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	//TODO: Add project owner/admin check
 
-// 	err = p.Pd.DeleteProfile(profile.GitHubUserID)
-// 	if err != nil {
-// 		p.log.Errorf("DeleteProfile database delete failed: %s", err.Error())
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
-// 		if err != nil {
-// 			p.log.Fatalf("DeleteProfile failed to send error response: %s", err)
-// 		}
-// 		return
-// 	}
+	//TODO: Project ID corresponds to Project name check
 
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Header().Set("Content-Type", "application/json")
+	if projectName != req.ProjectName {
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "request body project name and project url miss match"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateTask failed to send error response: %s", err)
+		}
+		return
+	}
 
-// 	err = jsonio.ToJSON(&models.Message{Message: "profile created"}, w)
-// 	if err != nil {
-// 		p.log.Fatalf("DeleteProfile failed to send success response: %s", err)
-// 	}
-// }
+	err = p.ProjectData.AddTask(
+		req.TaskID,
+		req.ProjectID,
+		req.ProjectName,
+		time.Now(),
+		req.TaskDescription,
+		req.Diffictly,
+		req.Priority,
+		req.Skills,
+	)
+	if err != nil {
+		p.Log.Errorf("CreateTask database add failed: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("CreateTask failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	err = jsonio.ToJSON(&models.Message{Message: "task created"}, w)
+	if err != nil {
+		p.Log.Fatalf("CreateTask failed to send success response: %s", err)
+	}
+}
+
+// DeleteTask delete a select task.
+func (p *Projects) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	projectName := chi.URLParam(r, "project-name")
+
+	var req projectModels.DeleteTaskReq
+	err := p.validate.GetJSON(&req, w, r, p.Log)
+	if err != nil {
+		p.Log.Errorf("DeleteTask failed to decode and validate JSON")
+		return
+	}
+
+	//TODO: Add project owner/admin check
+
+	//TODO: add proper error return if task id not found
+	err = p.ProjectData.DeleteTask(projectName, req.TaskID)
+	if err != nil {
+		p.Log.Errorf("DeleteTask database delete failed: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("DeleteTask failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	err = jsonio.ToJSON(&models.Message{Message: "task deleted"}, w)
+	if err != nil {
+		p.Log.Fatalf("DeleteTask failed to send success response: %s", err)
+	}
+}
+
+// EditTask edit the details of select task.
+func (p *Projects) EditTask(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+}
+
+// GetRepoIssues retrieve list of issues inside of a repo
+func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
+	client, err := githubAPI.GetGitClientFromContext(r)
+	if client == nil {
+		p.Log.Warning("GetRepoIssues client fetch from context returned nothing!")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
+	}
+
+	if err != nil {
+		p.Log.Errorf("GetRepoIssues client fetch from context failed: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
+	}
+
+	var repoReq projectModels.RepoInfoReq
+
+	err = p.validate.GetJSON(&repoReq, w, r, p.Log)
+	if err != nil {
+		p.Log.Errorf("GetRepoIssues failed to decode and validate JSON")
+		return
+	}
+
+	repo, err := githubAPI.GetRepoByName(client, repoReq.RepoName)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch repo info from github"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
+	}
+
+	issues, err := githubAPI.GetRepoIssues(client, repo)
+	if err != nil {
+		p.Log.Error("GetRepoIssues unable to fetch repo issues")
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoIssues failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	var issueList []projectModels.RepoIssue
+	for _, issue := range issues {
+		i := projectModels.RepoIssue{Title: *issue.Title, Url: *issue.URL, State: *issue.State}
+		issueList = append(issueList, i)
+	}
+
+	resp := projectModels.RepoIssueResp{Issues: issueList}
+
+	err = jsonio.ToJSON(&resp, w)
+	if err != nil {
+		p.Log.Fatalf("GetRepoIssues failed to send response: %s", err)
+	}
+}
