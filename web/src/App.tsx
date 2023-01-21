@@ -9,7 +9,6 @@ import Profile from './pages/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
 import Modal from './components/Modal/Modal'
 import Projects from './pages/Projects/Projects'
-import NewProject from './pages/NewProject/NewProject'
 const App = () => {
   return (
     <Router>
@@ -20,7 +19,6 @@ const App = () => {
           <Route path="" element={<LandingPage />} />
           <Route path="/profile/*" element={<Profile />} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/new-project" element={<NewProject />} />
           {/* star catches any route that is not found */}
           <Route path="/*" element={<NotFound />} />
           <Route path="/dashboard" />

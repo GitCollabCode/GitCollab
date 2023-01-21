@@ -171,7 +171,7 @@ func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var repoReq projectModels.RepoInfoReq
+	var repoReq projectModels.CreateRepoReq
 
 	err = p.validate.GetJSON(&repoReq, w, r, p.Log)
 	if err != nil {
@@ -211,7 +211,7 @@ func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = p.ProjectData.AddProject(userId, username, *repo.Name, *repo.URL)
+	err = p.ProjectData.AddProject(userId, username, *repo.Name, *repo.URL, repoReq.Description, repoReq.Skills)
 	if err != nil {
 		p.Log.Errorf("CreateProject failed add project: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

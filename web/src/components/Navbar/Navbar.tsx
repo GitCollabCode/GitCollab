@@ -17,7 +17,7 @@ const Navbar = () => {
           <nav>
             <div className={style.logo}>GitCollab</div>
             <div className={style.centerNavItems}>
-              <NavItem text="discover" link="/#" />
+              <NavItem text="projects" link="/projects" />
               <NavItem text="learn" link="/#" />
               <NavItem text="about" link="/#" />
             </div>

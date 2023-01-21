@@ -1,6 +1,5 @@
 package models
 
-// List GitHub repositories response
 // swagger:response reposGetResp
 type _ struct {
 	// in:body
@@ -12,6 +11,21 @@ type ReposGetResp struct {
 	// List of GitHub repository names
 	// Example: ["chicken1", "chicken2"]
 	Repos []string `json:"repos"`
+}
+
+// swagger:RequestCreateRepo
+type _ struct {
+	// in:body
+	// Required: true
+	Body CreateRepoReq
+}
+
+type CreateRepoReq struct {
+	// List of GitHub repository names
+	// Example: ["chicken1", "chicken2"]
+	RepoName    string   `json:"repo_name"`
+	Skills      []string `json:"skills"`
+	Description string   `json:"description"`
 }
 
 // Repo info request
