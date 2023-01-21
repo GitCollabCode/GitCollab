@@ -10,7 +10,7 @@ import (
 
 const MAX_SIGNIN_MIN = 10
 
-// Defines authentication services endpoints
+// AuthRouter serve authentication api endpoints
 func AuthRouter(auth *handlers.Auth) chi.Router {
 	r := chi.NewRouter()
 	r.Use(httprate.LimitByIP(MAX_SIGNIN_MIN, 1*time.Minute))
