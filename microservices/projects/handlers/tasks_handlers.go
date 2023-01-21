@@ -152,6 +152,7 @@ func (p *Projects) CreateTask(w http.ResponseWriter, r *http.Request) {
 		req.ProjectID,
 		req.ProjectName,
 		time.Now(),
+		req.TaskTitle,
 		req.TaskDescription,
 		req.Diffictly,
 		req.Priority,
