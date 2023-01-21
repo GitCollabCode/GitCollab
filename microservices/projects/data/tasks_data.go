@@ -19,12 +19,12 @@ type Task struct {
 	Skills          []int     `db:"skills"`
 }
 
-func (pd *ProjectData) AddTask(taskID int, projectID int, projectName string, createdDate time.Time, taskDescription string, diffictly int, priority int, skills []int) error {
+func (pd *ProjectData) AddTask(taskID int, projectID int, projectName string, createdDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []int) error {
 	sqlString :=
-		"INSERT INTO tasks(task_id, project_id, project_name, date_created_date, task_description, diffictly, priority, skills)" +
+		"INSERT INTO tasks(task_id, project_id, project_name, date_created_date, task_title, task_description, diffictly, priority, skills)" +
 			"VALUES($1, $2, $3, $4, $5, $6, $7, $8)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, taskID, projectID, projectName, createdDate, taskDescription, diffictly, priority, skills)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, taskID, projectID, projectName, createdDate, taskTitle, taskDescription, diffictly, priority, skills)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddTask database INSERT failed: %s", err.Error())
 		return err
@@ -55,6 +55,11 @@ func (pd *ProjectData) DeleteTask(projectName string, taskID int) error {
 func (pd *ProjectData) CompleteTask(taskID int, completedByID string) error {
 	sqlStatement := "UPDATE tasks SET completed_by_id = $1, completed_date = $2 WHERE task_id = $3"
 	return pd.PDriver.TransactOneRow(sqlStatement, completedByID, time.Now(), taskID)
+}
+
+func (pd *ProjectData) UpdateTaskTitle(taskID int, taskTitle string) error {
+	sqlStatement := "UPDATE projects SET task_title = $1 WHERE task_id = $2"
+	return pd.PDriver.TransactOneRow(sqlStatement, taskTitle, taskID)
 }
 
 func (pd *ProjectData) UpdateTaskDescription(taskID int, description string) error {
