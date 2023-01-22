@@ -271,10 +271,10 @@ func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
 func (p *Projects) GetSearchProjects(w http.ResponseWriter, r *http.Request) {
 	projects, err := p.ProjectData.GetTopNProjects(10)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		err = jsonio.ToJSON(&models.ErrorMessage{Message: "failed to fetch user projects"}, w)
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Maged could not find any projects"}, w)
 		if err != nil {
-			p.Log.Fatalf("CreateProject failed to send error response: %s", err)
+			p.Log.Fatalf("GetSearchProjects failed to send error response: %s", err)
 		}
 		return
 	}
