@@ -140,7 +140,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 		})
 	})
 
-	// swagger:route POST /projects/user-projects Projects userProjectsReq
+	// swagger:route Get /projects/user-projects Projects userProjectsReq
 	//
 	// Get GitCollab projects owned by a user.
 	//
@@ -156,5 +156,17 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 	//       200: messageResponse
 	r.Get("/user-projects", p.GetUserProjects)
 
+	// swagger:route get /projects/search-projects Projects
+	//
+	// Get GitCollab projects, just random ones for now
+	//
+	// Retrieve list of GitCollab projects
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Responses:
+	//       200: messageResponse
+	r.Get("/search-projects", p.GetSearchProjects)
 	return r
 }

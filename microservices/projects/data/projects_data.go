@@ -15,12 +15,13 @@ func NewProjectData(dbDriver *db.PostgresDriver) *ProjectData {
 }
 
 type Project struct {
-	ProjectID            int    `db:"project_id"`
-	ProjectOwnerId       string `db:"project_owner_id"`
-	ProjectOwnerUsername string `db:"project_owner_username"`
-	ProjectName          string `db:"project_name"`
-	ProjectURL           string `db:"project_url"`
-	//ProjectSkills        string `json:"project_skills"`
+	ProjectID            int      `db:"project_id"`
+	ProjectOwnerId       string   `db:"project_owner_id"`
+	ProjectOwnerUsername string   `db:"project_owner_username"`
+	ProjectName          string   `db:"project_name"`
+	ProjectURL           string   `db:"project_url"`
+	ProjectSkills        []string `json:"project_skills"`
+	ProjectDescription   string   `json:"project_description"`
 	//DateCreated string `json:"date_created"`
 }
 
@@ -85,5 +86,12 @@ func (pd *ProjectData) GetUserProjects(username string) ([]Project, error) {
 	var p []Project
 	sqlStatement := "SELECT * FROM projects WHERE project_owner_username = $1"
 	err := pd.PDriver.QueryRows(sqlStatement, &p, username)
+	return p, err
+}
+
+func (pd *ProjectData) GetTopNProjects(numProjects int) ([]Project, error) {
+	var p []Project
+	sqlStatement := "SELECT * from projects LIMIT $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &p, numProjects)
 	return p, err
 }
