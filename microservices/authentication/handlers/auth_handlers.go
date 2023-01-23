@@ -80,7 +80,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// create github client to retrieve user info, store in JWT
 	oauthClient := a.oauth.Client(context.Background(), token)
 	client := goGithub.NewClient(oauthClient)
-	username, _, err := client.Users.Get(context.Background(), "")
+	user, _, err := client.Users.Get(context.Background(), "")
 	if err != nil {
 		a.Log.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -88,29 +88,32 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new token for the frontend
-	tokenString, err := jwt.CreateGitCollabJwt(*username.Login, *username.ID, a.gitCollabSecret)
+	tokenString, err := jwt.CreateGitCollabJwt(*user.Login, *user.ID, a.gitCollabSecret)
 	if err != nil {
 		a.Log.Errorf("Faild to create a new jwt: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	userInfo, err := data.IsExistingUser(a.PgConn, int(*username.ID), a.Log)
+	userInfo, err := data.IsExistingUser(a.PgConn, int(*user.ID), a.Log)
 	if err != nil {
 		a.Log.Fatalf("Failed check if user in db: %s", err.Error())
 		return
 	}
 
-	var email string
-	if username.Email == nil {
-		email = ""
-	} else {
-		email = *username.Email
+	email := ""
+	if user.Email != nil {
+		email = *user.Email
+	}
+
+	bio := ""
+	if user.Bio != nil {
+		bio = *user.Bio
 	}
 
 	if userInfo == nil {
 		// did not find the user, create new account
-		err := data.CreateNewUser(int(*username.ID), *username.Login, token.AccessToken, email, *username.AvatarURL, *username.Bio, a.Log, a.PgConn)
+		err := data.CreateNewUser(int(*user.ID), *user.Login, token.AccessToken, email, *user.AvatarURL, bio, a.Log, a.PgConn)
 		if err != nil {
 			a.Log.Errorf("Failed to create new user: %s", err.Error())
 			return
