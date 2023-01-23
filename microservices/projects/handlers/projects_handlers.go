@@ -266,3 +266,30 @@ func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
 		p.Log.Fatalf("GetUserProjects failed to send success response: %s", err)
 	}
 }
+
+// GetUserProjects retrieve list of projects
+func (p *Projects) GetSearchProjects(w http.ResponseWriter, r *http.Request) {
+	projects, err := p.ProjectData.GetTopNProjects(10)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "Maged could not find any projects"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetSearchProjects failed to send error response: %s", err)
+		}
+		return
+	}
+	var pResp []projectModels.ProjectInfo
+	for _, projectInfo := range projects {
+		pResp = append(pResp, projectModels.ProjectInfo{
+			ProjectOwner:       projectInfo.ProjectOwnerUsername,
+			ProjectName:        projectInfo.ProjectName,
+			ProjectDescription: projectInfo.ProjectDescription,
+			ProjectSkills:      projectInfo.ProjectSkills,
+		})
+	}
+
+	err = jsonio.ToJSON(&projectModels.SearchProjectsResp{Projects: pResp}, w)
+	if err != nil {
+		p.Log.Fatalf("GetUserProjects failed to send success response: %s", err)
+	}
+}

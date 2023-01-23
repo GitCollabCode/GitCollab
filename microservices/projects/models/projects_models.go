@@ -103,3 +103,23 @@ type UserProjectsResp struct {
 	// Example: ["chicken1", "chicken2"]
 	Projects []string `json:"projects"`
 }
+
+// search projects response
+// swagger:response SearchProjectsResp
+type _ struct {
+	// in:body
+	// Required: true
+	Body SearchProjectsResp
+}
+
+type ProjectInfo struct {
+	ProjectName        string   `json:"project_name"`
+	ProjectDescription string   `json:"project_description"`
+	ProjectOwner       string   `json:"project_owner"`
+	ProjectSkills      []string `json:"project_skills"`
+}
+
+type SearchProjectsResp struct {
+	// GitCollab projects
+	Projects []ProjectInfo `json:"projects"`
+}
