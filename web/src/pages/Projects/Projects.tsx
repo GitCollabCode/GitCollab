@@ -7,9 +7,11 @@ import styles from './Projects.module.css'
 import Button from '../../components/Button/Button'
 import { ModalContextStateContext } from '../../context/modalContext/modalContext'
 import { ModalType } from '../../constants/common'
+import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 
 const Projects = () => {
   const { showModal, setModalType } = useContext(ModalContextStateContext)
+  const { isLoggedIn } = useContext(UserLoginContext)
   const [topicsFilter, setTopicsFilter] = useState([''])
   const [skillsFilter, setSkillsFilter] = useState([''])
   const [languagesFilter, setLanguagesFilter] = useState([''])
@@ -120,14 +122,16 @@ const Projects = () => {
             <div className={styles.titleBox}>
               <p className={styles.title}>Projects</p>
 
-              <Button
-                type="new"
-                text="New Project"
-                onClick={() => {
-                  setModalType(ModalType.NewProjectModal)
-                  showModal()
-                }}
-              />
+              {isLoggedIn && (
+                <Button
+                  type="new"
+                  text="New Project"
+                  onClick={() => {
+                    setModalType(ModalType.NewProjectModal)
+                    showModal()
+                  }}
+                />
+              )}
             </div>
             <div className={styles.line} />
           </div>
