@@ -9,6 +9,13 @@ import { ModalContextStateContext } from '../../context/modalContext/modalContex
 import { ModalType } from '../../constants/common'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 
+export type cardData = {
+  name:string,
+  description:string,
+  languages:string[],
+  url:string
+}
+
 const Projects = () => {
   const { showModal, setModalType } = useContext(ModalContextStateContext)
   const { isLoggedIn } = useContext(UserLoginContext)
@@ -92,6 +99,26 @@ const Projects = () => {
     },
   ]
 
+  const cardData  = [{name:"Project Name",
+  description:"Lorem upsum",
+  languages:["Stuff" ,"Other", "Other"],
+  url:"#"}]
+    
+  
+
+  const getProjectsCards = () =>{
+      //eslint-disable-next-line
+      let cards: JSX.Element[] = []
+      cardData.forEach(element => {
+        
+      });(element=>{
+          languagePills.push(<div className={style.pill}>{element}</div>)
+      })
+  
+      return languagePills
+  }
+
+
   const skills = ['skill1', 'skill2', 'skills3', 'skills4', 'skill5', 'skills6']
   const languages = ['lang1', 'lang2']
   const topics = ['topic1', 'topic2']
@@ -135,7 +162,7 @@ const Projects = () => {
             </div>
             <div className={styles.line} />
           </div>
-          <Table rows={intitalDataRows} isExpandable={false} />
+          <Table data={} />
         </div>
       </div>
     </div>
