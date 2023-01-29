@@ -1,0 +1,423 @@
+@startuml
+namespace authModels {
+    class GitHubOauthReq << (S,Aquamarine) >> {
+        + Code string
+
+    }
+    class GitHubRedirectResp << (S,Aquamarine) >> {
+        + RedirectUrl string
+
+    }
+    class LoginResp << (S,Aquamarine) >> {
+        + Token string
+        + NewUser bool
+
+    }
+    class _ << (S,Aquamarine) >> {
+        + Body GitHubOauthReq
+        + Body LoginResp
+        + Body GitHubRedirectResp
+
+    }
+}
+
+
+namespace data {
+    class Profile << (S,Aquamarine) >> {
+        + GitHubUserID int
+        + GitHubToken string
+        + Username string
+        + Email string
+        + AvatarURL string
+        + Bio string
+        + Skills []string
+        + Languages []string
+
+    }
+    class ProfileData << (S,Aquamarine) >> {
+        + PDriver *db.PostgresDriver
+
+        + AddProfile(githubUserID int, githubToken string, username string, avatarURL string, email string, bio string) error
+        + UpdateProfileToken(githubUserID int, githubToken string) error
+        + UpdateProfileUsername(githubUserID int, username string) error
+        + UpdateProfileAvatarURL(githubUserID int, avatarURL string) error
+        + UpdateProfileEmail(githubUserID int, email string) error
+        + UpdateProfileBio(githubUserID int, bio string) error
+        + AddProfileSkills(githubUserID int, skills ...string) error
+        + RemoveProfileSkills(githubUserID int, skills ...string) error
+        + AddProfileLanguages(githubUserID int, languages ...string) error
+        + RemoveProfileLanguages(githubUserID int, languages ...string) error
+        + DeleteProfile(githubUserID int) error
+        + GetProfile(githubUserID int) (*Profile, error)
+        + GetProfileByUsername(username string) (*Profile, error)
+
+    }
+    class Project << (S,Aquamarine) >> {
+        + ProjectID int
+        + ProjectOwnerId string
+        + ProjectOwnerUsername string
+        + ProjectName string
+        + ProjectURL string
+        + ProjectSkills []string
+        + ProjectDescription string
+
+    }
+    class ProjectData << (S,Aquamarine) >> {
+        + PDriver *db.PostgresDriver
+
+        + AddProject(ownerID int, ownerUsername string, projectName string, projectURL string, description string, skills []string) error
+        + UpdateProjectName(projectID int, projectName string) error
+        + UpdateProjectDescription(projectID int, description string) error
+        + DeleteProject(projectID int) error
+        + GetProject(projectID int) (*Project, error)
+        + GetUserProjects(username string) ([]Project, error)
+        + GetTopNProjects(numProjects int) ([]Project, error)
+        + AddTask(taskID int, projectID int, projectName string, createdDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []int) error
+        + GetTasks(projectName string) ([]Task, error)
+        + GetTask(projectName string, taskID int) (*Task, error)
+        + DeleteTask(projectName string, taskID int) error
+        + CompleteTask(taskID int, completedByID string) error
+        + UpdateTaskTitle(taskID int, taskTitle string) error
+        + UpdateTaskDescription(taskID int, description string) error
+        + UpdateTaskDiffictly(taskID int, diffictly string) error
+        + UpdateTaskPriority(taskID int, priority string) error
+        + UpdateTaskSkills(taskID int, skills string) error
+
+    }
+    class Task << (S,Aquamarine) >> {
+        + TaskID int
+        + ProjectID int
+        + ProjectName string
+        + CompletedByID int
+        + CreatedDate time.Time
+        + CompletedDate time.Time
+        + TaskTitle string
+        + TaskDescription string
+        + Diffictly int
+        + Priority int
+        + Skills []int
+
+    }
+    class data.Profiles << (T, #FF7700) >>  {
+    }
+}
+
+
+namespace db {
+    class PostgresDriver << (S,Aquamarine) >> {
+        + Pool *pgxpool.Pool
+        + Log *logrus.Logger
+
+        + TransactOneRow(sqlStatement string, args ...any) error
+        + QueryRow(sqlStatement string, structure <font color=blue>interface</font>{}, args ...any) error
+        + QueryRows(sqlStatement string, structure <font color=blue>interface</font>{}, args ...any) error
+
+    }
+}
+
+
+namespace gitauth {
+    class contextKey << (S,Aquamarine) >> {
+        + String() string
+
+    }
+    class gitauth.contextKey << (T, #FF7700) >>  {
+    }
+}
+
+
+namespace handlers {
+    class Auth << (S,Aquamarine) >> {
+        - oauth *oauth2.Config
+        - validate *validator.Validation
+        - gitRedirectUrl string
+        - gitCollabSecret string
+
+        + PgConn *db.PostgresDriver
+        + Log *logrus.Logger
+
+        + GithubRedirectHandler(w http.ResponseWriter, r *http.Request) 
+        + LoginHandler(w http.ResponseWriter, r *http.Request) 
+        + LogoutHandler(w http.ResponseWriter, r *http.Request) 
+
+    }
+    class Profiles << (S,Aquamarine) >> {
+        - log *logrus.Logger
+        - validate *validator.Validation
+
+        + Pd *data.ProfileData
+
+        + GetProfile(w http.ResponseWriter, r *http.Request) 
+        + PostProfile(w http.ResponseWriter, r *http.Request) 
+        + DeleteProfile(w http.ResponseWriter, r *http.Request) 
+        + SearchProfile(w http.ResponseWriter, r *http.Request) 
+        + PatchSkills(w http.ResponseWriter, r *http.Request) 
+        + DeleteSkills(w http.ResponseWriter, r *http.Request) 
+        + GetSkillList(w http.ResponseWriter, r *http.Request) 
+        + PatchLanguages(w http.ResponseWriter, r *http.Request) 
+        + DeleteLanguages(w http.ResponseWriter, r *http.Request) 
+        + GetLanguageList(w http.ResponseWriter, r *http.Request) 
+        + MiddleWareValidateProfile(next http.Handler) http.Handler
+
+    }
+    class Projects << (S,Aquamarine) >> {
+        - validate validator.Validation
+
+        + PgConn *db.PostgresDriver
+        + ProjectData *data.ProjectData
+        + Log *logrus.Logger
+
+        + GetUserRepos(w http.ResponseWriter, r *http.Request) 
+        + GetRepoInfo(w http.ResponseWriter, r *http.Request) 
+        + CreateProject(w http.ResponseWriter, r *http.Request) 
+        + GetUserProjects(w http.ResponseWriter, r *http.Request) 
+        + GetSearchProjects(w http.ResponseWriter, r *http.Request) 
+        + GetTasks(w http.ResponseWriter, r *http.Request) 
+        + GetTask(w http.ResponseWriter, r *http.Request) 
+        + CreateTask(w http.ResponseWriter, r *http.Request) 
+        + DeleteTask(w http.ResponseWriter, r *http.Request) 
+        + EditTask(w http.ResponseWriter, r *http.Request) 
+        + GetRepoIssues(w http.ResponseWriter, r *http.Request) 
+
+    }
+}
+
+
+namespace jwt {
+    class GitCollabJwtConf << (S,Aquamarine) >> {
+        - jwtSecret string
+
+        - parseToken(tokenString string) (*jwt.Token, error)
+
+        + VerifyJWT(logger *logrus.Logger) <font color=blue>func</font>(http.Handler) http.Handler
+
+    }
+    class blacklistData << (S,Aquamarine) >> {
+        - expiryTime time.Time
+        - jwt string
+
+    }
+    class contextKey << (S,Aquamarine) >> {
+        + String() string
+
+    }
+    class jwt.contextKey << (T, #FF7700) >>  {
+    }
+}
+
+
+namespace models {
+    class ErrorMessage << (S,Aquamarine) >> {
+        + Message string
+
+    }
+    class Message << (S,Aquamarine) >> {
+        + Message string
+
+    }
+    class _ << (S,Aquamarine) >> {
+        + Body ErrorMessage
+        + Body ErrorMessage
+
+    }
+}
+
+
+namespace profilesModels {
+    class GetLanguageListResp << (S,Aquamarine) >> {
+        + Languages []string
+
+    }
+    class GetSkillListResp << (S,Aquamarine) >> {
+        + Skills []string
+
+    }
+    class ProfileLanguagesReq << (S,Aquamarine) >> {
+        + Languages []string
+
+    }
+    class ProfileReq << (S,Aquamarine) >> {
+        + Username string
+        + GithubId int
+        + GitHubToken string
+        + Email string
+        + AvatarURL string
+        + Bio string
+        + Skills []string
+        + Languages []string
+
+    }
+    class ProfileResp << (S,Aquamarine) >> {
+        + Username string
+        + GithubId int
+        + Email string
+        + AvatarURL string
+        + Bio string
+        + Skills []string
+        + Languages []string
+
+    }
+    class ProfileSearchReq << (S,Aquamarine) >> {
+        + Username string
+
+    }
+    class ProfileSkillsReq << (S,Aquamarine) >> {
+        + Skills []string
+
+    }
+    class SearchProfilesResp << (S,Aquamarine) >> {
+        + Username string
+        + GithubId int
+        + Email string
+        + AvatarURL string
+
+    }
+    class _ << (S,Aquamarine) >> {
+        + Body ProfileSearchReq
+        + Body ProfileResp
+        + Body ProfileReq
+        + Body ProfileSkillsReq
+        + Body SearchProfilesResp
+        + Body GetLanguageListResp
+        + Body ProfileLanguagesReq
+
+    }
+}
+
+
+namespace projectsModels {
+    class Contributor << (S,Aquamarine) >> {
+        + Username string
+        + GitID int
+
+    }
+    class CreateRepoReq << (S,Aquamarine) >> {
+        + RepoName string
+        + Skills []string
+        + Description string
+
+    }
+    class CreateTaskReq << (S,Aquamarine) >> {
+        + TaskID int
+        + ProjectID int
+        + ProjectName string
+        + TaskTitle string
+        + TaskDescription string
+        + Diffictly int
+        + Priority int
+        + Skills []int
+
+    }
+    class DeleteTaskReq << (S,Aquamarine) >> {
+        + TaskID int
+
+    }
+    class EditTaskReq << (S,Aquamarine) >> {
+        + TaskTitle string
+        + TaskDescription string
+        + Diffictly int
+        + Priority int
+        + Skills []int
+
+    }
+    class ProjectInfo << (S,Aquamarine) >> {
+        + ProjectName string
+        + ProjectDescription string
+        + ProjectOwner string
+        + ProjectSkills []string
+
+    }
+    class RepoInfoReq << (S,Aquamarine) >> {
+        + RepoName string
+
+    }
+    class RepoInfoResp << (S,Aquamarine) >> {
+        + Languages []string
+        + Contributors []Contributor
+
+    }
+    class RepoIssue << (S,Aquamarine) >> {
+        + Title string
+        + Url string
+        + State string
+
+    }
+    class RepoIssueResp << (S,Aquamarine) >> {
+        + Issues []RepoIssue
+
+    }
+    class ReposGetResp << (S,Aquamarine) >> {
+        + Repos []string
+
+    }
+    class SearchProjectsResp << (S,Aquamarine) >> {
+        + Projects []ProjectInfo
+
+    }
+    class TaskResp << (S,Aquamarine) >> {
+        + TaskID int
+        + ProjectID int
+        + ProjectName string
+        + CompletedByID int
+        + CreatedDate time.Time
+        + CompletedDate time.Time
+        + TaskTitle string
+        + TaskDescription string
+        + Diffictly int
+        + Priority int
+        + Skills []int
+
+    }
+    class UserProjectsReq << (S,Aquamarine) >> {
+        + Username string
+
+    }
+    class UserProjectsResp << (S,Aquamarine) >> {
+        + Projects []string
+
+    }
+    class _ << (S,Aquamarine) >> {
+        + Body ReposGetResp
+        + Body CreateRepoReq
+        + Body RepoInfoReq
+        + Body RepoInfoResp
+        + Body UserProjectsReq
+        + Body UserProjectsResp
+        + Body SearchProjectsResp
+        + Body RepoIssueResp
+
+    }
+}
+
+
+namespace validator {
+    class Validation << (S,Aquamarine) >> {
+        - validate *validator.Validate
+
+        + GetJSON(structure <font color=blue>interface</font>{}, w http.ResponseWriter, r *http.Request, log *logrus.Logger) error
+        + Validate(i <font color=blue>interface</font>{}) ValidationErrors
+
+    }
+    class ValidationError << (S,Aquamarine) >> {
+        + Error() string
+
+    }
+    class ValidationErrorResp << (S,Aquamarine) >> {
+        + Messages []string
+
+    }
+    class ValidationErrors << (S,Aquamarine) >> {
+        + Errors() []string
+
+    }
+    class validator.ValidationErrors << (T, #FF7700) >>  {
+    }
+}
+"validator.FieldError" *-- "validator.ValidationError"
+
+
+"__builtin__.string" #.. "gitauth.contextKey"
+"__builtin__.string" #.. "jwt.contextKey"
+"data.[]*Profile" #.. "data.Profiles"
+"validator.[]ValidationError" #.. "validator.ValidationErrors"
+@enduml

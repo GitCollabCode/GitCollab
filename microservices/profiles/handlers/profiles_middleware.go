@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
 	jsonio "github.com/GitCollabCode/GitCollab/internal/jsonhttp"
@@ -10,7 +9,7 @@ import (
 	"github.com/GitCollabCode/GitCollab/microservices/profiles/data"
 )
 
-// Deprecated
+// DEPRECATED
 // Validates incoming request json body for profiles struct
 func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -37,8 +36,8 @@ func (p *Profiles) MiddleWareValidateProfile(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), ProfileCtx{}, profile)
-		r = r.WithContext(ctx)
+		// ctx := context.WithValue(r.Context(), ProfileCtx{}, profile)
+		// r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }

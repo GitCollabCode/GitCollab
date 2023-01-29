@@ -15,8 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ProfileCtx struct{}
-
 // Interface for profiles handlers.
 type Profiles struct {
 	log      *logrus.Logger
