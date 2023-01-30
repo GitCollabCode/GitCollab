@@ -50,9 +50,11 @@ import (
 	projectData "github.com/GitCollabCode/GitCollab/microservices/projects/data"
 	project "github.com/GitCollabCode/GitCollab/microservices/projects/handlers"
 	projectsRouter "github.com/GitCollabCode/GitCollab/microservices/projects/router"
+	projectWebhooks "github.com/GitCollabCode/GitCollab/microservices/projects/webhooks"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	githuboauth "golang.org/x/oauth2/github"
@@ -80,6 +82,7 @@ func main() {
 	// get environment variables
 	clientID := os.Getenv("GITHUB_CLIENTID")
 	clientSecret := os.Getenv("GITHUB_SECRET")
+	webhookSecret := os.Getenv("GITHUB_WEBHOOK_SECRET")
 	gitCollabSecret := os.Getenv("GITCOLLAB_SECRET")
 	gitRedirect := os.Getenv("REACT_APP_REDIRECT_URI")
 	dbUrl := os.Getenv("POSTGRES_URL")
@@ -157,6 +160,23 @@ func main() {
 		projectD := projectData.NewProjectData(dbDriver)
 		p := project.NewProjects(dbDriver, projectD, logger)
 		r.Mount("/project", projectsRouter.ProjectRouter(p, pd, jwtConf))
+
+		r.Post("/webhooks", func(w http.ResponseWriter, r *http.Request) {
+			payload, err := github.ValidatePayload(r, []byte(webhookSecret))
+			if err != nil {
+				logger.Errorf("Failed to validate github webhook payload: %s", err.Error())
+			}
+
+			event, err := github.ParseWebHook(github.WebHookType(r), payload)
+			if err != nil {
+				logger.Errorf("Failed to parse github webhook payload: %s", err.Error())
+			}
+
+			err = projectWebhooks.ProjectWebhookHandlers(event)
+			if err != nil {
+				logger.Errorf("Failed to process github webhook event: %s", err.Error())
+			}
+		})
 
 		// test routes
 		r.Route("/test", func(r chi.Router) {
