@@ -1,145 +1,120 @@
-import React, { useContext, useState } from 'react'
-import CheckboxFilter from '../../components/CheckboxFilter/CheckboxFilter'
-import SearchBox from '../../components/SearchBox/SearchBox'
-import Table, { rowType } from '../../components/Table/Tables'
-import styles from './Projects.module.css'
-
+import React from 'react'
 import Button from '../../components/Button/Button'
-import { ModalContextStateContext } from '../../context/modalContext/modalContext'
-import { ModalType } from '../../constants/common'
-import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
+import ContributerCard from '../../components/ContributerCard/ContributerCard'
+import TaskCard from '../../components/TaskCard/TaskCard'
+import Table from '../../components/Table/Tables'
+import {
+  TaskCardType,
+  TaskProgress,
+  ContributerType,
+} from '../../constants/common'
+import style from './Projects.module.css'
 
-const Projects = () => {
-  const { showModal, setModalType } = useContext(ModalContextStateContext)
-  const { isLoggedIn } = useContext(UserLoginContext)
-  const [topicsFilter, setTopicsFilter] = useState([''])
-  const [skillsFilter, setSkillsFilter] = useState([''])
-  const [languagesFilter, setLanguagesFilter] = useState([''])
-  const [searchFilter, setSearchFilter] = useState('')
+const Project = () => {
+  const getPills = (data: string[]) => {
+    //eslint-disable-next-line
+    let pills: JSX.Element[] = []
+    data.forEach((element) => {
+      pills.push(<div className={style.pill}>{element}</div>)
+    })
 
-  const setSelectedFilterOption = (value: string, filterName: string) => {
-    switch (filterName) {
-      case 'topics':
-        topicsFilter.includes(value)
-          ? setTopicsFilter(topicsFilter.splice(topicsFilter.indexOf(value), 1))
-          : setTopicsFilter(topicsFilter.concat([value]))
-        break
-      case 'skills':
-        skillsFilter.includes(value)
-          ? setSkillsFilter(skillsFilter.splice(skillsFilter.indexOf(value), 1))
-          : setSkillsFilter(skillsFilter.concat([value]))
-        break
-
-      case 'languages':
-        languagesFilter.includes(value)
-          ? setLanguagesFilter(
-              languagesFilter.splice(languagesFilter.indexOf(value), 1)
-            )
-          : setLanguagesFilter(languagesFilter.concat([value]))
-        break
-      case 'search':
-        setSearchFilter(value)
-        console.log(searchFilter)
-        break
-    }
+    return pills
   }
 
-  const intitalDataRows: rowType[] = [
+  const getContributers = (contributer: ContributerType[]) => {
+    //eslint-disable-next-line
+    let contributerCards: JSX.Element[] = []
+    contributer.forEach((element) => {
+      contributerCards.push(<ContributerCard contributer={element} />)
+    })
+
+    return contributerCards
+  }
+
+  const getIssuesList = (tasks: TaskCardType[]) => {
+    //eslint-disable-next-line
+    let taskCards: JSX.Element[] = []
+    tasks.forEach((element) => {
+      taskCards.push(<TaskCard task={element} />)
+    })
+
+    return taskCards
+  }
+
+  const langs = ['lang1', 'lang2', 'lang3']
+  const skills = ['skills1', 'skills2', 'skills3']
+  const contributers: ContributerType[] = [
     {
-      id: '1',
-      date: '2014-04-18',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'A',
-      points: 5,
-      percent: 50,
+      name: 'kevin',
+      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
     },
     {
-      id: '2',
-      date: '2014-04-21',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'B',
-      points: 10,
-      percent: 60,
+      name: 'ehvan',
+      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
     },
     {
-      id: '3',
-      date: '2014-08-09',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'C',
-      points: 15,
-      percent: 70,
+      name: 'kevin',
+      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
     },
     {
-      id: '4',
-      date: '2014-04-24',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'D',
-      points: 20,
-      percent: 80,
-    },
-    {
-      id: '5',
-      date: '2014-04-26',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'E',
-      points: 25,
-      percent: 90,
+      name: 'ehvan',
+      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
     },
   ]
-
-  const skills = ['skill1', 'skill2', 'skills3', 'skills4', 'skill5', 'skills6']
-  const languages = ['lang1', 'lang2']
-  const topics = ['topic1', 'topic2']
-
+  const tasks: TaskCardType[] = [
+    {
+      name: '',
+      description: '',
+      languages: ['', ''],
+      assignedTo: '',
+      assignedToImg: '',
+      progress: TaskProgress.UnAssigned,
+    },
+  ]
+  console.log(contributers)
   return (
-    <div className={styles.projects}>
-      <div className={styles.filterPanel}>
-        <SearchBox setFilterOption={setSelectedFilterOption} />
-        <CheckboxFilter
-          filterName="topics"
-          setFilterOption={setSelectedFilterOption}
-          values={topics}
-        />
-        <CheckboxFilter
-          filterName="skills"
-          setFilterOption={setSelectedFilterOption}
-          values={skills}
-        />
-        <CheckboxFilter
-          filterName="languages"
-          setFilterOption={setSelectedFilterOption}
-          values={languages}
-        />
+    <div className={style.page}>
+      <div className={style.left}>
+        <div className={[style.card, style.descriptionCard].join(' ')}>
+          <p>
+            <u>Description</u>
+          </p>
+          <p className={style.description}>
+            This project is actually so stupid, Majed is cringe
+          </p>
+        </div>
+        <div className={[style.card, style.languagesCard].join(' ')}>
+          <p>Project Langs</p>
+          <div className={style.over}>{getPills(langs)}</div>
+        </div>
+        <div className={[style.card, style.skillsCard].join(' ')}>
+          <p>Project Skills</p>
+          <div className={style.over}>{getPills(skills)}</div>
+        </div>
       </div>
-      <div className={styles.projectsDisplay}>
-        <div className={styles.projectsBox}>
-          <div className={styles.projectTitle}>
-            <div className={styles.titleBox}>
-              <p className={styles.title}>Projects</p>
 
-              {isLoggedIn && (
-                <Button
-                  type="new"
-                  text="New Project"
-                  onClick={() => {
-                    setModalType(ModalType.NewProjectModal)
-                    showModal()
-                  }}
-                />
-              )}
-            </div>
-            <div className={styles.line} />
+      <div className={style.right}>
+        <div className={style.projectInfo}>
+          <p>The Project</p>
+          <div className={style.contributerList}>
+            {getContributers(contributers)}
           </div>
-          <Table rows={intitalDataRows} isExpandable={false} />
+        </div>
+        <div className={style.tasksDisplay}>
+          <div className={style.tasksBox}>
+            <div className={style.tasksTitle}>
+              <div className={style.titleBox}>
+                <p className={style.title}>Tasks</p>
+                <Button type="new" text="New Task" />
+              </div>
+              <div className={style.line} />
+            </div>
+            <Table>{getIssuesList(tasks)}</Table>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default Projects
+export default Project

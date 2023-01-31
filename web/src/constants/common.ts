@@ -7,6 +7,16 @@ export enum ModalType {
   NewProjectModal,
 }
 
+export enum TaskProgress {
+  UnAssigned,
+  Assigned,
+  InProgress,
+  InReview,
+  NeedsChanges,
+  ReadyToMerge,
+  Done,
+}
+
 export type userValue = {
   isLoggedIn: boolean | null
   jwtToken: string | undefined
@@ -62,4 +72,25 @@ export type ReposResponse = {
 export type SelectType = {
   value: string
   label: string
+}
+
+export type ContributerType = {
+  name: string
+  url: string
+}
+
+export type ProjectCardType = {
+  name: string
+  description: string
+  languages: string[]
+  url: string
+}
+
+export type TaskCardType = {
+  name: string
+  description: string
+  languages: string[]
+  assignedTo: string
+  assignedToImg: string
+  progress: TaskProgress
 }

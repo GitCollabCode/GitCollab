@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
-import { profileResponse } from '../../constants/common'
-import Table, { rowType } from '../../components/Table/Tables'
+import { profileResponse, ProjectCardType } from '../../constants/common'
+import Table from '../../components/Table/Tables'
+import ProjectCard from '../../components/ProjectCard/ProjectCard'
 
 const Profile = () => {
   let initialProfile: profileResponse = {
@@ -53,53 +54,22 @@ const Profile = () => {
     return skills
   }
 
-  const intitalDataRows: rowType[] = [
+  const data: ProjectCardType[] = [
     {
-      id: '1',
-      date: '2014-04-18',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'A',
-      points: 5,
-      percent: 50,
-    },
-    {
-      id: '2',
-      date: '2014-04-21',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'B',
-      points: 10,
-      percent: 60,
-    },
-    {
-      id: '3',
-      date: '2014-08-09',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'C',
-      points: 15,
-      percent: 70,
-    },
-    {
-      id: '4',
-      date: '2014-04-24',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'D',
-      points: 20,
-      percent: 80,
-    },
-    {
-      id: '5',
-      date: '2014-04-26',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'E',
-      points: 25,
-      percent: 90,
+      name: 'Project Name',
+      description: 'Lorem upsum',
+      languages: ['Stuff', 'Other', 'Other'],
+      url: '#',
     },
   ]
+  const getProjectsRows = () => {
+    //eslint-disable-next-line
+    let projectCards: JSX.Element[] = []
+    data.forEach((element) => {
+      projectCards.push(<ProjectCard data={element} />)
+    })
+    return projectCards
+  }
 
   return (
     <div className={styles.container}>
@@ -133,7 +103,7 @@ const Profile = () => {
               <div className={styles.header}>Projects</div>
               <div className={styles.line}></div>
               <div>
-                <Table rows={intitalDataRows} isExpandable={false} />
+                <Table>{getProjectsRows()}</Table>
               </div>
             </div>
           </div>
