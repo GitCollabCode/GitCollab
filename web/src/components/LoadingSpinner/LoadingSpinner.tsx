@@ -19,7 +19,10 @@ const LoadingSpinner = ({
   }
 
   return (
-    <div className={type !== 'fixed' ? style.overlay : style.dynamicOverlay}>
+    <div
+      className={type !== 'fixed' ? style.overlay : style.dynamicOverlay}
+      data-testid={type !== 'fixed' ? 'overlay' : 'dynamicOverlay'}
+    >
       <RingLoader
         loading={isLoading}
         color={'#ffffff'}

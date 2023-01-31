@@ -30,7 +30,11 @@ const Button = ({
   }
 
   return (
-    <button className={styles.greenButton} onClick={() => onClick && onClick()}>
+    <button
+      className={styles.greenButton}
+      title={type}
+      onClick={() => onClick && onClick()}
+    >
       {icon}
       <p className={styles.buttonText}>{text}</p>
     </button>
