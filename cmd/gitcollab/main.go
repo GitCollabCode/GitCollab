@@ -161,6 +161,7 @@ func main() {
 		p := project.NewProjects(dbDriver, projectD, logger)
 		r.Mount("/project", projectsRouter.ProjectRouter(p, pd, jwtConf))
 
+		projectWebhook := projectWebhooks.NewProjectWebhooks(projectD)
 		r.Post("/webhooks", func(w http.ResponseWriter, r *http.Request) {
 			payload, err := github.ValidatePayload(r, []byte(webhookSecret))
 			if err != nil {
@@ -172,7 +173,7 @@ func main() {
 				logger.Errorf("Failed to parse github webhook payload: %s", err.Error())
 			}
 
-			err = projectWebhooks.ProjectWebhookHandlers(event)
+			err = projectWebhook.ProjectWebhookHandlers(event)
 			if err != nil {
 				logger.Errorf("Failed to process github webhook event: %s", err.Error())
 			}

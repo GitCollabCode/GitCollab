@@ -30,6 +30,7 @@ type TaskResp struct {
 	TaskID          int       `json:"task_id"`
 	ProjectID       int       `json:"project_id"`
 	ProjectName     string    `json:"project_name"`
+	TaskStatus      string    `json:"task_status"`
 	CompletedByID   int       `json:"completed_by_id"`
 	CreatedDate     time.Time `json:"date_created_date"`
 	CompletedDate   time.Time `json:"completed_date"`
@@ -46,6 +47,7 @@ type DeleteTaskReq struct {
 
 type EditTaskReq struct {
 	TaskTitle       string `json:"task_title"`
+	TaskStatus      string `json:"task_status"`
 	TaskDescription string `json:"task_description"`
 	Diffictly       int    `json:"diffictly"`
 	Priority        int    `json:"priority"`
