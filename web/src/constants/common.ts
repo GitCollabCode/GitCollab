@@ -5,6 +5,7 @@ export enum ModalType {
   LanguagesSelectModal,
   PageNotFoundModal,
   NewProjectModal,
+  NewTaskModal,
 }
 
 export type userValue = {
