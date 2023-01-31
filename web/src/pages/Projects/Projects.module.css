@@ -1,24 +1,152 @@
-.projects {
+.page {
   display: flex;
   flex-direction: row;
-  margin-left: 22px;
-  margin-top: 34px;
+  margin: 1rem 3rem;
+  color: white;
 }
 
-.filterPanel {
-  width: 22%;
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: #1e1f26;
+  border-radius: 25px;
+  width: 17.5rem;
+  margin-bottom: 1.75rem;
+
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 39px;
+  line-height: 46px;
 }
 
-.projectsDisplay {
-  width: 75%;
+.description {
+  text-align: center;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 42px;
+  align-self: center;
+  padding: 0px 25px;
 }
 
-.projectsBox {
+.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.right {
+  width: 85%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.pill {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 190px;
+  background: #9a196a;
+  border-radius: 20px;
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.descriptionCard {
+  height: 15.6rem;
+}
+
+.languagesCard {
+  height: 10rem;
+}
+
+.skillsCard {
+  height: 17.5rem;
+}
+
+.card p {
+  margin-bottom: 1rem;
+}
+
+.over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.over::-webkit-scrollbar-track {
+  border: 1px solid #000;
+  padding: 2px 0;
+  background-color: #404040;
+  border-radius: 10px;
+}
+
+.over::-webkit-scrollbar {
+  width: 10px;
+}
+
+.over::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #737272;
+  border: 1px solid #000;
+}
+
+.contributerList {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.contributerList::-webkit-scrollbar-track {
+  border: 1px solid #000;
+  padding: 2px 0;
+  background-color: #404040;
+  border-radius: 10px;
+}
+
+.contributerList::-webkit-scrollbar {
+  width: 10px;
+}
+
+.contributerList::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #737272;
+  border: 1px solid #000;
+}
+
+.projectInfo {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.projectInfo p {
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 70px;
+}
+
+.issuesDisplay {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.issuesBox {
   background: #1e1f26;
   border-radius: 48px;
   padding-left: 3rem;
+  padding-right: 3rem;
   margin-left: 1rem;
-  height: calc(100% - 3rem);
+  height: 32.9375rem;
 }
 
 .line {
@@ -36,7 +164,7 @@
   font-weight: 400;
   font-size: 60px;
   line-height: 70px;
-  padding-top: 35px;
+  padding-top: 25px;
 
   color: #ffffff;
 }
@@ -45,12 +173,4 @@
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-}
-
-.noLink {
-  color: #2da573;
-}
-
-.noLink:hover {
-  color: #4b072c;
 }
