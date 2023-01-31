@@ -1,4 +1,4 @@
-package models
+package projectsModels
 
 import "time"
 

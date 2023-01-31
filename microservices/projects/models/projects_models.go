@@ -1,4 +1,4 @@
-package models
+package projectsModels
 
 // swagger:response reposGetResp
 type _ struct {
