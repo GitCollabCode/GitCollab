@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE } from '../../constants/endpoints'
 import { profileResponse } from '../../constants/common'
@@ -114,50 +113,29 @@ const Profile = () => {
         <p className={styles.username}>{profile.username}</p>
         <p className={styles.bioText}>{profile.bio}</p>
       </div>
-      <Media query={{ minWidth: 1024 }}>
-        <div className={styles.tables}>
-          <div className={styles.row}>
-            <div className={styles.card}>
-              <div className={styles.header}>Skills</div>
-              <div className={styles.line}></div>
-              <ul>{getSkills()}</ul>
-            </div>
-            <div className={styles.card}>
-              <div className={styles.header}>Languages</div>
-              <div className={styles.line}></div>
-              <ul>{getLanguages()}</ul>
-            </div>
+      <div className={styles.tables}>
+        <div className={styles.row}>
+          <div className={styles.card}>
+            <div className={styles.header}>Skills</div>
+            <div className={styles.line}></div>
+            <ul>{getSkills()}</ul>
           </div>
-          <div className={styles.row}>
-            <div className={styles.card}>
-              <div className={styles.header}>Projects</div>
-              <div className={styles.line}></div>
-              <div>
-                <Table rows={intitalDataRows} isExpandable={false} />
-              </div>
+          <div className={styles.card}>
+            <div className={styles.header}>Languages</div>
+            <div className={styles.line}></div>
+            <ul>{getLanguages()}</ul>
+          </div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.card}>
+            <div className={styles.header}>Projects</div>
+            <div className={styles.line}></div>
+            <div>
+              <Table rows={intitalDataRows} isExpandable={false} />
             </div>
           </div>
         </div>
-      </Media>
-      <Media query={{ maxWidth: 1023 }}>
-        <div className={styles.tables}>
-          <div className={styles.card}>
-            <div>Card 1</div>
-            <div className={styles.line}></div>
-            <div>Card 1 Body</div>
-          </div>
-          <div className={styles.card}>
-            <div>Card 2</div>
-            <div className={styles.line}></div>
-            <div>Card 2 Body</div>
-          </div>
-          <div className={styles.card}>
-            <div>Card 2</div>
-            <div className={styles.line}></div>
-            <div>Card 2 Body</div>
-          </div>
-        </div>
-      </Media>
+      </div>
     </div>
   )
 }

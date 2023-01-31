@@ -15,6 +15,7 @@ const SearchBox = ({
       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
         setFilterOption(e.target.value, 'search')
       }
+      data-testid="search"
     />
   )
 }

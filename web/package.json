@@ -61,6 +61,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "eslint": "^8.30.0",
+    "jest-fetch-mock": "^3.0.3",
     "jest-watch-typeahead": "^0.6.5",
     "prettier": "2.7.1"
   }

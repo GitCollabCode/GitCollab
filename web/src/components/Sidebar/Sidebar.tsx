@@ -6,7 +6,7 @@ import style from './Sidebar.module.css'
 const Sidebar = () => {
   return (
     <Menu>
-      <div className={style.sidebar}>
+      <div className={style.sidebar} data-testid="hamburger">
         <div>
           <a href="/projects" className={style.link}>
             projects

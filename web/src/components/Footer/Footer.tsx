@@ -3,7 +3,7 @@ import styles from './Footer.module.css'
 
 const Footer = () => {
   return (
-    <div className={styles.center}>
+    <div className={styles.center} data-testid="footer">
       <footer id="footer">
         <div className="footer-top">
           <div className="container"></div>
