@@ -12,6 +12,7 @@ const TaskCard = ({ task }: { task: TaskCardType }) => {
       <p>{task.assignedToImg}</p>
       <p>{task.languages}</p>
       <p>{task.progress}</p>
+      <></>
     </>
   )
 }
