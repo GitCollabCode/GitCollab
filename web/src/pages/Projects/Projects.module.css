@@ -135,12 +135,12 @@
   line-height: 70px;
 }
 
-.issuesDisplay {
+.tasksDisplay {
   margin-top: 2rem;
   width: 100%;
 }
 
-.issuesBox {
+.tasksBox {
   background: #1e1f26;
   border-radius: 48px;
   padding-left: 3rem;

@@ -7,7 +7,7 @@ export enum ModalType {
   NewProjectModal,
 }
 
-export enum IssueProgress {
+export enum TaskProgress {
   UnAssigned,
   Assigned,
   InProgress,
@@ -86,11 +86,11 @@ export type ProjectCardType = {
   url: string
 }
 
-export type IssueCardType = {
+export type TaskCardType = {
   name: string
   description: string
   languages: string[]
   assignedTo: string
   assignedToImg: string
-  progress: IssueProgress
+  progress: TaskProgress
 }

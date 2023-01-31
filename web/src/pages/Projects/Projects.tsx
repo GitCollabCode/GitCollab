@@ -1,11 +1,11 @@
 import React from 'react'
 import Button from '../../components/Button/Button'
 import ContributerCard from '../../components/ContributerCard/ContributerCard'
-import IssueCard from '../../components/IssueCard/IssueCard'
+import TaskCard from '../../components/TaskCard/TaskCard'
 import Table from '../../components/Table/Tables'
 import {
-  IssueCardType,
-  IssueProgress,
+  TaskCardType,
+  TaskProgress,
   ContributerType,
 } from '../../constants/common'
 import style from './Projects.module.css'
@@ -31,14 +31,14 @@ const Project = () => {
     return contributerCards
   }
 
-  const getIssuesList = (issues: IssueCardType[]) => {
+  const getIssuesList = (tasks: TaskCardType[]) => {
     //eslint-disable-next-line
-    let issueCards: JSX.Element[] = []
-    issues.forEach((element) => {
-      issueCards.push(<IssueCard issue={element} />)
+    let taskCards: JSX.Element[] = []
+    tasks.forEach((element) => {
+      taskCards.push(<TaskCard task={element} />)
     })
 
-    return issueCards
+    return taskCards
   }
 
   const langs = ['lang1', 'lang2', 'lang3']
@@ -61,14 +61,14 @@ const Project = () => {
       url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
     },
   ]
-  const issues: IssueCardType[] = [
+  const tasks: TaskCardType[] = [
     {
       name: '',
       description: '',
       languages: ['', ''],
       assignedTo: '',
       assignedToImg: '',
-      progress: IssueProgress.UnAssigned,
+      progress: TaskProgress.UnAssigned,
     },
   ]
   console.log(contributers)
@@ -100,16 +100,16 @@ const Project = () => {
             {getContributers(contributers)}
           </div>
         </div>
-        <div className={style.issuesDisplay}>
-          <div className={style.issuesBox}>
-            <div className={style.issuesTitle}>
+        <div className={style.tasksDisplay}>
+          <div className={style.tasksBox}>
+            <div className={style.tasksTitle}>
               <div className={style.titleBox}>
-                <p className={style.title}>Issues</p>
-                <Button type="new" text="New Issue" />
+                <p className={style.title}>Tasks</p>
+                <Button type="new" text="New Task" />
               </div>
               <div className={style.line} />
             </div>
-            <Table>{getIssuesList(issues)}</Table>
+            <Table>{getIssuesList(tasks)}</Table>
           </div>
         </div>
       </div>
