@@ -73,7 +73,9 @@ func (pw *ProjectWebhooks) processPullRequestReview(event interface{}) error {
 		return nil
 	}
 
-	if *req.Review.State == "APPROVED" {
+	if *req.Review.State == "APPROVED" && *req.PullRequest.Mergeable {
+		err = pw.pd.UpdateTaskStatus(*req.Repo.Name, issueID, handlers.TaskStatusReadyToMerge)
+	} else if *req.Review.State == "APPROVED" {
 		err = pw.pd.UpdateTaskStatus(*req.Repo.Name, issueID, handlers.TaskStatusApproved)
 	} else if *req.Review.State == "CHANGES_REQUESTED" {
 		err = pw.pd.UpdateTaskStatus(*req.Repo.Name, issueID, handlers.TaskStatusChangesRequested)
