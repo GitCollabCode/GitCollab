@@ -123,3 +123,13 @@ type SearchProjectsResp struct {
 	// GitCollab projects
 	Projects []ProjectInfo `json:"projects"`
 }
+
+type ProjectResp struct {
+	ProjectID            int      `json:"project_id"`
+	ProjectOwnerId       string   `json:"project_owner_id"`
+	ProjectOwnerUsername string   `json:"project_owner_username"`
+	ProjectName          string   `json:"project_name"`
+	ProjectURL           string   `json:"project_url"`
+	ProjectSkills        []string `json:"project_skills"`
+	ProjectDescription   string   `json:"project_description"`
+}

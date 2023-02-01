@@ -82,6 +82,13 @@ func (pd *ProjectData) GetProject(projectID int) (*Project, error) {
 	return &p, err
 }
 
+func (pd *ProjectData) GetProjectByName(projectName string) (*Project, error) {
+	var p Project
+	sqlStatement := "SELECT * FROM projects WHERE project_name = $1"
+	err := pd.PDriver.QueryRow(sqlStatement, &p, projectName)
+	return &p, err
+}
+
 func (pd *ProjectData) GetUserProjects(username string) ([]Project, error) {
 	var p []Project
 	sqlStatement := "SELECT * FROM projects WHERE project_owner_username = $1"

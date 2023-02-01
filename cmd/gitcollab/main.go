@@ -166,16 +166,19 @@ func main() {
 			payload, err := github.ValidatePayload(r, []byte(webhookSecret))
 			if err != nil {
 				logger.Errorf("Failed to validate github webhook payload: %s", err.Error())
+				return
 			}
 
 			event, err := github.ParseWebHook(github.WebHookType(r), payload)
 			if err != nil {
 				logger.Errorf("Failed to parse github webhook payload: %s", err.Error())
+				return
 			}
 
 			err = projectWebhook.ProjectWebhookHandlers(event)
 			if err != nil {
 				logger.Errorf("Failed to process github webhook event: %s", err.Error())
+				return
 			}
 		})
 
