@@ -57,14 +57,7 @@ const Profile = () => {
     return skills
   }
 
-  /*const data: ProjectCardType[] = [
-    {
-      project_name: 'Project Name',
-      project_description: 'Lorem upsum',
-      project_skills: ['Stuff', 'Other', 'Other'],
-      project_owner:""
-    },
-  ]*/
+
   useEffect(() => {
     setIsLoading(true)
     fetch(process.env.REACT_APP_API_URI + USER_PROJECT, {
@@ -80,10 +73,10 @@ const Profile = () => {
       .then((data:ProfileProjectResponse ) => {
         console.log(data)
         if(data.projects !==null){
-        setProjectsCards(data.projects)
+          setProjectsCards(data.projects)
         }
-        setIsLoading(false)
-        console.log(isLoading)
+          setIsLoading(false)
+          
       })
   }, [])
 
@@ -103,7 +96,7 @@ const Profile = () => {
     console.log(cards)
     setProjectCard(cards)
   }
-
+  console.log(isLoading)
   return (
     <div className={styles.container}>
       <div className={styles.bio}>
