@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
-import { GET_PROFILE } from '../../constants/endpoints'
-import { profileResponse, ProjectCardType } from '../../constants/common'
+import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
+import { ProfileProjectResponse, profileResponse } from '../../constants/common'
 import Table from '../../components/Table/Tables'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
 
@@ -18,6 +18,9 @@ const Profile = () => {
   }
 
   const [profile, setProfile] = useState(initialProfile)
+  const [isLoading, setIsLoading] = useState(false)
+  //eslint-disable-next-line
+  const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
 
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
@@ -54,21 +57,51 @@ const Profile = () => {
     return skills
   }
 
-  const data: ProjectCardType[] = [
+  /*const data: ProjectCardType[] = [
     {
-      name: 'Project Name',
-      description: 'Lorem upsum',
-      languages: ['Stuff', 'Other', 'Other'],
-      url: '#',
+      project_name: 'Project Name',
+      project_description: 'Lorem upsum',
+      project_skills: ['Stuff', 'Other', 'Other'],
+      project_owner:""
     },
-  ]
-  const getProjectsRows = () => {
+  ]*/
+  useEffect(() => {
+    setIsLoading(true)
+    fetch(process.env.REACT_APP_API_URI + USER_PROJECT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
+      },
+      body: JSON.stringify({username:window.location.href.split('profile/')[1]}),
+      })
+      .then((response) => response.json())
+      .then((data:ProfileProjectResponse ) => {
+        console.log(data)
+        if(data.projects !==null){
+        setProjectsCards(data.projects)
+        }
+        setIsLoading(false)
+        console.log(isLoading)
+      })
+  }, [])
+
+
+  const setProjectsCards = (projects:string[]) => {
     //eslint-disable-next-line
-    let projectCards: JSX.Element[] = []
-    data.forEach((element) => {
-      projectCards.push(<ProjectCard data={element} />)
+    let cards: JSX.Element[] = []
+    projects.forEach((element, index) => {
+      cards.push(
+        <tr key={index}>
+          <td>
+            <ProjectCard data={{project_name:element, project_description:"",project_owner:"", project_skills:[]}} key={index} />
+          </td>
+        </tr>
+      )
     })
-    return projectCards
+    console.log(cards)
+    setProjectCard(cards)
   }
 
   return (
@@ -103,7 +136,7 @@ const Profile = () => {
               <div className={styles.header}>Projects</div>
               <div className={styles.line}></div>
               <div>
-                <Table>{getProjectsRows()}</Table>
+                <Table>{projectCards}</Table>
               </div>
             </div>
           </div>

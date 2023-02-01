@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import CheckboxFilter from '../../components/CheckboxFilter/CheckboxFilter'
 import SearchBox from '../../components/SearchBox/SearchBox'
 import Table from '../../components/Table/Tables'
@@ -6,13 +6,18 @@ import styles from './ProjectSearch.module.css'
 
 import Button from '../../components/Button/Button'
 import { ModalContextStateContext } from '../../context/modalContext/modalContext'
-import { ModalType, ProjectCardType } from '../../constants/common'
+import { ModalType, ProjectCardType, SearchProjectResponse } from '../../constants/common'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
+import { SEARCH_PROJECT } from '../../constants/endpoints'
+
+
 
 const ProjectSearch = () => {
   const { showModal, setModalType } = useContext(ModalContextStateContext)
   const { isLoggedIn } = useContext(UserLoginContext)
+  //eslint-disable-next-line
+  const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
   const [topicsFilter, setTopicsFilter] = useState([''])
   const [skillsFilter, setSkillsFilter] = useState([''])
   const [languagesFilter, setLanguagesFilter] = useState([''])
@@ -45,25 +50,25 @@ const ProjectSearch = () => {
     }
   }
 
-  const cardData: ProjectCardType[] = [
-    {
-      name: 'Project Name',
-      description: 'Lorem upsum',
-      languages: ['Stuff', 'Other', 'Other'],
-      url: '#',
-    },
-    {
-      name: 'Project Name',
-      description: 'Lorem upsum',
-      languages: ['Stuff', 'Other', 'Other', 'Super long pill'],
-      url: '#',
-    },
-  ]
+  useEffect(() => {
+    fetch(process.env.REACT_APP_API_URI + SEARCH_PROJECT, {
+      method: 'GET',
+    })
+      .then((response) => {console.log(response)
+        return response.json()})
+      .then((data: SearchProjectResponse) => {
+        setProjectsCards(data.projects)
+        console.log(data)
+      })
+  }, [])
 
-  const getProjectsCards = () => {
+  const setProjectsCards = (projects:ProjectCardType[]) => {
+    if(projects === undefined){
+      return 
+    }
     //eslint-disable-next-line
     let cards: JSX.Element[] = []
-    cardData.forEach((element, index) => {
+    projects.forEach((element, index) => {
       cards.push(
         <tr key={index}>
           <td>
@@ -72,8 +77,10 @@ const ProjectSearch = () => {
         </tr>
       )
     })
-    return cards
+    console.log(cards)
+    setProjectCard(cards)
   }
+
 
   const skills = ['skill1', 'skill2', 'skills3', 'skills4', 'skill5', 'skills6']
   const languages = ['lang1', 'lang2']
@@ -118,7 +125,7 @@ const ProjectSearch = () => {
             </div>
             <div className={styles.line} />
           </div>
-          <Table>{getProjectsCards()}</Table>
+          <Table>{projectCards}</Table>
         </div>
       </div>
     </div>

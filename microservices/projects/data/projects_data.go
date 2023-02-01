@@ -84,7 +84,7 @@ func (pd *ProjectData) GetProject(projectID int) (*Project, error) {
 
 func (pd *ProjectData) GetUserProjects(username string) ([]Project, error) {
 	var p []Project
-	sqlStatement := "SELECT * FROM projects WHERE project_owner_username = $1"
+	sqlStatement := "SELECT * FROM projects WHERE LOWER(project_owner_username) = $1"
 	err := pd.PDriver.QueryRows(sqlStatement, &p, username)
 	return p, err
 }

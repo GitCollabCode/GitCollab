@@ -1,31 +1,42 @@
-import React from 'react'
-import { ProjectCardType } from '../../constants/common'
+import React from "react";
 
-import style from './ProjectCard.module.css'
+import style from "./ProjectCard.module.css";
+import { ProjectCardType } from "../../constants/common";
 
-const ProjectCard = ({ data }: { data: ProjectCardType }) => {
-  const getLanguagePills = () => {
-    //eslint-disable-next-line
-    let languagePills: JSX.Element[] = []
-    data.languages.forEach((element) => {
-      languagePills.push(<div className={style.pill}>{element}</div>)
-    })
 
-    return languagePills
-  }
 
-  return (
-    <a href={data.url}>
-      <div className={style.card}>
+const ProjectCard = ({data}:{data:ProjectCardType}) => {
+    
+    
+    const getLanguagePills = () => {
+        if(data.project_skills === undefined){
+            return <></>
+        }
+         //eslint-disable-next-line
+        let languagePills: JSX.Element[] = []
+        data.project_skills.forEach((element,index)=>{
+            languagePills.push(<div className={style.pill} key={index}>{element}</div>)
+        })
+    
+        return languagePills
+    }
+
+return ( 
+    <a href={process.env.REACT_APP_REDIRECT_URI +"project/"+data.project_name}>
+    <div className={style.card}>
         <div className={style.info}>
-          <h3>{data.name}</h3>
-
-          <p>{data.description}</p>
+            <h3>{data.project_name}</h3> 
+           {data.project_description!=="" && <p>{data.project_description}</p>}
         </div>
-        <div className={style.tags}>{getLanguagePills()}</div>
-      </div>
+        {data.project_skills.length !==0 && 
+        <div className={style.tags}>
+            {getLanguagePills()}
+        </div>}
+
+    </div>
     </a>
-  )
+)
+
 }
 
-export default ProjectCard
+export default ProjectCard;

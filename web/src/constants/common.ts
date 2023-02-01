@@ -80,10 +80,10 @@ export type ContributerType = {
 }
 
 export type ProjectCardType = {
-  name: string
-  description: string
-  languages: string[]
-  url: string
+  project_name: string
+  project_description: string
+  project_owner: string
+  project_skills:string[]
 }
 
 export type TaskCardType = {
@@ -93,4 +93,12 @@ export type TaskCardType = {
   assignedTo: string
   assignedToImg: string
   progress: TaskProgress
+}
+
+export type SearchProjectResponse = {
+  projects:ProjectCardType[]
+}
+
+export type ProfileProjectResponse = {
+  projects:string[]
 }
