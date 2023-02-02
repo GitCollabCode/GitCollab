@@ -255,7 +255,13 @@ func (p *Projects) GetUserProjects(w http.ResponseWriter, r *http.Request) {
 
 	// create response containing list of projects
 	for _, project := range projects {
-		resp.Projects = append(resp.Projects, project.ProjectName)
+		p := projectModels.ProjectInfo{
+			ProjectName:        project.ProjectName,
+			ProjectDescription: project.ProjectDescription,
+			ProjectOwner:       project.ProjectOwnerUsername,
+			ProjectSkills:      project.ProjectSkills,
+		}
+		resp.Projects = append(resp.Projects, p)
 	}
 
 	w.WriteHeader(http.StatusOK)
