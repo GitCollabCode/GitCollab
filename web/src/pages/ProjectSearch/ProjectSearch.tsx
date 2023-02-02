@@ -125,7 +125,9 @@ const ProjectSearch = () => {
             </div>
             <div className={styles.line} />
           </div>
+          <div className={styles.overflow}>
           <Table>{projectCards}</Table>
+          </div>
         </div>
       </div>
     </div>

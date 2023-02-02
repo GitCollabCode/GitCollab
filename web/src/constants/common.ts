@@ -100,5 +100,5 @@ export type SearchProjectResponse = {
 }
 
 export type ProfileProjectResponse = {
-  projects:string[]
+  projects:ProjectCardType[]
 }

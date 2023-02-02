@@ -200,7 +200,7 @@ const NewProjectModal = () => {
                   <div className={styles.selectBox}>
                     <Select
                       options={getReposSelect()}
-                      onChange={(e) => handleRepoChange(e?.value)}
+                      onChange={(e:any) => handleRepoChange(e?.value)}
                     />
                   </div>
                 ) : (
