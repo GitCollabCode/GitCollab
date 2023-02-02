@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
