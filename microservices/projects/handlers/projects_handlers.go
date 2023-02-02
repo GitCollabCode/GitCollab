@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/GitCollabCode/GitCollab/internal/db"
 	githubAPI "github.com/GitCollabCode/GitCollab/internal/github"
@@ -61,9 +62,32 @@ func (p *Projects) GetUserRepos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get user projects to see if already exists in db
+	username := r.Context().Value(jwt.ContextKeyUser).(string)
+	userProjects, err := p.ProjectData.GetUserProjects(username)
+	if err != nil {
+		p.Log.Errorf("Failed to retrieve users existing projects: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetRepoInfo failed to send error response: %s", err)
+		}
+		return
+	}
+
 	var repoNames []string
 	for _, repo := range repos {
-		repoNames = append(repoNames, *repo.Name)
+		// check if project is already registered
+		projectFound := false
+		for _, project := range userProjects {
+			if strings.EqualFold(project.ProjectName, *repo.Name) {
+				projectFound = true
+			}
+		}
+		// add if project not found
+		if !projectFound {
+			repoNames = append(repoNames, *repo.Name)
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

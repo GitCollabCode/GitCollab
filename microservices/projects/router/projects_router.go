@@ -27,7 +27,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 
 			// swagger:route GET /projects/github/user-repos Projects GitHub githubGetUserRepos
 			//
-			// Get GitHub repos owned by user.
+			// Get GitHub repos owned by user that are not yet registered here
 			//
 			// Retrieve a list of GitHub repos owned by a user.
 			//
