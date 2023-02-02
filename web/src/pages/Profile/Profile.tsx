@@ -23,7 +23,6 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false)
   //eslint-disable-next-line
   const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
-  const modal = useContext(ModalContextStateContext)
   
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
@@ -41,6 +40,7 @@ const Profile = () => {
         setProfile(data)
       })
       .catch((err) =>{
+       const modal = useContext(ModalContextStateContext)
        modal.setModalType(ModalType.PageNotFoundModal)
        modal.showModal()
       })
@@ -93,6 +93,7 @@ const Profile = () => {
           setIsLoading(false)
       })
       .catch((err) =>{
+        const modal = useContext(ModalContextStateContext)
         modal.setModalType(ModalType.PageNotFoundModal)
         modal.showModal()
        })
