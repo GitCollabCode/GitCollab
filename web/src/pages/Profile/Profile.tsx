@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
-import { ProfileProjectResponse, ProjectCardType, profileResponse } from '../../constants/common'
+import { ModalType, ProfileProjectResponse, ProjectCardType, profileResponse } from '../../constants/common'
 import Table from '../../components/Table/Tables'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
+import { ModalContextStateContext } from '../../context/modalContext/modalContext'
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner'
 
 const Profile = () => {
   let initialProfile: profileResponse = {
@@ -21,34 +23,44 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false)
   //eslint-disable-next-line
   const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
-
+  const modal = useContext(ModalContextStateContext)
+  
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
     })
-      .then((response) => response.json())
+    .then((response) => {
+      if(response.status >=400)
+      {
+          throw new Error()
+      }else{
+        return response.json()
+    }})
       .then((data: profileResponse) => {
         setProfile(data)
-        console.log(data)
+      })
+      .catch((err) =>{
+       modal.setModalType(ModalType.PageNotFoundModal)
+       modal.showModal()
       })
   }, [])
 
   const getLanguages = () => {
     //eslint-disable-next-line
-    let languagList: JSX.Element[] = [<></>]
-    profile.languages.forEach((element) => {
-      languagList.push(<li className={styles.profileLi}>{element}</li>)
+    let languagList: JSX.Element[] = []
+    profile.languages.forEach((element, index) => {
+      languagList.push(<li key={index} className={styles.profileLi}>{element}</li>)
     })
-   
+
     return languagList
   }
 
   const getSkills = () => {
     //eslint-disable-next-line
-    let skills: JSX.Element[] = [<></>]
-    profile.skills.forEach((element) => {
-      skills.push(<li className={styles.profileLi}>{element}</li>)
+    let skills: JSX.Element[] = []
+    profile.skills.forEach((element, index) => {
+      skills.push(<li key={index} className={styles.profileLi}>{element}</li>)
     })
 
     return skills
@@ -66,15 +78,24 @@ const Profile = () => {
       },
       body: JSON.stringify({username:window.location.href.split('profile/')[1]}),
       })
-      .then((response) => response.json())
+      .then((response) => {
+        if(response.status >=400)
+        {
+            throw new Error()
+        }else{
+          return response.json()
+      }})
       .then((data:ProfileProjectResponse) => {
         console.log(data)
         if(data.projects !==null){
           setProjectsCards(data.projects)
         }
           setIsLoading(false)
-          
       })
+      .catch((err) =>{
+        modal.setModalType(ModalType.PageNotFoundModal)
+        modal.showModal()
+       })
   }, [])
 
 
@@ -93,9 +114,10 @@ const Profile = () => {
     console.log(cards)
     setProjectCard(cards)
   }
-  console.log(isLoading)
+
   return (
     <div className={styles.container}>
+      {isLoading && (<LoadingSpinner isLoading={isLoading}/>)}
       <div className={styles.bio}>
         <div className={styles.circle}>
           <img

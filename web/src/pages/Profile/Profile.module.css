@@ -79,10 +79,12 @@
 
 }
 .topCard {
+  height: 20rem;
   max-height: 20rem;
 }
 
 .projectCard{
+  height:25rem;
   max-height: 25rem;
 }
 
