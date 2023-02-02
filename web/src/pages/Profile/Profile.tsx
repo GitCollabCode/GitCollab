@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
-import { ProfileProjectResponse, profileResponse } from '../../constants/common'
+import { ProfileProjectResponse, ProjectCardType, profileResponse } from '../../constants/common'
 import Table from '../../components/Table/Tables'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
 
@@ -24,9 +24,6 @@ const Profile = () => {
 
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
-    console.log(window.location.href)
-    console.log(`Testing with username ${username}`)
-    console.log(process.env.REACT_APP_API_URI + GET_PROFILE + username)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
     })
@@ -43,7 +40,7 @@ const Profile = () => {
     profile.languages.forEach((element) => {
       languagList.push(<li className={styles.profileLi}>{element}</li>)
     })
-
+   
     return languagList
   }
 
@@ -70,7 +67,7 @@ const Profile = () => {
       body: JSON.stringify({username:window.location.href.split('profile/')[1]}),
       })
       .then((response) => response.json())
-      .then((data:ProfileProjectResponse ) => {
+      .then((data:ProfileProjectResponse) => {
         console.log(data)
         if(data.projects !==null){
           setProjectsCards(data.projects)
@@ -81,14 +78,14 @@ const Profile = () => {
   }, [])
 
 
-  const setProjectsCards = (projects:string[]) => {
+  const setProjectsCards = (projects:ProjectCardType[]) => {
     //eslint-disable-next-line
     let cards: JSX.Element[] = []
     projects.forEach((element, index) => {
       cards.push(
         <tr key={index}>
           <td>
-            <ProjectCard data={{project_name:element, project_description:"",project_owner:"", project_skills:[]}} key={index} />
+            <ProjectCard data={element} key={index} />
           </td>
         </tr>
       )
@@ -113,22 +110,22 @@ const Profile = () => {
       <Media query={{ minWidth: 1024 }}>
         <div className={styles.tables}>
           <div className={styles.row}>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.topCard].join(" ")}>
               <div className={styles.header}>Skills</div>
               <div className={styles.line}></div>
-              <ul>{getSkills()}</ul>
+              <ul className={styles.overflow}>{getSkills()}</ul>
             </div>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.topCard].join(" ")}>
               <div className={styles.header}>Languages</div>
               <div className={styles.line}></div>
-              <ul>{getLanguages()}</ul>
+              <ul className={styles.overflow}>{getLanguages()}</ul>
             </div>
           </div>
           <div className={styles.row}>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.projectCard].join(" ")}>
               <div className={styles.header}>Projects</div>
               <div className={styles.line}></div>
-              <div>
+              <div className={styles.overflow}>
                 <Table>{projectCards}</Table>
               </div>
             </div>

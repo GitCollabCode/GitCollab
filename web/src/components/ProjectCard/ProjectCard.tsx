@@ -22,19 +22,20 @@ const ProjectCard = ({data}:{data:ProjectCardType}) => {
     }
 
 return ( 
-    <a href={process.env.REACT_APP_REDIRECT_URI +"project/"+data.project_name}>
+    
     <div className={style.card}>
+        <a href={process.env.REACT_APP_REDIRECT_URI +"project/"+data.project_name}>
         <div className={style.info}>
             <h3>{data.project_name}</h3> 
            {data.project_description!=="" && <p>{data.project_description}</p>}
         </div>
+        </a>
         {data.project_skills.length !==0 && 
         <div className={style.tags}>
             {getLanguagePills()}
         </div>}
 
     </div>
-    </a>
 )
 
 }
