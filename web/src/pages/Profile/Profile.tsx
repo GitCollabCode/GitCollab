@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
 import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
@@ -23,6 +23,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false)
   //eslint-disable-next-line
   const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
+  const modalContext = useContext(ModalContextStateContext)
   
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
@@ -40,11 +41,10 @@ const Profile = () => {
         setProfile(data)
       })
       .catch((err) =>{
-       const modal = useContext(ModalContextStateContext)
-       modal.setModalType(ModalType.PageNotFoundModal)
-       modal.showModal()
+        modalContext.setModalType(ModalType.PageNotFoundModal)
+        modalContext.showModal()
       })
-  }, [])
+  }, [modalContext])
 
   const getLanguages = () => {
     //eslint-disable-next-line
@@ -93,11 +93,10 @@ const Profile = () => {
           setIsLoading(false)
       })
       .catch((err) =>{
-        const modal = useContext(ModalContextStateContext)
-        modal.setModalType(ModalType.PageNotFoundModal)
-        modal.showModal()
+        modalContext.setModalType(ModalType.PageNotFoundModal)
+        modalContext.showModal()
        })
-  }, [])
+  }, [modalContext])
 
 
   const setProjectsCards = (projects:ProjectCardType[]) => {
