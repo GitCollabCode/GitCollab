@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Button from '../../components/Button/Button'
 import ContributerCard from '../../components/ContributerCard/ContributerCard'
 import TaskCard from '../../components/TaskCard/TaskCard'
@@ -7,10 +7,13 @@ import {
   TaskCardType,
   TaskProgress,
   ContributerType,
+  ModalType,
 } from '../../constants/common'
 import style from './Projects.module.css'
+import { ModalContextStateContext } from '../../context/modalContext/modalContext'
 
 const Project = () => {
+  const { showModal, setModalType } = useContext(ModalContextStateContext)
   const getPills = (data: string[]) => {
     //eslint-disable-next-line
     let pills: JSX.Element[] = []
@@ -105,7 +108,14 @@ const Project = () => {
             <div className={style.tasksTitle}>
               <div className={style.titleBox}>
                 <p className={style.title}>Tasks</p>
-                <Button type="new" text="New Task" />
+                <Button
+                  type="new"
+                  text="New Task"
+                  onClick={() => {
+                    setModalType(ModalType.NewTaskModal)
+                    showModal()
+                  }}
+                />
               </div>
               <div className={style.line} />
             </div>

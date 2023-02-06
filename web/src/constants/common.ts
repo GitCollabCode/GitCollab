@@ -5,6 +5,7 @@ export enum ModalType {
   LanguagesSelectModal,
   PageNotFoundModal,
   NewProjectModal,
+  NewTaskModal,
 }
 
 export enum TaskProgress {
@@ -69,6 +70,10 @@ export type ReposResponse = {
   repos: string[]
 }
 
+export type IssueResponse = {
+  issues: string[]
+}
+
 export type SelectType = {
   value: string
   label: string
@@ -83,7 +88,7 @@ export type ProjectCardType = {
   project_name: string
   project_description: string
   project_owner: string
-  project_skills:string[]
+  project_skills: string[]
 }
 
 export type TaskCardType = {
@@ -96,9 +101,9 @@ export type TaskCardType = {
 }
 
 export type SearchProjectResponse = {
-  projects:ProjectCardType[]
+  projects: ProjectCardType[]
 }
 
 export type ProfileProjectResponse = {
-  projects:ProjectCardType[]
+  projects: ProjectCardType[]
 }
