@@ -8,7 +8,9 @@ import Navbar from './components/Navbar/Navbar'
 import Profile from './pages/Profile/Profile'
 import NotFound from './components/Misc/NotFound'
 import Modal from './components/Modal/Modal'
-import Projects from './pages/Projects/Projects'
+import ProjectSearch from './pages/ProjectSearch/ProjectSearch'
+import Project from './pages/Projects/Projects'
+
 const App = () => {
   return (
     <Router>
@@ -18,10 +20,11 @@ const App = () => {
         <Routes>
           <Route path="" element={<LandingPage />} />
           <Route path="/profile/*" element={<Profile />} />
-          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects" element={<ProjectSearch />} />
           {/* star catches any route that is not found */}
           <Route path="/*" element={<NotFound />} />
           <Route path="/dashboard" />
+          <Route path="/project/*" element={<Project />} />
         </Routes>
       </div>
       <Footer />

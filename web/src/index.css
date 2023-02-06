@@ -46,8 +46,8 @@ body {
     linear-gradient(252.96deg, #4b072c 14.27%, #000000 88.33%);
   background-repeat: no-repeat;
   background-attachment: fixed;
-  height: 100%;
-  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
   display: flex;
   font-weight: 400;
   font-family: 'Fira Sans', sans-serif;

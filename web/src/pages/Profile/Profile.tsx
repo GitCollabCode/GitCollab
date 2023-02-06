@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Media from 'react-media'
 import styles from './Profile.module.css'
-import { GET_PROFILE } from '../../constants/endpoints'
-import { profileResponse } from '../../constants/common'
-import Table, { rowType } from '../../components/Table/Tables'
+import { GET_PROFILE, USER_PROJECT } from '../../constants/endpoints'
+import { ModalType, ProfileProjectResponse, ProjectCardType, profileResponse } from '../../constants/common'
+import Table from '../../components/Table/Tables'
+import ProjectCard from '../../components/ProjectCard/ProjectCard'
+import { ModalContextStateContext } from '../../context/modalContext/modalContext'
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner'
 
 const Profile = () => {
   let initialProfile: profileResponse = {
@@ -17,27 +20,37 @@ const Profile = () => {
   }
 
   const [profile, setProfile] = useState(initialProfile)
-
+  const [isLoading, setIsLoading] = useState(false)
+  //eslint-disable-next-line
+  const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
+  const modalContext = useContext(ModalContextStateContext)
+  
   useEffect(() => {
     const username = window.location.href.split('profile/')[1]
-    console.log(window.location.href)
-    console.log(`Testing with username ${username}`)
-    console.log(process.env.REACT_APP_API_URI + GET_PROFILE + username)
     fetch(process.env.REACT_APP_API_URI + GET_PROFILE + username, {
       method: 'GET',
     })
-      .then((response) => response.json())
+    .then((response) => {
+      if(response.status >=400)
+      {
+          throw new Error()
+      }else{
+        return response.json()
+    }})
       .then((data: profileResponse) => {
         setProfile(data)
-        console.log(data)
       })
-  }, [])
+      .catch((err) =>{
+        modalContext.setModalType(ModalType.PageNotFoundModal)
+        modalContext.showModal()
+      })
+  }, [modalContext])
 
   const getLanguages = () => {
     //eslint-disable-next-line
-    let languagList: JSX.Element[] = [<></>]
-    profile.languages.forEach((element) => {
-      languagList.push(<li className={styles.profileLi}>{element}</li>)
+    let languagList: JSX.Element[] = []
+    profile.languages.forEach((element, index) => {
+      languagList.push(<li key={index} className={styles.profileLi}>{element}</li>)
     })
 
     return languagList
@@ -45,64 +58,66 @@ const Profile = () => {
 
   const getSkills = () => {
     //eslint-disable-next-line
-    let skills: JSX.Element[] = [<></>]
-    profile.skills.forEach((element) => {
-      skills.push(<li className={styles.profileLi}>{element}</li>)
+    let skills: JSX.Element[] = []
+    profile.skills.forEach((element, index) => {
+      skills.push(<li key={index} className={styles.profileLi}>{element}</li>)
     })
 
     return skills
   }
 
-  const intitalDataRows: rowType[] = [
-    {
-      id: '1',
-      date: '2014-04-18',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'A',
-      points: 5,
-      percent: 50,
-    },
-    {
-      id: '2',
-      date: '2014-04-21',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'B',
-      points: 10,
-      percent: 60,
-    },
-    {
-      id: '3',
-      date: '2014-08-09',
-      total: 121.0,
-      status: 'Not Shipped',
-      name: 'C',
-      points: 15,
-      percent: 70,
-    },
-    {
-      id: '4',
-      date: '2014-04-24',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'D',
-      points: 20,
-      percent: 80,
-    },
-    {
-      id: '5',
-      date: '2014-04-26',
-      total: 121.0,
-      status: 'Shipped',
-      name: 'E',
-      points: 25,
-      percent: 90,
-    },
-  ]
+
+  useEffect(() => {
+    setIsLoading(true)
+    fetch(process.env.REACT_APP_API_URI + USER_PROJECT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
+      },
+      body: JSON.stringify({username:window.location.href.split('profile/')[1]}),
+      })
+      .then((response) => {
+        if(response.status >=400)
+        {
+            throw new Error()
+        }else{
+          return response.json()
+      }})
+      .then((data:ProfileProjectResponse) => {
+        console.log(data)
+        if(data.projects !==null){
+          setProjectsCards(data.projects)
+        }
+          setIsLoading(false)
+      })
+      .catch((err) =>{
+        modalContext.setModalType(ModalType.PageNotFoundModal)
+        modalContext.showModal()
+       })
+  }, [modalContext])
+
+
+  const setProjectsCards = (projects:ProjectCardType[]) => {
+    //eslint-disable-next-line
+    let cards: JSX.Element[] = []
+    projects.forEach((element, index) => {
+      cards.push(
+        <tr key={index}>
+          <td>
+            <ProjectCard data={element} key={index} />
+          </td>
+        </tr>
+      )
+    })
+    console.log(cards)
+    setProjectCard(cards)
+  }
 
   return (
     <div className={styles.container}>
+      {isLoading && (<LoadingSpinner isLoading={isLoading}/>)}
       <div className={styles.bio}>
         <div className={styles.circle}>
           <img
@@ -117,23 +132,23 @@ const Profile = () => {
       <Media query={{ minWidth: 1024 }}>
         <div className={styles.tables}>
           <div className={styles.row}>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.topCard].join(" ")}>
               <div className={styles.header}>Skills</div>
               <div className={styles.line}></div>
-              <ul>{getSkills()}</ul>
+              <ul className={styles.overflow}>{getSkills()}</ul>
             </div>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.topCard].join(" ")}>
               <div className={styles.header}>Languages</div>
               <div className={styles.line}></div>
-              <ul>{getLanguages()}</ul>
+              <ul className={styles.overflow}>{getLanguages()}</ul>
             </div>
           </div>
           <div className={styles.row}>
-            <div className={styles.card}>
+            <div className={[styles.card, styles.projectCard].join(" ")}>
               <div className={styles.header}>Projects</div>
               <div className={styles.line}></div>
-              <div>
-                <Table rows={intitalDataRows} isExpandable={false} />
+              <div className={styles.overflow}>
+                <Table>{projectCards}</Table>
               </div>
             </div>
           </div>
