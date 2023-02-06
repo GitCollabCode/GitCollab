@@ -1,0 +1,27 @@
+.card {
+  width: 400px;
+  height: 100px;
+  margin-right: 2rem;
+  background: #1e1f26;
+  border-radius: 25px;
+  display: inline-block;
+  padding-left: 1rem;
+  padding-top: 1rem;
+
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 46px;
+}
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.profilePic {
+  margin-left: 1rem;
+  width: 3rem;
+  height: 3rem;
+}

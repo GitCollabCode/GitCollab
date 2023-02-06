@@ -27,7 +27,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 
 			// swagger:route GET /projects/github/user-repos Projects GitHub githubGetUserRepos
 			//
-			// Get GitHub repos owned by user.
+			// Get GitHub repos owned by user that are not yet registered here
 			//
 			// Retrieve a list of GitHub repos owned by a user.
 			//
@@ -140,7 +140,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 		})
 	})
 
-	// swagger:route Get /projects/user-projects Projects userProjectsReq
+	// swagger:route Post /projects/user-projects Projects userProjectsReq
 	//
 	// Get GitCollab projects owned by a user.
 	//
@@ -154,7 +154,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 	//
 	//     Responses:
 	//       200: messageResponse
-	r.Get("/user-projects", p.GetUserProjects)
+	r.Post("/user-projects", p.GetUserProjects)
 
 	// swagger:route get /projects/search-projects Projects
 	//

@@ -9,7 +9,7 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockedUsedNavigate,
 }))
 
-describe('Login', () => {
+describe('Login Button', () => {
   it('Test Render', () => {
     render(
       <Login
