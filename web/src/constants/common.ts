@@ -71,7 +71,13 @@ export type ReposResponse = {
 }
 
 export type IssueResponse = {
-  issues: string[]
+  issues: IssueType[]
+}
+
+export type IssueType = {
+  state:string,
+  title:string,
+  url:string
 }
 
 export type SelectType = {

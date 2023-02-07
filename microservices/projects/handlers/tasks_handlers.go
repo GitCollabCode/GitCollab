@@ -259,6 +259,7 @@ func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
 
 	issues, err := githubAPI.GetRepoIssues(client, repo)
 	if err != nil {
+		p.Log.Error(client)
 		p.Log.Error("GetRepoIssues unable to fetch repo issues")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)

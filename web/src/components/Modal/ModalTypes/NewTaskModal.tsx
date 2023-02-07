@@ -22,7 +22,7 @@ const NewTaskModal = () => {
     issues: [],
   }
 
-  const initialArray: string[] = []
+  const initialArray: number[] = []
 
   const [step, setCurrentStep] = useState(0)
 
@@ -40,7 +40,7 @@ const NewTaskModal = () => {
   const getIssuesSelect = () => {
     let values: SelectType[] = []
     issues.issues.forEach((element) => {
-      values.push({ value: element, label: element })
+      values.push({ value: element.title, label: element.title })
     })
     return values
   }
@@ -54,14 +54,14 @@ const NewTaskModal = () => {
 
   //This is for when adding a skill to the array when clicked
   const handleAddClick = useCallback(
-    (id: string, skillType: string) => {
-      const el = document.getElementById(id)
+    (id: number, skillType: string) => {
+      const el = document.getElementById(id+"")
       if (el?.classList.contains(styles.active)) {
         el?.classList.remove(styles.active)
-        addedSkills.splice(addedSkills.indexOf(skillType), 1)
+        addedSkills.splice(addedSkills.indexOf(id), 1)
       } else {
         el?.classList.add(styles.active)
-        addedSkills.push(skillType)
+        addedSkills.push(id)
       }
       setAddedSkills(addedSkills)
     },
@@ -71,6 +71,7 @@ const NewTaskModal = () => {
   //Fetch a users public repos
   useEffect(() => {
     setIsLoading(true)
+    console.log(projectName)
     fetch(process.env.REACT_APP_API_URI + GET_PROJECT_ISSUES, {
       method: 'POST',
       body: JSON.stringify({ repo_name: projectName }),
@@ -88,6 +89,7 @@ const NewTaskModal = () => {
         }
       })
       .then((data: IssueResponse) => {
+        console.log(data)
         setIssues(data)
         setIsLoading(false)
       })
@@ -115,7 +117,7 @@ const NewTaskModal = () => {
               <button
                 id={index + ''}
                 className={[styles.modalText, styles.skillButton].join(' ')}
-                onClick={() => handleAddClick(index + '', element)}
+                onClick={() => handleAddClick(index , element)}
                 key={index}
               >
                 {element}
@@ -130,13 +132,19 @@ const NewTaskModal = () => {
   //Function to create a new project
   const createTask = () => {
     const requestData = {
-      repo_name: selectedTask,
+      project_id: 1,
+      project_name:projectName,
+      task_title: selectedTask,
+      task_description: description,
+      difficulty:1,
+      priority:1,
       skills: addedSkills,
-      description: description,
     }
 
+  
+
     fetch(
-      process.env.REACT_APP_API_URI + '/project/' + projectName + CREATE_TASK,
+      process.env.REACT_APP_API_URI + 'project/' + projectName + CREATE_TASK,
       {
         method: 'POST',
         body: JSON.stringify(requestData),
