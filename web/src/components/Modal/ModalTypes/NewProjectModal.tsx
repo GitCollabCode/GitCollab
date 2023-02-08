@@ -139,6 +139,7 @@ const NewProjectModal = () => {
           throw new Error()
         }
         hideModal()
+        window.location.reload()
       })
       .catch((err) => {
         setError(true)

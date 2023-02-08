@@ -55,7 +55,7 @@ const NewTaskModal = () => {
   //This is for when adding a skill to the array when clicked
   const handleAddClick = useCallback(
     (id: number, skillType: string) => {
-      const el = document.getElementById(id+"")
+      const el = document.getElementById(id + '')
       if (el?.classList.contains(styles.active)) {
         el?.classList.remove(styles.active)
         addedSkills.splice(addedSkills.indexOf(id), 1)
@@ -117,7 +117,7 @@ const NewTaskModal = () => {
               <button
                 id={index + ''}
                 className={[styles.modalText, styles.skillButton].join(' ')}
-                onClick={() => handleAddClick(index , element)}
+                onClick={() => handleAddClick(index, element)}
                 key={index}
               >
                 {element}
@@ -133,15 +133,13 @@ const NewTaskModal = () => {
   const createTask = () => {
     const requestData = {
       project_id: 1,
-      project_name:projectName,
+      project_name: projectName,
       task_title: selectedTask,
       task_description: description,
-      difficulty:1,
-      priority:1,
+      difficulty: 1,
+      priority: 1,
       skills: addedSkills,
     }
-
-  
 
     fetch(
       process.env.REACT_APP_API_URI + 'project/' + projectName + CREATE_TASK,
@@ -160,6 +158,7 @@ const NewTaskModal = () => {
           throw new Error()
         }
         hideModal()
+        window.location.reload()
       })
       .catch((err) => {
         setError(true)
