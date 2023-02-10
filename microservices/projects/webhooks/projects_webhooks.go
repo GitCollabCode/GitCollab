@@ -48,9 +48,12 @@ func (pw *ProjectWebhooks) processPullRequest(event interface{}) error {
 	}
 
 	if *req.PullRequest.Merged {
-		pw.pd.CompleteTask(*req.Repo.Name, issueID, int(*req.PullRequest.Assignee.ID))
-		pw.pd.UpdateTaskStatus(*req.Repo.Name, issueID, handlers.TaskStatusCompleted)
-		return nil
+		err = pw.pd.CompleteTask(*req.Repo.Name, issueID, int(*req.PullRequest.Assignee.ID))
+		if err != nil {
+			return err
+		}
+
+		return pw.pd.UpdateTaskStatus(*req.Repo.Name, issueID, handlers.TaskStatusCompleted)
 	}
 
 	return nil
