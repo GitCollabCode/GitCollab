@@ -13,9 +13,9 @@ const CheckboxFilter = ({
   const getFilterOptions = () => {
     //eslint-disable-next-line
     let options: JSX.Element[] = []
-    values.forEach((element) => {
+    values.forEach((element, index) => {
       options.push(
-        <div className={styles.checkboxBox}>
+        <div className={styles.checkboxBox} key={index}>
           <label>
             <input
               className={styles.checkBox}

@@ -39,7 +39,12 @@ const LoginButton = ({
         method: 'POST',
         body: JSON.stringify(requestData),
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if(response.status >= 400){
+            throw new Error()
+          }
+          return response.json()
+        })
         .then((data: loginResponse) => {
           if (data.NewUser) {
             modalContext.setModalType(ModalType.SkillSelectModal)

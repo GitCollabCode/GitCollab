@@ -1,4 +1,4 @@
-package models
+package projectsModels
 
 // swagger:response reposGetResp
 type _ struct {
@@ -90,20 +90,6 @@ type UserProjectsReq struct {
 	Username string `json:"username" validate:"required"`
 }
 
-// User projects response
-// swagger:response userProjectsResp
-type _ struct {
-	// in:body
-	// Required: true
-	Body UserProjectsResp
-}
-
-type UserProjectsResp struct {
-	// GitCollab projects
-	// Example: ["chicken1", "chicken2"]
-	Projects []string `json:"projects"`
-}
-
 // search projects response
 // swagger:response SearchProjectsResp
 type _ struct {
@@ -132,4 +118,17 @@ type ProjectResp struct {
 	ProjectURL           string   `json:"project_url"`
 	ProjectSkills        []string `json:"project_skills"`
 	ProjectDescription   string   `json:"project_description"`
+}
+
+// User projects response
+// swagger:response userProjectsResp
+type _ struct {
+	// in:body
+	// Required: true
+	Body UserProjectsResp
+}
+
+type UserProjectsResp struct {
+	// GitCollab projects
+	Projects []ProjectInfo `json:"projects"`
 }

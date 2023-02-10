@@ -7,16 +7,21 @@ td {
   min-width: 100px;
   font-family: 'Roboto Flex';
   font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 47px;
-
   color: #ffffff;
 }
 
 .tableBackground {
-  background: #47072b;
   border-radius: 20px;
   margin-right: 39.5px;
   margin-left: 19.5px;
+}
+
+tr {
+  margin-bottom: 2rem;
+}
+
+tr,
+tbody,
+table {
+  width: 100%;
 }
