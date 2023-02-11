@@ -12,6 +12,8 @@ import (
 	"github.com/GitCollabCode/GitCollab/internal/validator"
 	"github.com/GitCollabCode/GitCollab/microservices/projects/data"
 	projectModels "github.com/GitCollabCode/GitCollab/microservices/projects/models"
+	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -252,6 +254,48 @@ func (p *Projects) CreateProject(w http.ResponseWriter, r *http.Request) {
 	err = jsonio.ToJSON(&models.Message{Message: "project created"}, w)
 	if err != nil {
 		p.Log.Fatalf("CreateProject failed to send success response: %s", err)
+	}
+}
+
+func (p *Projects) GetProject(w http.ResponseWriter, r *http.Request) {
+	projectName := chi.URLParam(r, "project-name")
+
+	project, err := p.ProjectData.GetProjectByName(projectName)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "project not found"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetProject failed to send error response: %s", err)
+		}
+		return
+	}
+
+	if err != nil {
+		p.Log.Errorf("GetProject database search failed: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("GetProject failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	res := projectModels.ProjectResp{
+		ProjectID:            project.ProjectID,
+		ProjectOwnerId:       project.ProjectOwnerId,
+		ProjectOwnerUsername: project.ProjectOwnerUsername,
+		ProjectName:          project.ProjectName,
+		ProjectURL:           project.ProjectURL,
+		ProjectSkills:        project.ProjectSkills,
+		ProjectDescription:   project.ProjectDescription,
+	}
+
+	err = jsonio.ToJSON(res, w)
+	if err != nil {
+		p.Log.Fatalf("GetProject failed to send response: %s", err)
 	}
 }
 

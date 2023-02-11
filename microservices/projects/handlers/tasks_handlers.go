@@ -151,6 +151,7 @@ func (p *Projects) CreateTask(w http.ResponseWriter, r *http.Request) {
 		req.TaskID,
 		req.ProjectID,
 		req.ProjectName,
+		TaskStatusUnassigned,
 		time.Now(),
 		req.TaskTitle,
 		req.TaskDescription,
@@ -213,7 +214,60 @@ func (p *Projects) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 // EditTask edit the details of select task.
 func (p *Projects) EditTask(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Implemented", http.StatusNotImplemented)
+	projectName := chi.URLParam(r, "project-name")
+	taskIDStr := chi.URLParam(r, "task-id")
+
+	taskID, err := strconv.Atoi(taskIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "invalid task ID"}, w)
+		if err != nil {
+			p.Log.Fatalf("EditTask failed to send error response: %s", err)
+		}
+		return
+	}
+
+	var req projectModels.EditTaskReq
+	err = p.validate.GetJSON(&req, w, r, p.Log)
+	if err != nil {
+		p.Log.Errorf("EditTask failed to decode and validate JSON")
+		return
+	}
+
+	err = p.ProjectData.CoalesceUpdate(projectName,
+		taskID,
+		req.TaskTitle,
+		req.TaskStatus,
+		req.TaskDescription,
+		req.Diffictly,
+		req.Priority,
+		req.Skills)
+	if err == pgx.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "task not found"}, w)
+		if err != nil {
+			p.Log.Fatalf("EditTask failed to send error response: %s", err)
+		}
+		return
+	}
+
+	if err != nil {
+		p.Log.Errorf("EditTask database update failed: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)
+		if err != nil {
+			p.Log.Fatalf("EditTask failed to send error response: %s", err)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	err = jsonio.ToJSON(&models.Message{Message: "task updated"}, w)
+	if err != nil {
+		p.Log.Fatalf("EditTask failed to send response: %s", err)
+	}
 }
 
 // GetRepoIssues retrieve list of issues inside of a repo
