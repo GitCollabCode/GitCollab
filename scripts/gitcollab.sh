@@ -56,7 +56,7 @@ function test-integration() {
     source gitcollab_pyenv/bin/activate && pytest ./integration_tests/
 }
 
-function fetch_valid_containers() {\
+function fetch_valid_containers() {
     while [[ $# -gt 0 ]]; do
         param="$1"
         shift

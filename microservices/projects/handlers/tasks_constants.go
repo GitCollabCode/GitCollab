@@ -1,9 +1,9 @@
 package handlers
 
-var TaskStatusUnassigned = "UNASSIGNED"
-var TaskStatusAssigned = "ASSIGNED"
-var TaskStatusChangesRequested = "CHANGES_REQUESTED"
-var TaskStatusDismissed = "DISMISSED"
-var TaskStatusApproved = "APPROVED"
-var TaskStatusReadyToMerge = "READY_TO_MERGE"
-var TaskStatusCompleted = "COMPLETED"
+const TaskStatusUnassigned = "UNASSIGNED"
+const TaskStatusAssigned = "ASSIGNED"
+const TaskStatusChangesRequested = "CHANGES_REQUESTED"
+const TaskStatusDismissed = "DISMISSED"
+const TaskStatusApproved = "APPROVED"
+const TaskStatusReadyToMerge = "READY_TO_MERGE"
+const TaskStatusCompleted = "COMPLETED"
