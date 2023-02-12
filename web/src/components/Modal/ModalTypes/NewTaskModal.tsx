@@ -22,7 +22,7 @@ const NewTaskModal = () => {
     issues: [],
   }
 
-  const initialArray: number[] = []
+  const initialArray: string[] = []
 
   const [step, setCurrentStep] = useState(0)
 
@@ -58,10 +58,10 @@ const NewTaskModal = () => {
       const el = document.getElementById(id + '')
       if (el?.classList.contains(styles.active)) {
         el?.classList.remove(styles.active)
-        addedSkills.splice(addedSkills.indexOf(id), 1)
+        addedSkills.splice(addedSkills.indexOf(skillType), 1)
       } else {
         el?.classList.add(styles.active)
-        addedSkills.push(id)
+        addedSkills.push(skillType)
       }
       setAddedSkills(addedSkills)
     },
@@ -140,6 +140,8 @@ const NewTaskModal = () => {
       priority: 1,
       skills: addedSkills,
     }
+
+  
 
     fetch(
       process.env.REACT_APP_API_URI + 'project/' + projectName + CREATE_TASK,

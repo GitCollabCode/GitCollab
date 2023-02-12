@@ -148,7 +148,6 @@ func (p *Projects) CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = p.ProjectData.AddTask(
-		req.TaskID,
 		req.ProjectID,
 		req.ProjectName,
 		TaskStatusUnassigned,

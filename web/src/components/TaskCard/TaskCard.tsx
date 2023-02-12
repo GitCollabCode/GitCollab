@@ -1,17 +1,15 @@
 import React from 'react'
-import { TaskCardType } from '../../constants/common'
+import { TaskType } from '../../constants/common'
 import style from './TaskCard.module.css'
 
-const TaskCard = ({ task }: { task: TaskCardType }) => {
+const TaskCard = ({ task }: { task: TaskType }) => {
   console.log(task)
   return (
     <>
-      <p className={style.style}>{task.name}</p>
-      <p>{task.description}</p>
-      <p>{task.assignedTo}</p>
-      <p>{task.assignedToImg}</p>
-      <p>{task.languages}</p>
-      <p>{task.progress}</p>
+      <p className={style.style}>{task.task_title}</p>
+      <p>{task.task_description}</p>
+      <p>{task.skills}</p>
+      <p>{task.task_status}</p>
       <></>
     </>
   )

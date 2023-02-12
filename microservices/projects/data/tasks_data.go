@@ -20,12 +20,12 @@ type Task struct {
 	Skills          []string  `db:"skills"`
 }
 
-func (pd *ProjectData) AddTask(taskID int, projectID int, projectName string, taskStatus string, createdDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []string) error {
+func (pd *ProjectData) AddTask(projectID int, projectName string, taskStatus string, createdDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []string) error {
 	sqlString :=
-		"INSERT INTO tasks(task_id, project_id, project_name, task_status, completed_by_id, created_date, task_title, task_description, diffictly, priority, skills)" +
-			"VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
+		"INSERT INTO tasks(project_id, project_name, task_status, created_date, task_title, task_description, diffictly, priority, skills)" +
+			"VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, taskID, projectID, projectName, taskStatus, 0, createdDate, taskTitle, taskDescription, diffictly, priority, skills)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, projectID, projectName, taskStatus, createdDate, taskTitle, taskDescription, diffictly, priority, skills)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddTask database INSERT failed: %s", err.Error())
 		return err

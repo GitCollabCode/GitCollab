@@ -113,3 +113,23 @@ export type SearchProjectResponse = {
 export type ProfileProjectResponse = {
   projects: ProjectCardType[]
 }
+
+
+export type TaskType = {
+  "task_id":number,
+	"project_id":number,
+	"project_name":string,
+	"task_status":string,
+	"completed_by_id":number,
+	"date_created_date":Date,
+	"completed_date":Date,
+	"task_title":string,
+	"task_description":String,
+	"diffictly":number,
+	"priority":number,
+	"skills":string[]
+}
+
+export type TaskResponse = {
+  0:TaskType[]
+}

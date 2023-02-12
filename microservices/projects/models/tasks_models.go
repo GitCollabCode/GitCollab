@@ -16,7 +16,6 @@ type RepoIssueResp struct {
 }
 
 type CreateTaskReq struct {
-	TaskID          int      `json:"task_id"`
 	ProjectID       int      `json:"project_id"`
 	ProjectName     string   `json:"project_name"`
 	TaskTitle       string   `json:"task_title"`

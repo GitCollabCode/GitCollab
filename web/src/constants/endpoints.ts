@@ -11,4 +11,6 @@ export const CREATE_PROJECT = 'project/create-project'
 export const SEARCH_PROJECT = 'project/search-projects'
 export const USER_PROJECT = 'project/user-projects'
 export const GET_PROJECT_ISSUES = 'project/github/repo-issues'
+export const GET_PROJECT = "project/"
+export const GET_TASKS = "/tasks/"
 export const CREATE_TASK = '/tasks/new' //Needs the follow /project/${projectname}/tasks/new
