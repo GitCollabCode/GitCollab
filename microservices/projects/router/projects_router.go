@@ -138,6 +138,9 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 				r.Post("/new", p.CreateTask)
 			})
 		})
+
+		r.Get("/", p.GetProject)
+
 	})
 
 	// swagger:route Post /projects/user-projects Projects userProjectsReq
