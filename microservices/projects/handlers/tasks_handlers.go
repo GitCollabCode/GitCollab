@@ -47,6 +47,7 @@ func (p *Projects) GetTasks(w http.ResponseWriter, r *http.Request) {
 			TaskID:          task.TaskID,
 			ProjectID:       task.ProjectID,
 			ProjectName:     task.ProjectName,
+			TaskStatus:      task.TaskStatus,
 			CompletedByID:   task.CompletedByID,
 			CreatedDate:     task.CreatedDate,
 			CompletedDate:   task.CompletedDate,
@@ -107,6 +108,7 @@ func (p *Projects) GetTask(w http.ResponseWriter, r *http.Request) {
 		TaskID:          task.TaskID,
 		ProjectID:       task.ProjectID,
 		ProjectName:     task.ProjectName,
+		TaskStatus:      task.TaskStatus,
 		CompletedByID:   task.CompletedByID,
 		CreatedDate:     task.CreatedDate,
 		CompletedDate:   task.CompletedDate,
@@ -148,11 +150,11 @@ func (p *Projects) CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = p.ProjectData.AddTask(
-		req.TaskID,
 		req.ProjectID,
 		req.ProjectName,
 		TaskStatusUnassigned,
 		time.Now(),
+		time.Time{},
 		req.TaskTitle,
 		req.TaskDescription,
 		req.Diffictly,
@@ -313,6 +315,7 @@ func (p *Projects) GetRepoIssues(w http.ResponseWriter, r *http.Request) {
 
 	issues, err := githubAPI.GetRepoIssues(client, repo)
 	if err != nil {
+		p.Log.Error(client)
 		p.Log.Error("GetRepoIssues unable to fetch repo issues")
 		w.WriteHeader(http.StatusInternalServerError)
 		err = jsonio.ToJSON(&models.ErrorMessage{Message: "internal server error"}, w)

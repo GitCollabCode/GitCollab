@@ -64,6 +64,6 @@ func GetRepoIssues(client *github.Client, repo *github.Repository) ([]*github.Is
 	}
 	issueService := client.Issues
 
-	issues, _, err := issueService.List(context.Background(), true, &github.IssueListOptions{})
+	issues, _, err := issueService.ListByRepo(context.Background(), *repo.GetOwner().Login, *repo.Name, &github.IssueListByRepoOptions{})
 	return issues, err
 }

@@ -9,6 +9,7 @@ import LoginModal from './ModalTypes/SkillSelectModal'
 import LanguagesSelectModal from './ModalTypes/LanguagesSelectModal'
 import PageNotFoundModal from './ModalTypes/PageNotFoundModal'
 import NewProjectModal from './ModalTypes/NewProjectModal'
+import NewTaskModal from './ModalTypes/NewTaskModal'
 
 const Modal = () => {
   const { modalType, displayModal, hideModal /*showModal*/ } = useContext(
@@ -33,6 +34,8 @@ const Modal = () => {
         return <PageNotFoundModal />
       case ModalType.NewProjectModal:
         return <NewProjectModal />
+      case ModalType.NewTaskModal:
+        return <NewTaskModal />
     }
   }
 

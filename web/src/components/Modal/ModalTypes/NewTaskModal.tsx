@@ -1,45 +1,64 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
-  ReposResponse,
+  IssueResponse,
   SelectType,
   SkillListResponse,
 } from '../../../constants/common'
-import {
-  CREATE_PROJECT,
-  GET_SKILLS,
-  GET_USER_REPOS,
-} from '../../../constants/endpoints'
-import styles from '../Modal.module.css'
-
-import octocat from '../../../assets/octocat.png'
-
-import Select from 'react-select'
-import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner'
+import octocat from '../../../assets/octocat.png'
+import { ModalContextStateContext } from '../../../context/modalContext/modalContext'
 
-const NewProjectModal = () => {
-  const { hideModal } = useContext(ModalContextStateContext)
+import styles from '../Modal.module.css'
+import Select from 'react-select'
+import {
+  CREATE_TASK,
+  GET_PROJECT_ISSUES,
+  GET_SKILLS,
+} from '../../../constants/endpoints'
+import FivePointSelector from '../../FivePointSelector/FivePointSelector'
 
-  const intialRepos: ReposResponse = {
-    repos: [],
+const NewTaskModal = () => {
+  const { hideModal, projectId } = useContext(ModalContextStateContext)
+  const intialIssues: IssueResponse = {
+    issues: [],
   }
+
   const initialArray: string[] = []
 
   const [step, setCurrentStep] = useState(0)
 
-  const [repos, setRepos] = useState(intialRepos) //List of repos from user-repos
-  const [selectedRepo, setSelectedRepo] = useState('') //The selected repo
+  const [issues, setIssues] = useState(intialIssues) //List of repos from user-repos
+  const [selectedTask, setSelectedTask] = useState('') //The selected repo
   const [description, setDescription] = useState('') //The description of the project
   const [error, setError] = useState(false) //For when an API failed
+  const [difficulty, setDifficulty] = useState<number>(0)
+  const [priority, setPriority] = useState<number>(0)
 
   const [skillList, setSkillList] = useState() //The total list of skills
   const [addedSkills, setAddedSkills] = useState(initialArray) //Skills that the user selected
   const [isLoading, setIsLoading] = useState(false) //For when api is loading
+  const projectName = window.location.href.split('project/')[1]
+
+  //Formats the Repos into usable data
+  const getIssuesSelect = () => {
+    let values: SelectType[] = []
+    issues.issues.forEach((element) => {
+      values.push({ value: element.title, label: element.title })
+    })
+    return values
+  }
+
+  //Handle Selecting a repo when using react select repos
+  const handleRepoChange = (value: string | undefined) => {
+    if (value) {
+      setSelectedTask(value)
+    }
+  }
 
   //This is for when adding a skill to the array when clicked
   const handleAddClick = useCallback(
-    (id: string, skillType: string) => {
-      const el = document.getElementById(id)
+    (id: number, skillType: string) => {
+      const el = document.getElementById(id + '')
       if (el?.classList.contains(styles.active)) {
         el?.classList.remove(styles.active)
         addedSkills.splice(addedSkills.indexOf(skillType), 1)
@@ -55,8 +74,10 @@ const NewProjectModal = () => {
   //Fetch a users public repos
   useEffect(() => {
     setIsLoading(true)
-    fetch(process.env.REACT_APP_API_URI + GET_USER_REPOS, {
-      method: 'GET',
+    console.log(projectName)
+    fetch(process.env.REACT_APP_API_URI + GET_PROJECT_ISSUES, {
+      method: 'POST',
+      body: JSON.stringify({ repo_name: projectName }),
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -70,14 +91,15 @@ const NewProjectModal = () => {
           return response.json()
         }
       })
-      .then((data: ReposResponse) => {
-        setRepos(data)
+      .then((data: IssueResponse) => {
+        console.log(data)
+        setIssues(data)
         setIsLoading(false)
       })
       .catch((err) => {
         setError(true)
       })
-  }, [])
+  }, [projectName])
 
   //UseEffect to query each piece of data for each step in the form
   useEffect(() => {
@@ -98,7 +120,7 @@ const NewProjectModal = () => {
               <button
                 id={index + ''}
                 className={[styles.modalText, styles.skillButton].join(' ')}
-                onClick={() => handleAddClick(index + '', element)}
+                onClick={() => handleAddClick(index, element)}
                 key={index}
               >
                 {element}
@@ -110,30 +132,32 @@ const NewProjectModal = () => {
     }
   }, [handleAddClick, step])
 
-  //Handle Selecting a repo when using react select repos
-  const handleRepoChange = (value: string | undefined) => {
-    if (value) {
-      setSelectedRepo(value)
-    }
-  }
-
   //Function to create a new project
-  const createProject = () => {
+  const createTask = () => {
     const requestData = {
-      repo_name: selectedRepo,
+      project_id: projectId,
+      project_name: projectName,
+      task_title: selectedTask,
+      task_description: description,
+      diffictly: difficulty,
+      priority: priority,
       skills: addedSkills,
-      description: description,
     }
 
-    fetch(process.env.REACT_APP_API_URI + CREATE_PROJECT, {
-      method: 'POST',
-      body: JSON.stringify(requestData),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
-      },
-    })
+  
+
+    fetch(
+      process.env.REACT_APP_API_URI + 'project/' + projectName + CREATE_TASK,
+      {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + localStorage.getItem('gitcollab_jwt'),
+        },
+      }
+    )
       .then((response) => {
         if (response.status >= 400) {
           throw new Error()
@@ -144,15 +168,6 @@ const NewProjectModal = () => {
       .catch((err) => {
         setError(true)
       })
-  }
-
-  //Formats the Repos into usable data
-  const getReposSelect = () => {
-    let values: SelectType[] = []
-    repos.repos.forEach((element) => {
-      values.push({ value: element, label: element })
-    })
-    return values
   }
 
   //Renders the correct html for which step the user is on
@@ -195,14 +210,14 @@ const NewProjectModal = () => {
                   alt="Github Cat"
                 />
                 <p className={styles.modalTextContent}>
-                  {repos.repos.length > 0
+                  {issues.issues.length > 0
                     ? 'Please select the project you would like to register from Github'
                     : 'To create a GitCollab Project, please create a GitHub project first'}
                 </p>
-                {repos.repos.length !== 0 ? (
+                {issues.issues.length !== 0 ? (
                   <div className={styles.selectBox}>
                     <Select
-                      options={getReposSelect()}
+                      options={getIssuesSelect()}
                       onChange={(e: any) => handleRepoChange(e?.value)}
                     />
                   </div>
@@ -211,16 +226,16 @@ const NewProjectModal = () => {
                 )}
                 <div className={styles.spaceBox}></div>
                 <button
-                  disabled={selectedRepo === '' ? true : false}
+                  disabled={selectedTask === '' ? true : false}
                   className={[
                     styles.modalButton,
                     styles.skillContinueButton,
                   ].join(' ')}
                   onClick={() => {
-                    repos.repos.length > 0 ? setCurrentStep(1) : hideModal()
+                    issues.issues.length > 0 ? setCurrentStep(1) : hideModal()
                   }}
                 >
-                  {repos.repos.length > 0 ? 'Continue' : 'Close'}
+                  {issues.issues.length > 0 ? 'Continue' : 'Close'}
                 </button>
               </div>
             )}
@@ -231,11 +246,11 @@ const NewProjectModal = () => {
           <>
             <div className={styles.modalText}>
               <p className={styles.modalTextTitle}>
-                Tell us more about your project
+                Tell us more about your task
               </p>
               <div className={styles.modalTextUnderline} />
               <p className={styles.modalTextContent}>
-                Select a few topics that you want in your project
+                Select a few topics that you want in your task
               </p>
               <div className={styles.skillButtonContainer}>
                 <>{skillList}</>
@@ -257,11 +272,11 @@ const NewProjectModal = () => {
           <>
             <div className={styles.modalText}>
               <p className={styles.modalTextTitle}>
-                Tell us more about your project
+                Tell us more about your task
               </p>
               <div className={styles.modalTextUnderline} />
               <p className={styles.modalTextContent}>
-                Please provide a description of your project
+                Please provide a description of your task
               </p>
 
               <textarea
@@ -275,9 +290,38 @@ const NewProjectModal = () => {
                   styles.modalButton,
                   styles.skillContinueButton,
                 ].join(' ')}
-                onClick={() => createProject()}
+                onClick={() => setCurrentStep(3)}
               >
-                Create Project
+                Continue
+              </button>
+            </div>
+          </>
+        )
+        case 3: // Adding a priorities + difficulty to the task
+        return (
+          <>
+            <div className={styles.modalText}>
+              <p className={styles.modalTextTitle}>
+                Tell us more about your task
+              </p>
+              <div className={styles.modalTextUnderline} />
+              <p className={styles.modalTextContent}>
+                Please provide a level from 1 - 5 on how quickly and how hard the task will be.
+              </p>
+              <div className={styles.pointSelectors}>
+                <FivePointSelector title="Priority" onChange={setPriority}/>
+                <FivePointSelector title="Difficulty" onChange={setDifficulty}/>
+              </div>
+              <div className={styles.spaceBox}></div>
+              <button
+                disabled={priority === 0 || difficulty === 0 ? true : false}
+                className={[
+                  styles.modalButton,
+                  styles.skillContinueButton,
+                ].join(' ')}
+                onClick={() => createTask()}
+              >
+                Create Task
               </button>
             </div>
           </>
@@ -290,4 +334,4 @@ const NewProjectModal = () => {
   return getCurrentStepsHtml(step)
 }
 
-export default NewProjectModal
+export default NewTaskModal

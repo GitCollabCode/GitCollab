@@ -89,7 +89,7 @@ func ProjectRouter(p *handlers.Projects, profiles *profileData.ProfileData, jwtC
 			//
 			//     Responses:
 			//       200: repoIssueResp
-			r.Get("/repo-issues", p.GetRepoIssues)
+			r.Post("/repo-issues", p.GetRepoIssues)
 		})
 
 		// swagger:route POST /projects/create-project Projects repoInfoReq

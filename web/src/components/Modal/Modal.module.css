@@ -168,3 +168,11 @@
   font-size: 20px;
   line-height: 25px;
 }
+
+.pointSelectors{
+  height:300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
