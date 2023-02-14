@@ -57,6 +57,8 @@ export type modalContextState = {
   displayModal: boolean
   showModal: () => void
   hideModal: () => void
+  projectId : number
+  setProjectId: (val:number) => void
 }
 
 export type SkillListResponse = {

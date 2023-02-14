@@ -18,7 +18,7 @@ import {
 import FivePointSelector from '../../FivePointSelector/FivePointSelector'
 
 const NewTaskModal = () => {
-  const { hideModal } = useContext(ModalContextStateContext)
+  const { hideModal, projectId } = useContext(ModalContextStateContext)
   const intialIssues: IssueResponse = {
     issues: [],
   }
@@ -135,7 +135,7 @@ const NewTaskModal = () => {
   //Function to create a new project
   const createTask = () => {
     const requestData = {
-      project_id: 1,
+      project_id: projectId,
       project_name: projectName,
       task_title: selectedTask,
       task_description: description,

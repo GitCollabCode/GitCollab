@@ -33,7 +33,7 @@ const initialproject:ProjectResp ={
 }
 
 const Project = () => {
-  const { showModal, setModalType } = useContext(ModalContextStateContext)
+  const { showModal, setModalType, setProjectId } = useContext(ModalContextStateContext)
   const projectName = window.location.href.split('project/')[1]
   const [project, setProject] = useState<ProjectResp>(initialproject)
   const [tasks, setTasks] = useState<TaskResponse>()
@@ -174,6 +174,7 @@ useEffect(() => {
                   type="new"
                   text="New Task"
                   onClick={() => {
+                    setProjectId(project.project_id)
                     setModalType(ModalType.NewTaskModal)
                     showModal()
                   }}
