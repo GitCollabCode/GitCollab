@@ -17,7 +17,6 @@
     "react-dom": "^18.2.0",
     "react-media": "^1.10.0",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.1",
     "react-spinners": "^0.13.6",
     "typescript": "^4.8.3",
     "web-vitals": "^2.1.4"
@@ -59,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "react-scripts": "5.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "eslint": "^8.30.0",
     "jest-watch-typeahead": "^0.6.5",
