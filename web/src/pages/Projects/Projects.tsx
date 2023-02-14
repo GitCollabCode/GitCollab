@@ -41,8 +41,8 @@ const Project = () => {
   const getPills = (data: string[]) => {
     //eslint-disable-next-line
     let pills: JSX.Element[] = []
-    data.forEach((element) => {
-      pills.push(<div className={style.pill}>{element}</div>)
+    data.forEach((element, index) => {
+      pills.push(<div className={style.pill} key={index}>{element}</div>)
     })
 
     return pills
@@ -51,8 +51,8 @@ const Project = () => {
   const getContributers = (contributer: ContributerType[]) => {
     //eslint-disable-next-line
     let contributerCards: JSX.Element[] = []
-    contributer.forEach((element) => {
-      contributerCards.push(<ContributerCard contributer={element} />)
+    contributer.forEach((element, index) => {
+      contributerCards.push(<ContributerCard contributer={element} key={index}/>)
     })
 
     return contributerCards
@@ -61,8 +61,13 @@ const Project = () => {
   const getIssuesList = (tasks: TaskResponse) => {
     //eslint-disable-next-line
     let taskCards: JSX.Element[] = []
-    tasks[0].forEach((element) => {
-      taskCards.push(<TaskCard task={element} />)
+    tasks.forEach((element, index) => {
+      taskCards.push(
+      <tr key={index}>
+        <td>
+          <TaskCard task={element} />
+      </td>
+      </tr>)
     })
 
     return taskCards
@@ -176,7 +181,9 @@ useEffect(() => {
               </div>
               <div className={style.line} />
             </div>
-            <Table>{tasks && getIssuesList(tasks)}</Table>
+            <div className={style.overflow}>
+              <Table>{tasks && getIssuesList(tasks)}</Table>
+            </div>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   GET_PROJECT_ISSUES,
   GET_SKILLS,
 } from '../../../constants/endpoints'
+import FivePointSelector from '../../FivePointSelector/FivePointSelector'
 
 const NewTaskModal = () => {
   const { hideModal } = useContext(ModalContextStateContext)
@@ -30,6 +31,8 @@ const NewTaskModal = () => {
   const [selectedTask, setSelectedTask] = useState('') //The selected repo
   const [description, setDescription] = useState('') //The description of the project
   const [error, setError] = useState(false) //For when an API failed
+  const [difficulty, setDifficulty] = useState<number>(0)
+  const [priority, setPriority] = useState<number>(0)
 
   const [skillList, setSkillList] = useState() //The total list of skills
   const [addedSkills, setAddedSkills] = useState(initialArray) //Skills that the user selected
@@ -136,8 +139,8 @@ const NewTaskModal = () => {
       project_name: projectName,
       task_title: selectedTask,
       task_description: description,
-      difficulty: 1,
-      priority: 1,
+      diffictly: difficulty,
+      priority: priority,
       skills: addedSkills,
     }
 
@@ -243,11 +246,11 @@ const NewTaskModal = () => {
           <>
             <div className={styles.modalText}>
               <p className={styles.modalTextTitle}>
-                Tell us more about your project
+                Tell us more about your task
               </p>
               <div className={styles.modalTextUnderline} />
               <p className={styles.modalTextContent}>
-                Select a few topics that you want in your project
+                Select a few topics that you want in your task
               </p>
               <div className={styles.skillButtonContainer}>
                 <>{skillList}</>
@@ -269,11 +272,11 @@ const NewTaskModal = () => {
           <>
             <div className={styles.modalText}>
               <p className={styles.modalTextTitle}>
-                Tell us more about your project
+                Tell us more about your task
               </p>
               <div className={styles.modalTextUnderline} />
               <p className={styles.modalTextContent}>
-                Please provide a description of your project
+                Please provide a description of your task
               </p>
 
               <textarea
@@ -287,9 +290,38 @@ const NewTaskModal = () => {
                   styles.modalButton,
                   styles.skillContinueButton,
                 ].join(' ')}
+                onClick={() => setCurrentStep(3)}
+              >
+                Continue
+              </button>
+            </div>
+          </>
+        )
+        case 3: // Adding a priorities + difficulty to the task
+        return (
+          <>
+            <div className={styles.modalText}>
+              <p className={styles.modalTextTitle}>
+                Tell us more about your task
+              </p>
+              <div className={styles.modalTextUnderline} />
+              <p className={styles.modalTextContent}>
+                Please provide a level from 1 - 5 on how quickly and how hard the task will be.
+              </p>
+              <div className={styles.pointSelectors}>
+                <FivePointSelector title="Priority" onChange={setPriority}/>
+                <FivePointSelector title="Difficulty" onChange={setDifficulty}/>
+              </div>
+              <div className={styles.spaceBox}></div>
+              <button
+                disabled={priority === 0 || difficulty === 0 ? true : false}
+                className={[
+                  styles.modalButton,
+                  styles.skillContinueButton,
+                ].join(' ')}
                 onClick={() => createTask()}
               >
-                Create Project
+                Create Task
               </button>
             </div>
           </>

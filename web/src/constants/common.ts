@@ -8,14 +8,15 @@ export enum ModalType {
   NewTaskModal,
 }
 
+
 export enum TaskProgress {
-  UnAssigned,
-  Assigned,
-  InProgress,
-  InReview,
-  NeedsChanges,
-  ReadyToMerge,
-  Done,
+  TaskStatusUnassigned = "UNASSIGNED",
+  TaskStatusAssigned = "ASSIGNED",
+  TaskStatusChangesRequested = "CHANGES_REQUESTED",
+  TaskStatusDismissed = "DISMISSED",
+  TaskStatusApproved = "APPROVED",
+  TaskStatusReadyToMerge = "READY_TO_MERGE",
+  TaskStatusCompleted = "COMPLETED",
 }
 
 export type userValue = {
@@ -119,7 +120,7 @@ export type TaskType = {
   "task_id":number,
 	"project_id":number,
 	"project_name":string,
-	"task_status":string,
+	"task_status":TaskProgress,
 	"completed_by_id":number,
 	"date_created_date":Date,
 	"completed_date":Date,
@@ -130,6 +131,5 @@ export type TaskType = {
 	"skills":string[]
 }
 
-export type TaskResponse = {
-  0:TaskType[]
-}
+export type TaskResponse = TaskType[] 
+

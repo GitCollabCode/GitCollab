@@ -20,12 +20,12 @@ type Task struct {
 	Skills          []string  `db:"skills"`
 }
 
-func (pd *ProjectData) AddTask(projectID int, projectName string, taskStatus string, createdDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []string) error {
+func (pd *ProjectData) AddTask(projectID int, projectName string, taskStatus string, createdDate time.Time, completedDate time.Time, taskTitle string, taskDescription string, diffictly int, priority int, skills []string) error {
 	sqlString :=
-		"INSERT INTO tasks(project_id, project_name, task_status, created_date, task_title, task_description, diffictly, priority, skills)" +
-			"VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+		"INSERT INTO tasks(project_id, project_name, task_status, created_date, completed_date, task_title, task_description, diffictly, priority, skills)" +
+			"VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 
-	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, projectID, projectName, taskStatus, createdDate, taskTitle, taskDescription, diffictly, priority, skills)
+	_, err := pd.PDriver.Pool.Exec(context.Background(), sqlString, projectID, projectName, taskStatus, createdDate, completedDate, taskTitle, taskDescription, diffictly, priority, skills)
 	if err != nil {
 		pd.PDriver.Log.Errorf("AddTask database INSERT failed: %s", err.Error())
 		return err
@@ -36,14 +36,14 @@ func (pd *ProjectData) AddTask(projectID int, projectName string, taskStatus str
 
 func (pd *ProjectData) GetTasks(projectName string) ([]Task, error) {
 	var tasks []Task
-	sqlStatement := "SELECT * FROM tasks WHERE project_name = $1"
-	err := pd.PDriver.QueryRow(sqlStatement, &tasks, projectName)
+	sqlStatement := "SELECT task_id, project_id, project_name, task_status, COALESCE(completed_by_id, 0) as completed_by_id, created_date, completed_date, task_title, task_description, diffictly, priority, skills FROM tasks WHERE project_name = $1"
+	err := pd.PDriver.QueryRows(sqlStatement, &tasks, projectName)
 	return tasks, err
 }
 
 func (pd *ProjectData) GetTask(projectName string, taskID int) (*Task, error) {
 	var t Task
-	sqlStatement := "SELECT * FROM tasks WHERE task_id = $1 AND project_name = $2"
+	sqlStatement := "SELECT task_id, project_id, project_name, task_status, COALESCE(completed_by_id, 0) as completed_by_id, created_date, completed_date, task_title, task_description, diffictly, priority, skills FROM tasks WHERE task_id = $1 AND project_name = $2"
 	err := pd.PDriver.QueryRow(sqlStatement, &t, taskID, projectName)
 	return &t, err
 }
