@@ -6,20 +6,22 @@ import LoginButton from '../LoginButton/LoginButton'
 import Media from 'react-media'
 import Sidebar from '../Sidebar/Sidebar'
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'
+import { useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
   return (
     <>
       <Media query={{ minWidth: 1023 }}>
         <div className={style.navbar}>
           {isLoading && <LoadingSpinner isLoading={isLoading} />}
           <nav>
-            <div className={style.logo}>GitCollab</div>
+            <div className={style.logo} onClick={() => navigate('/')}>
+              GitCollab
+            </div>
             <div className={style.centerNavItems}>
               <NavItem text="projects" link="/projects" />
-              <NavItem text="learn" link="/#" />
-              <NavItem text="about" link="/#" />
             </div>
             <div className={style.loginBox}>
               <LoginButton setIsLoading={setIsLoading} />

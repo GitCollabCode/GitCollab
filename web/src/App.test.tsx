@@ -27,5 +27,5 @@ test('renders', () => {
   })
 
   const links = document.getElementsByClassName('link')
-  expect(links.length).toBe(3)
+  expect(links.length).toBe(1)
 })

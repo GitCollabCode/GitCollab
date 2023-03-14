@@ -16,7 +16,7 @@
   width: 50%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   padding-left: 2rem;
   padding-right: 2rem;
 }
@@ -28,6 +28,7 @@
   font-size: 4.5rem;
   line-height: 5.375rem;
   width: 25%;
+  cursor: pointer;
 
   color: white;
   margin-top: 0.5rem;

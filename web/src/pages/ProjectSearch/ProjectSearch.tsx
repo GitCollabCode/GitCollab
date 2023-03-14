@@ -6,18 +6,22 @@ import styles from './ProjectSearch.module.css'
 
 import Button from '../../components/Button/Button'
 import { ModalContextStateContext } from '../../context/modalContext/modalContext'
-import { ModalType, ProjectCardType, SearchProjectResponse } from '../../constants/common'
+import {
+  ModalType,
+  ProjectCardType,
+  SearchProjectResponse,
+} from '../../constants/common'
 import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
 import { SEARCH_PROJECT } from '../../constants/endpoints'
-
-
 
 const ProjectSearch = () => {
   const { showModal, setModalType } = useContext(ModalContextStateContext)
   const { isLoggedIn } = useContext(UserLoginContext)
   //eslint-disable-next-line
-  const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(undefined)
+  const [projectCards, setProjectCard] = useState<JSX.Element[] | undefined>(
+    undefined
+  )
   const [topicsFilter, setTopicsFilter] = useState([''])
   const [skillsFilter, setSkillsFilter] = useState([''])
   const [languagesFilter, setLanguagesFilter] = useState([''])
@@ -54,17 +58,19 @@ const ProjectSearch = () => {
     fetch(process.env.REACT_APP_API_URI + SEARCH_PROJECT, {
       method: 'GET',
     })
-      .then((response) => {console.log(response)
-        return response.json()})
+      .then((response) => {
+        console.log(response)
+        return response.json()
+      })
       .then((data: SearchProjectResponse) => {
         setProjectsCards(data.projects)
         console.log(data)
       })
   }, [])
 
-  const setProjectsCards = (projects:ProjectCardType[]) => {
-    if(projects === undefined){
-      return 
+  const setProjectsCards = (projects: ProjectCardType[]) => {
+    if (projects === undefined) {
+      return
     }
     //eslint-disable-next-line
     let cards: JSX.Element[] = []
@@ -81,10 +87,14 @@ const ProjectSearch = () => {
     setProjectCard(cards)
   }
 
-
-  const skills = ['skill1', 'skill2', 'skills3', 'skills4', 'skill5', 'skills6']
-  const languages = ['lang1', 'lang2']
-  const topics = ['topic1', 'topic2']
+  const skills = ['Testing', 'UI/UX', 'Frontend', 'Backend']
+  const languages = ['Python', 'Java', 'SQL', 'C/C++', 'JavaScript', 'Kotlin']
+  const topics = [
+    'Data Structures and Algorithms',
+    'Web Development',
+    'Object-Oriented Programming',
+    'Machine Learning',
+  ]
 
   return (
     <div className={styles.projects}>
@@ -126,7 +136,7 @@ const ProjectSearch = () => {
             <div className={styles.line} />
           </div>
           <div className={styles.overflow}>
-          <Table>{projectCards}</Table>
+            <Table>{projectCards}</Table>
           </div>
         </div>
       </div>
