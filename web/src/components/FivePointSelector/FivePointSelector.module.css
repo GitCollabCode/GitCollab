@@ -1,0 +1,40 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    width: 300px;
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-family: 'Roboto Flex';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 40px;
+
+}
+
+.options {
+    font-family: 'Roboto Flex';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 50px;
+    line-height: 50px;
+    display: flex;
+    flex-direction: row;
+}
+
+.option {
+    color: white;
+    height: auto;
+    width: 60px;
+    border-left: 1px solid #bbb;
+    background: #9a196a;
+}
+
+.selected {
+    height: auto;
+    width: 60px;
+    background-color: #2da572;
+}

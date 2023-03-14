@@ -14,6 +14,11 @@ const initialState: modalContextState = {
   hideModal: () => {
     /** */
   },
+  projectId: 0,
+  setProjectId: (val:number) => {
+     /** */
+  }
+
 }
 
 export const ModalContextStateContext =
@@ -25,6 +30,7 @@ export const ModalContextStateProvider = ({
   children: ReactNode
 }) => {
   const [displayModal, setdisplayModal] = useState(false)
+  const [projectId, setProjectId] = useState(0)
   const [modalType, setModalType] = useState<ModalType>(
     ModalType.LoggedOutModal
   )
@@ -45,6 +51,8 @@ export const ModalContextStateProvider = ({
         displayModal,
         showModal,
         hideModal,
+        projectId, 
+        setProjectId
       }}
     >
       {children}

@@ -5,16 +5,18 @@ export enum ModalType {
   LanguagesSelectModal,
   PageNotFoundModal,
   NewProjectModal,
+  NewTaskModal,
 }
 
+
 export enum TaskProgress {
-  UnAssigned,
-  Assigned,
-  InProgress,
-  InReview,
-  NeedsChanges,
-  ReadyToMerge,
-  Done,
+  TaskStatusUnassigned = "UNASSIGNED",
+  TaskStatusAssigned = "ASSIGNED",
+  TaskStatusChangesRequested = "CHANGES_REQUESTED",
+  TaskStatusDismissed = "DISMISSED",
+  TaskStatusApproved = "APPROVED",
+  TaskStatusReadyToMerge = "READY_TO_MERGE",
+  TaskStatusCompleted = "COMPLETED",
 }
 
 export type userValue = {
@@ -55,6 +57,8 @@ export type modalContextState = {
   displayModal: boolean
   showModal: () => void
   hideModal: () => void
+  projectId : number
+  setProjectId: (val:number) => void
 }
 
 export type SkillListResponse = {
@@ -67,6 +71,16 @@ export type LanguageListResponse = {
 
 export type ReposResponse = {
   repos: string[]
+}
+
+export type IssueResponse = {
+  issues: IssueType[]
+}
+
+export type IssueType = {
+  state:string,
+  title:string,
+  url:string
 }
 
 export type SelectType = {
@@ -83,7 +97,7 @@ export type ProjectCardType = {
   project_name: string
   project_description: string
   project_owner: string
-  project_skills:string[]
+  project_skills: string[]
 }
 
 export type TaskCardType = {
@@ -96,9 +110,28 @@ export type TaskCardType = {
 }
 
 export type SearchProjectResponse = {
-  projects:ProjectCardType[]
+  projects: ProjectCardType[]
 }
 
 export type ProfileProjectResponse = {
-  projects:ProjectCardType[]
+  projects: ProjectCardType[]
 }
+
+
+export type TaskType = {
+  "task_id":number,
+	"project_id":number,
+	"project_name":string,
+	"task_status":TaskProgress,
+	"completed_by_id":number,
+	"date_created_date":Date,
+	"completed_date":Date,
+	"task_title":string,
+	"task_description":String,
+	"diffictly":number,
+	"priority":number,
+	"skills":string[]
+}
+
+export type TaskResponse = TaskType[] 
+

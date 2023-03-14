@@ -60,14 +60,16 @@ function fetch_valid_containers() {
     while [[ $# -gt 0 ]]; do
         param="$1"
         shift
-        if grep "container_name:" "$(pwd)/docker-compose.yaml" | grep -q "$param"; then
-            if [ -z "$selected_container" ]; then
-                selected_container="$param"
-            else
-                selected_container="$selected_container $param"
+        if [ "$param" != "-v" ] && [ "$param" != "-h" ]; then
+            if grep "container_name:" "$(pwd)/docker-compose.yaml" | grep -q "$param"; then
+                if [ -z "$selected_container" ]; then
+                    selected_container="$param"
+                else
+                    selected_container="$selected_container $param"
+                fi
             fi
         fi
-        done
+    done
 }
 
 function build() {
