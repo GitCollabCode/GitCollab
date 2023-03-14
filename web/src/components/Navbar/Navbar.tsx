@@ -15,7 +15,9 @@ const Navbar = () => {
         <div className={style.navbar}>
           {isLoading && <LoadingSpinner isLoading={isLoading} />}
           <nav>
-            <div className={style.logo}>GitCollab</div>
+            <div className={style.logo} data-testid={'logo'}>
+              GitCollab
+            </div>
             <div className={style.centerNavItems}>
               <NavItem text="projects" link="/projects" />
               <NavItem text="learn" link="/#" />

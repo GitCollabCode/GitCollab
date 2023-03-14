@@ -35,7 +35,6 @@ const Modal = () => {
         return <NewProjectModal />
     }
   }
-  console.log(displayModal, modalType)
   return displayModal ? (
     ReactDOM.createPortal(
       <>

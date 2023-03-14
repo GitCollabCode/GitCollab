@@ -41,7 +41,7 @@ describe('Modal', () => {
     )
   })
 
-  it.skip('Test LanguageSelectModal render', () => {
+  it('Test LanguageSelectModal render', () => {
     render(
       <ModalContextStateContext.Provider
         value={{
@@ -58,7 +58,7 @@ describe('Modal', () => {
     )
   })
 
-  it.skip('Test NewProjectModal render', () => {
+  it('Test NewProjectModal render', () => {
     render(
       <ModalContextStateContext.Provider
         value={{
@@ -92,7 +92,7 @@ describe('Modal', () => {
       expect(screen.getByText('Take me back home')).toBeInTheDocument()
     )
   })
-  it.skip('Test SkillsSelectModal render', () => {
+  it('Test SkillsSelectModal render', () => {
     render(
       <ModalContextStateContext.Provider
         value={{
