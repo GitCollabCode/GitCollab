@@ -19,11 +19,11 @@ const LandingPage = () => {
         <div className={style.textContainer}>
           <div className={style.topText}>Coding is</div>
           <div className={style.animatedText}>
-            <div className={style.line}>wagwan</div>
-            <div className={style.line}>cringe</div>
+            <div className={style.line}>cooperative</div>
+            <div className={style.line}>innovative</div>
             <div className={style.line}>collaborative</div>
-            <div className={style.line}>in your walls</div>
-            <div className={style.line}>maged sus</div>
+            <div className={style.line}>interactive</div>
+            <div className={style.line}>productive</div>
           </div>
         </div>
       </div>

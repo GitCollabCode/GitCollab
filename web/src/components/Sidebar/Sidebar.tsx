@@ -12,17 +12,6 @@ const Sidebar = () => {
             projects
           </a>
         </div>
-
-        <div>
-          <a href="/" className={style.link}>
-            learn
-          </a>
-        </div>
-        <div>
-          <a href="/" className={style.link}>
-            about
-          </a>
-        </div>
       </div>
     </Menu>
   )
