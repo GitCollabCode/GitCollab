@@ -39,6 +39,7 @@ export function UserLoginProvider({ children }: { children: ReactNode }) {
       // Verify was actually done
       if (res.status === 200) {
         localStorage.removeItem('gitcollab_jwt')
+        localStorage.removeItem('user')
         dispatch({
           type: 'LOGOUT',
         })

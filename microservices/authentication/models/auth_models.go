@@ -27,7 +27,8 @@ type LoginResp struct {
 	// Example: {Bearer JWT-TOKEN}
 	Token string `json:"Token"`
 	// indicates if this is a new users logging in for the first time
-	NewUser bool `json:"NewUser"`
+	NewUser  bool   `json:"NewUser"`
+	UserName string `json:"UserName"`
 }
 
 // Redirect URL response

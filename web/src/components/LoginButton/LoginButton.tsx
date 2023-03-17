@@ -25,7 +25,7 @@ const LoginButton = ({
     // If Github API returns the code parameter
     if (hasCode) {
       setIsLoading(true)
-      
+
       const newUrl = url.split('?code=')
       window.history.pushState({}, '', newUrl[0])
       setData({ ...data, isLoading: true })
@@ -40,7 +40,7 @@ const LoginButton = ({
         body: JSON.stringify(requestData),
       })
         .then((response) => {
-          if(response.status >= 400){
+          if (response.status >= 400) {
             throw new Error()
           }
           return response.json()
@@ -53,6 +53,7 @@ const LoginButton = ({
           }
 
           logIn(data.Token)
+          localStorage.setItem('user', data.UserName.toLowerCase())
           setIsLoading(false)
         })
         .catch((error) => {

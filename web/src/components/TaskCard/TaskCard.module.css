@@ -95,6 +95,7 @@
     flex-wrap: wrap;
     width:100%;
     justify-content: center;
+    text-align: center;
     max-width: 11.8rem;
     background: #9a196a;
     border-radius: 20px;

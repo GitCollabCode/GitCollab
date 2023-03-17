@@ -33,6 +33,7 @@ export type userDispatch = {
 export type loginResponse = {
   Token: string
   NewUser: boolean
+  UserName: string
 }
 
 export type profileResponse = {
