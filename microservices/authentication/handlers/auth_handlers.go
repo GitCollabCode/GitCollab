@@ -128,7 +128,7 @@ func (a *Auth) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	isNewUser := userInfo == nil
-	err = jsonio.ToJSON(&authModels.LoginResp{Token: tokenString, NewUser: isNewUser}, w)
+	err = jsonio.ToJSON(&authModels.LoginResp{Token: tokenString, NewUser: isNewUser, UserName: *user.Login}, w)
 	if err != nil {
 		a.Log.Fatalf("failed to serve jwt to frontend: %s", err.Error())
 	}
