@@ -7,11 +7,6 @@ const ContributerCard = ({ contributer }: { contributer: ContributerType }) => {
     <div className={style.card}>
       <div className={style.content}>
         <p>{contributer.name}</p>
-        <img
-          className={style.profilePic}
-          src={contributer.url}
-          alt={'Profile'}
-        />
       </div>
     </div>
   )

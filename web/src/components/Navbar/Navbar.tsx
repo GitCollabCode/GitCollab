@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import NavItem from '../NavItem/NavItem'
 
 import style from '../Navbar/Navbar.module.css'
@@ -7,9 +7,11 @@ import Media from 'react-media'
 import Sidebar from '../Sidebar/Sidebar'
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner'
 import { useNavigate } from 'react-router-dom'
+import { UserLoginContext } from '../../context/userLoginContext/userLoginContext'
 
 const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const { isLoggedIn } = useContext(UserLoginContext)
   const navigate = useNavigate()
   return (
     <>
@@ -22,9 +24,17 @@ const Navbar = () => {
             </div>
             <div className={style.centerNavItems}>
               <NavItem text="projects" link="/projects" />
+              {isLoggedIn && (
+                <NavItem
+                  text="profile"
+                  link={`/profile/${localStorage.getItem('user')}`}
+                />
+              )}
             </div>
             <div className={style.loginBox}>
-              <LoginButton setIsLoading={setIsLoading} />
+              <>
+                <LoginButton setIsLoading={setIsLoading} />
+              </>
             </div>
           </nav>
         </div>

@@ -13,36 +13,42 @@ import { ModalContextStateContext } from '../../context/modalContext/modalContex
 import { GET_PROJECT, GET_TASKS } from '../../constants/endpoints'
 
 type ProjectResp = {
-  project_id:number,
-  project_owner_id:string,
-  project_owner_username:string,
-  project_name:string,
-  project_url:string,
-  project_skills:string[],
-  project_description:string,
+  project_id: number
+  project_owner_id: string
+  project_owner_username: string
+  project_name: string
+  project_url: string
+  project_skills: string[]
+  project_description: string
 }
 
-const initialproject:ProjectResp ={
-  project_id:0,
-  project_owner_id:"string",
-  project_owner_username:"string",
-  project_name:"string",
-  project_url:"string",
-  project_skills:[],
-  project_description:"string",
+const initialproject: ProjectResp = {
+  project_id: 0,
+  project_owner_id: 'string',
+  project_owner_username: 'string',
+  project_name: 'string',
+  project_url: 'string',
+  project_skills: [],
+  project_description: 'string',
 }
 
 const Project = () => {
-  const { showModal, setModalType, setProjectId } = useContext(ModalContextStateContext)
+  const { showModal, setModalType, setProjectId } = useContext(
+    ModalContextStateContext
+  )
   const projectName = window.location.href.split('project/')[1]
   const [project, setProject] = useState<ProjectResp>(initialproject)
   const [tasks, setTasks] = useState<TaskResponse>()
-  
+
   const getPills = (data: string[]) => {
     //eslint-disable-next-line
     let pills: JSX.Element[] = []
     data.forEach((element, index) => {
-      pills.push(<div className={style.pill} key={index}>{element}</div>)
+      pills.push(
+        <div className={style.pill} key={index}>
+          {element}
+        </div>
+      )
     })
 
     return pills
@@ -52,7 +58,9 @@ const Project = () => {
     //eslint-disable-next-line
     let contributerCards: JSX.Element[] = []
     contributer.forEach((element, index) => {
-      contributerCards.push(<ContributerCard contributer={element} key={index}/>)
+      contributerCards.push(
+        <ContributerCard contributer={element} key={index} />
+      )
     })
 
     return contributerCards
@@ -63,42 +71,47 @@ const Project = () => {
     let taskCards: JSX.Element[] = []
     tasks.forEach((element, index) => {
       taskCards.push(
-      <tr key={index}>
-        <td>
-          <TaskCard task={element} />
-      </td>
-      </tr>)
+        <tr key={index}>
+          <td>
+            <TaskCard
+              task={element}
+              owner={project.project_owner_username.toLowerCase()}
+            />
+          </td>
+        </tr>
+      )
     })
 
     return taskCards
   }
 
-
-useEffect(() => {
-  //setIsLoading(true)
-  console.log(projectName)
-  fetch(process.env.REACT_APP_API_URI + GET_PROJECT + projectName +"/", {
-    method: 'GET',
-  })
-    .then((response) => {
-      if (response.status >= 400) {
-        throw new Error('API failed')
-      } else {
-        return response.json()
-      }
-    })
-    .then((data: ProjectResp) => {
-      console.log(data)
-      setProject(data)
-      //setIsLoading(false)
-    })
-    .catch((err) => {
-     // setError(true)
-    })
-
-    fetch(process.env.REACT_APP_API_URI + GET_PROJECT + projectName + GET_TASKS, {
+  useEffect(() => {
+    //setIsLoading(true)
+    fetch(process.env.REACT_APP_API_URI + GET_PROJECT + projectName + '/', {
       method: 'GET',
     })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error('API failed')
+        } else {
+          return response.json()
+        }
+      })
+      .then((data: ProjectResp) => {
+        console.log(data)
+        setProject(data)
+        //setIsLoading(false)
+      })
+      .catch((err) => {
+        // setError(true)
+      })
+
+    fetch(
+      process.env.REACT_APP_API_URI + GET_PROJECT + projectName + GET_TASKS,
+      {
+        method: 'GET',
+      }
+    )
       .then((response) => {
         if (response.status >= 400) {
           throw new Error('API failed')
@@ -112,30 +125,16 @@ useEffect(() => {
         //setIsLoading(false)
       })
       .catch((err) => {
-       // setError(true)
+        // setError(true)
       })
-}, [projectName])
-
+  }, [projectName])
 
   const contributers: ContributerType[] = [
     {
-      name: 'kevin',
-      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
-    },
-    {
-      name: 'ehvan',
-      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
-    },
-    {
-      name: 'kevin',
-      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
-    },
-    {
-      name: 'ehvan',
-      url: 'https://avatars.githubusercontent.com/u/39808977?s=40&v=4',
+      name: project.project_owner_username,
+      url: '',
     },
   ]
-  
 
   return (
     <div className={style.page}>
@@ -144,9 +143,7 @@ useEffect(() => {
           <p>
             <u>Description</u>
           </p>
-          <p className={style.description}>
-            {project.project_description}
-          </p>
+          <p className={style.description}>{project.project_description}</p>
         </div>
         <div className={[style.card, style.languagesCard].join(' ')}>
           <p>Project Langs</p>
@@ -170,15 +167,18 @@ useEffect(() => {
             <div className={style.tasksTitle}>
               <div className={style.titleBox}>
                 <p className={style.title}>Tasks</p>
-                <Button
-                  type="new"
-                  text="New Task"
-                  onClick={() => {
-                    setProjectId(project.project_id)
-                    setModalType(ModalType.NewTaskModal)
-                    showModal()
-                  }}
-                />
+                {localStorage.getItem('user') ===
+                  project.project_owner_username.toLowerCase() && (
+                  <Button
+                    type="new"
+                    text="New Task"
+                    onClick={() => {
+                      setProjectId(project.project_id)
+                      setModalType(ModalType.NewTaskModal)
+                      showModal()
+                    }}
+                  />
+                )}
               </div>
               <div className={style.line} />
             </div>
